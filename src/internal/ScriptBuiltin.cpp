@@ -4,6 +4,10 @@
 using namespace SerpentLua::internal;
 using namespace geode::prelude;
 
+void ScriptBuiltin::entry(lua_State* L) {
+    log::info("Erm... what the Sigma?");
+}
+
 Result<> ScriptBuiltin::initPlugin() {
     if (plugin) return Err("Builtin plugin was already initialized.");
     std::map<std::string, std::string> map = {
