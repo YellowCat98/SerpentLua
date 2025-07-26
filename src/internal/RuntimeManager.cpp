@@ -3,22 +3,19 @@
 using namespace SerpentLua::internal;
 using namespace geode::prelude;
 
-SerpentLua::internal::RuntimeManager* SerpentLua::internal::RuntimeManager::get() {
-    static SerpentLua::internal::RuntimeManager* instance;
-    if (!instance) instance = new SerpentLua::internal::RuntimeManager();
+RuntimeManager* RuntimeManager::get() {
+    static RuntimeManager* instance;
+    if (!instance) instance = new RuntimeManager();
     return instance;
 }
 
-#ifdef YELLOWCAT98_SERPENTLUA_EXPORTING
-void SerpentLua::internal::RuntimeManager::setLoadedScript(script* script) {
+void RuntimeManager::setLoadedScript(script* script) {
     loadedScripts.insert({script->getMetadata().id, script});
 }
 
-void SerpentLua::internal::RuntimeManager::setScript(const ScriptMetadata& script) {
+void RuntimeManager::setScript(const ScriptMetadata& script) {
     scripts.insert({script.id, script});
 }
-
-#endif
 
 Result<script*, std::string> SerpentLua::internal::RuntimeManager::getLoadedScriptByID(const std::string& id) {
     if (!loadedScripts.contains(id)) {

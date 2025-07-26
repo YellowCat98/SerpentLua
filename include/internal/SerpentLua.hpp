@@ -44,4 +44,11 @@ namespace SerpentLua::internal {
         std::map<std::string, ScriptMetadata> scripts;
         std::map<std::string, script*> loadedScripts;
     };
+
+    namespace ScriptBuiltin { // builtin plugin, can be included within a script by doing `--@plugins serpentlua_builtin`
+        void entry(lua_State* L);
+
+        inline SerpentLua::Plugin* plugin = nullptr;
+        geode::Result<> initPlugin();
+    };
 };
