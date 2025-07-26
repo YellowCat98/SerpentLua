@@ -1,0 +1,20 @@
+{
+	"geode": "4.6.3",
+	"gd": {
+		"win": "2.2074",
+		"android": "2.2074",
+		"mac": "2.2074",
+		"ios": "2.2074"
+	},
+	"id": "yellowcat98.serpentlua",
+	"name": "SerpentLua",
+	"version": "v1.0.0",
+	"developer": "YellowCat98",
+	"description": "Run Lua script and import bindings.",
+	"early-load": true,
+	"api": {
+		"include": [
+			"include/SerpentLua.hpp"
+		]
+	}
+}

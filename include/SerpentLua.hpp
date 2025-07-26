@@ -1,0 +1,58 @@
+#pragma once
+#include <string>
+#include <vector>
+#include <matjson.hpp>
+#include <Geode/Geode.hpp>
+#include <string>
+#include <vector>
+#include <filesystem>
+#include <fstream>
+#include <sstream>
+extern "C" {
+    #include <lua.h>
+    #include <lualib.h>
+    #include <lauxlib.h>
+}
+
+#ifdef GEODE_IS_WINDOWS
+    #ifdef YELLOWCAT98_SERPENTLUA_EXPORTING
+        #define SERPENTLUA_DLL __declspec(dllexport)
+    #else
+        #define SERPENTLUA_DLL __declspec(dllimport)
+    #endif
+#else
+    #define SERPENTLUA_DLL __attribute__((visibility("default")))
+#endif
+
+namespace SerpentLua {
+    SERPENTLUA_DLL lua_State* getLuaState();
+
+    struct SERPENTLUA_DLL PluginMetadata final {
+        static PluginMetadata create(std::map<std::string, std::string>& metadata);
+        std::string name;
+        std::string id;
+        std::string version;
+        std::string serpentVersion;
+    };
+    class SERPENTLUA_DLL Plugin final {
+    public:
+        static geode::Result<Plugin*, std::string> create(PluginMetadata metadata, std::function<void(lua_State*)> entry);
+        std::function<void(lua_State*)> getEntry();
+        #ifdef YELLOWCAT98_SERPENTLUA_EXPORTING
+        static geode::Result<Plugin*, std::string> createNative(const std::filesystem::path& path); // meant for plugins that are built using dlls explicitly.
+        #endif
+    private:
+        PluginMetadata metadata;
+        std::function<void(lua_State*)> entry;
+        bool native;
+        // meant for native plugins.
+        struct __metadata {
+            const char* name;
+            const char* id;
+            const char* version;
+            const char* serpentVersion;
+        };
+    };
+
+
+}
