@@ -63,5 +63,6 @@ build-*/
 .idea/
 /cmake-build-*/
 
-# ignore test folder
-.test/
+# ignore test folder libs and lua
+.test/lib
+.test/lua
