@@ -39,7 +39,7 @@ if(PROJECT_IS_TOP_LEVEL) # sol is purely used to serpentlua's internal plugin
 CPMAddPackage(
     NAME sol2
     GITHUB_REPOSITORY ThePhD/sol2
-    VERSION 3.3.0
+    VERSION 3.5.0 # wonder who taught it was a good idea to not make the actual latest version the latest version!
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${sol2_SOURCE_DIR}/include)
