@@ -35,7 +35,7 @@ CPMAddPackage(
     DOWNLOAD_ONLY TRUE
 )
 
-if(PROJECT_IS_TOP_LEVEL) # sol is purely used to serpentlua's internal plugin
+if(PROJECT_IS_TOP_LEVEL) # sol is purely used for serpentlua's internal plugin
 CPMAddPackage(
     NAME sol2
     GITHUB_REPOSITORY ThePhD/sol2
