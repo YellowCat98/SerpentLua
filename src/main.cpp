@@ -5,6 +5,7 @@
 #include <internal/SerpentLua.hpp>
 
 using namespace geode::prelude;
+using namespace SerpentLua::internal;
 
 Result<void, std::vector<std::pair<std::string, std::string>>> createDirs(const std::filesystem::path& where, const std::vector<std::string>& dirs) {
 	std::vector<std::pair<std::string, std::string>> errs;
@@ -57,25 +58,27 @@ class $modify(MenuLayerHook, MenuLayer) {
 		if (!MenuLayer::init()) return false;
 		return true;
 	}
-/*
+
 	void onMoreGames(CCObject*) {
-		auto test = SerpentLua::Plugin::createNative(Mod::get()->getConfigDir() / "plugins" / "yellowcat98_plugintest.dll");
-		auto script = SerpentLua::script::create(Mod::get()->getConfigDir() / "scripts" / "test.lua");
-		if (script.isErr()) {
-			log::error("{}", script.err());
+		ScriptBuiltin::initPlugin();
+		auto metadata = ScriptMetadata::createFromScript(Mod::get()->getConfigDir() / "scripts" / "yellowcat98_test.lua");
+		if (metadata.isErr()) {
+			log::error("{}", metadata.err());
 			return;
 		}
-		if (test.isErr()) {
-			log::error("{}", test.err().value());
+		auto res = script::create(metadata.unwrap());
+		if (res.isErr()) {
+			log::error("{}", res.err());
 			return;
 		}
-		auto scriptunwrap = script.unwrap();
-		test.unwrap()->getEntry()(scriptunwrap->getLuaState());
-		auto exec = scriptunwrap->execute();
-		if (exec.isErr()) {
-			log::error("{}", exec.err());
-			return;
+
+		auto script = res.unwrap();
+
+		ScriptBuiltin::plugin->getEntry()(script->getLuaState());
+
+		auto execres = script->execute();
+		if (execres.isErr()) {
+			log::error("{}", execres.err());
 		}
 	}
-*/
 };

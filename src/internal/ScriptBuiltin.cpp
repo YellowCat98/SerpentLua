@@ -5,7 +5,17 @@ using namespace SerpentLua::internal;
 using namespace geode::prelude;
 
 void ScriptBuiltin::entry(lua_State* L) {
-    log::info("Erm... what the Sigma?");
+    sol::state_view state(L);
+
+    auto t = state.new_usertype<ScriptMetadata>("ScriptMetadata", sol::no_constructor);
+
+    t["getByID"] = &ScriptMetadata::getScript;
+    t["name"] = &ScriptMetadata::name;
+    t["id"] = &ScriptMetadata::id;
+    t["version"] = &ScriptMetadata::version;
+    t["serpentVersion"] = &ScriptMetadata::serpentVersion;
+    t["nostd"] = &ScriptMetadata::nostd;
+    
 }
 
 Result<> ScriptBuiltin::initPlugin() {

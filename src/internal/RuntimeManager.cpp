@@ -13,8 +13,8 @@ void RuntimeManager::setLoadedScript(script* script) {
     loadedScripts.insert({script->getMetadata().id, script});
 }
 
-void RuntimeManager::setScript(const ScriptMetadata& script) {
-    scripts.insert({script.id, script});
+void RuntimeManager::setScript(ScriptMetadata* script) {
+    scripts.insert({script->id, script});
 }
 
 Result<script*, std::string> SerpentLua::internal::RuntimeManager::getLoadedScriptByID(const std::string& id) {
@@ -25,7 +25,7 @@ Result<script*, std::string> SerpentLua::internal::RuntimeManager::getLoadedScri
     return Ok(loadedScripts[id]);
 }
 
-Result<ScriptMetadata, std::string> SerpentLua::internal::RuntimeManager::getScriptByID(const std::string& id) {
+Result<ScriptMetadata*, std::string> SerpentLua::internal::RuntimeManager::getScriptByID(const std::string& id) {
     if (!scripts.contains(id)) return Err("Script Getter: Script {} does not exist.", id);
     return Ok(scripts[id]);
 }

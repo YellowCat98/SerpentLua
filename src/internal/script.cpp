@@ -4,7 +4,7 @@ using namespace SerpentLua::internal;
 using namespace geode::prelude;
 
 
-ScriptMetadata script::getMetadata() {
+ScriptMetadata* script::getMetadata() {
     return metadata;
 }
 
@@ -19,8 +19,9 @@ lua_State* script::createState(bool nostd) {
 }
 
 void script::terminate() {
-    log::info("Script {} termination: Initialized.", metadata.id);
-    if (SerpentLua::internal::RuntimeManager::get()->getScriptByID(metadata.id).isOk()) SerpentLua::internal::RuntimeManager::get()->getScriptByID(metadata.id).unwrap().status = "terminated";
+    log::info("Script {} termination: Initialized.", metadata->id);
+    auto theUnfortunate = SerpentLua::internal::RuntimeManager::get()->getScriptByID(metadata->id);
+    if (theUnfortunate.isOk()) theUnfortunate.unwrap()->status = "terminated";
     // this is quite sad
     // the next thing i will do is script termination
     delete this;
@@ -37,9 +38,10 @@ void script::terminate() {
 }
 
 geode::Result<> script::execute() {
-    if (luaL_dofile(this->state, this->metadata.path.string().c_str()) != LUA_OK) {
-        auto err = Err("Script `{}` execution: \n{}\nScript has failed initial execution, will terminate for the rest of the session.", metadata.path.filename(), std::string(lua_tostring(this->state, -1)));
+    if (luaL_dofile(this->state, this->metadata->path.string().c_str()) != LUA_OK) {
+        auto err = Err("Script `{}` execution: \n{}\nScript has failed initial execution, will terminate for the rest of the session.", metadata->path.filename(), std::string(lua_tostring(this->state, -1)));
         this->terminate();
+        return err;
     }
     return Ok();
 }
@@ -48,17 +50,17 @@ geode::Result<script*, std::string> script::getLoadedScript(const std::string& i
     return SerpentLua::internal::RuntimeManager::get()->getLoadedScriptByID(id);
 }
 
-geode::Result<script*, std::string> script::create(const ScriptMetadata& metadata) {
-    lua_State* state = script::createState(metadata.nostd);
+geode::Result<script*, std::string> script::create(ScriptMetadata* metadata) {
+    lua_State* state = script::createState(metadata->nostd);
     if (!state) {
-        return Err("Script `{}` creation: An error occured creating lua state.", metadata.path.filename());
+        return Err("Script `{}` creation: An error occured creating lua state.", metadata->path.filename());
     }
 
     auto ret = new script();
-    if (!ret) return Err("Script `{}` creation: Couldn't create.", metadata.path.filename());
+    if (!ret) return Err("Script `{}` creation: Couldn't create.", metadata->path.filename());
     ret->metadata = metadata;
     ret->state = state;
 
-    log::debug("Script `{}` creation: Created successfully!", metadata.path.filename());
+    log::debug("Script `{}` creation: Created successfully!", metadata->path.filename());
     return Ok(ret);
 }

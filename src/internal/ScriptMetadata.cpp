@@ -4,11 +4,11 @@
 using namespace SerpentLua::internal;
 using namespace geode::prelude;
 
-geode::Result<ScriptMetadata, std::string> ScriptMetadata::getScript(const std::string& id) {
+geode::Result<ScriptMetadata*, std::string> ScriptMetadata::getScript(const std::string& id) {
     return SerpentLua::internal::RuntimeManager::get()->getScriptByID(id);
 }
 
-geode::Result<ScriptMetadata, std::string> ScriptMetadata::createFromScript(const std::filesystem::path& scriptPath) {
+geode::Result<ScriptMetadata*, std::string> ScriptMetadata::createFromScript(const std::filesystem::path& scriptPath) {
     if (!std::filesystem::exists(scriptPath)) return Err("Script {} doesn't exist.", scriptPath.filename());
     log::info("Script `{}` creation: Initialized.", scriptPath.filename());
     std::ifstream file(scriptPath);
@@ -70,13 +70,13 @@ geode::Result<ScriptMetadata, std::string> ScriptMetadata::createFromScript(cons
     return Ok(ScriptMetadata::create(metadata));
 }
 
-ScriptMetadata ScriptMetadata::create(std::map<std::string, std::string>& metadata) {
-    auto ret = ScriptMetadata();
+ScriptMetadata* ScriptMetadata::create(std::map<std::string, std::string>& metadata) {
+    auto ret = new ScriptMetadata();
 
-    ret.name = metadata["name"];
-    ret.id = metadata["id"];
-    ret.version = metadata["version"];
-    ret.serpentVersion = metadata["serpent-version"];
-    ret.nostd = metadata.contains("nostd");
+    ret->name = metadata["name"];
+    ret->id = metadata["id"];
+    ret->version = metadata["version"];
+    ret->serpentVersion = metadata["serpent-version"];
+    ret->nostd = metadata.contains("nostd");
     return ret;
 }

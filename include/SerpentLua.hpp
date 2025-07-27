@@ -25,8 +25,6 @@ extern "C" {
 #endif
 
 namespace SerpentLua {
-    SERPENTLUA_DLL lua_State* getLuaState();
-
     struct SERPENTLUA_DLL PluginMetadata final {
         static PluginMetadata create(std::map<std::string, std::string>& metadata);
         std::string name;
