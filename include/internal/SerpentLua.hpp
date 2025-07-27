@@ -1,5 +1,6 @@
 // internal header, meant for serpentlua's plugin.
 #pragma once
+#define SOL_ALL_SAFETIES_ON 1
 #define SOL_USE_STD_OPTIONAL 1
 #include <SerpentLua.hpp>
 
