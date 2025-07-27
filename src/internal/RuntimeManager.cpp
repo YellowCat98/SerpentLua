@@ -29,3 +29,7 @@ Result<ScriptMetadata*, std::string> SerpentLua::internal::RuntimeManager::getSc
     if (!scripts.contains(id)) return Err("Script Getter: Script {} does not exist.", id);
     return Ok(scripts[id]);
 }
+
+std::map<std::string, script*> SerpentLua::internal::RuntimeManager::getAllLoadedScripts() {
+    return loadedScripts;
+}

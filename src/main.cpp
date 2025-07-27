@@ -61,14 +61,15 @@ class $modify(MenuLayerHook, MenuLayer) {
 
 	void onMoreGames(CCObject*) {
 		ScriptBuiltin::initPlugin();
-		auto metadata = ScriptMetadata::createFromScript(Mod::get()->getConfigDir() / "scripts" / "yellowcat98_test.lua");
-		if (metadata.isErr()) {
-			log::error("{}", metadata.err());
+		auto metadataRes = ScriptMetadata::createFromScript(Mod::get()->getConfigDir() / "scripts" / "yellowcat98_test.lua");
+		if (metadataRes.isErr()) {
+			log::error("Metadata err: {}", metadataRes.err().value());
 			return;
 		}
-		auto res = script::create(metadata.unwrap());
+		auto metadata = metadataRes.unwrap();
+		auto res = script::create(metadata);
 		if (res.isErr()) {
-			log::error("{}", res.err());
+			log::error("Create err: {}", res.err().value());
 			return;
 		}
 
@@ -76,9 +77,11 @@ class $modify(MenuLayerHook, MenuLayer) {
 
 		ScriptBuiltin::plugin->getEntry()(script->getLuaState());
 
+		RuntimeManager::get()->setScript(metadata);
+
 		auto execres = script->execute();
 		if (execres.isErr()) {
-			log::error("{}", execres.err());
+			log::error("exec Err: {}", execres.err().value());
 		}
 	}
 };

@@ -38,8 +38,8 @@ void script::terminate() {
 }
 
 geode::Result<> script::execute() {
-    if (luaL_dofile(this->state, this->metadata->path.string().c_str()) != LUA_OK) {
-        auto err = Err("Script `{}` execution: \n{}\nScript has failed initial execution, will terminate for the rest of the session.", metadata->path.filename(), std::string(lua_tostring(this->state, -1)));
+    if (luaL_dofile(this->state, this->metadata->path.c_str()) != LUA_OK) {
+        auto err = Err("Script `{}` execution: \n{}\nScript has failed initial execution, will terminate for the rest of the session.", metadata->id, std::string(lua_tostring(this->state, -1)));
         this->terminate();
         return err;
     }
@@ -53,14 +53,14 @@ geode::Result<script*, std::string> script::getLoadedScript(const std::string& i
 geode::Result<script*, std::string> script::create(ScriptMetadata* metadata) {
     lua_State* state = script::createState(metadata->nostd);
     if (!state) {
-        return Err("Script `{}` creation: An error occured creating lua state.", metadata->path.filename());
+        return Err("Script `{}` creation: An error occured creating lua state.", metadata->id);
     }
 
     auto ret = new script();
-    if (!ret) return Err("Script `{}` creation: Couldn't create.", metadata->path.filename());
+    if (!ret) return Err("Script `{}` creation: Couldn't create.", metadata->id);
     ret->metadata = metadata;
     ret->state = state;
 
-    log::debug("Script `{}` creation: Created successfully!", metadata->path.filename());
+    log::debug("Script `{}` creation: Created successfully!", metadata->id);
     return Ok(ret);
 }

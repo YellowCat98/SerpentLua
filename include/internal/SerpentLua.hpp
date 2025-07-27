@@ -14,7 +14,7 @@ namespace SerpentLua::internal {
         std::string version;
         std::string serpentVersion;
         bool nostd;
-        std::filesystem::path path;
+        std::string path;
         std::string status;
     };
     class script {
@@ -41,6 +41,8 @@ namespace SerpentLua::internal {
 
         void setLoadedScript(script* script);
         void setScript(ScriptMetadata* script);
+
+        std::map<std::string, script*> getAllLoadedScripts();
     private:
         // using std::map so i can retrieve a script directly through id
         std::map<std::string, ScriptMetadata*> scripts;

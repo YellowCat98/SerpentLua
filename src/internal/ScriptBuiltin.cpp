@@ -9,7 +9,26 @@ void ScriptBuiltin::entry(lua_State* L) {
 
     auto t = state.new_usertype<ScriptMetadata>("ScriptMetadata", sol::no_constructor);
 
-    t["getByID"] = &ScriptMetadata::getScript;
+    t["getByID"] = [](sol::this_state ts, const std::string& id) -> sol::object {
+        sol::state_view lua(ts); // ts so tuff!
+
+        auto result = ScriptMetadata::getScript(id);
+
+        if (result.isErr()) return sol::make_object(lua, result.err().value());
+
+        return sol::make_object(lua, result.unwrap());
+    };
+
+    t["get"] = [](sol::this_state ts) -> sol::object {
+        lua_State* L = ts;
+    
+        for (auto& pair : RuntimeManager::get()->getAllLoadedScripts()) {
+            if (pair.second->getLuaState() == ts) return sol::make_object(L, pair.second->getMetadata());
+        }
+
+        return sol::nil;
+    };
+
     t["name"] = &ScriptMetadata::name;
     t["id"] = &ScriptMetadata::id;
     t["version"] = &ScriptMetadata::version;

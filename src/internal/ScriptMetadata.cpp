@@ -64,6 +64,9 @@ geode::Result<ScriptMetadata*, std::string> ScriptMetadata::createFromScript(con
         auto it = std::find(requiredKeys.begin(), requiredKeys.end(), key);
         if (it == requiredKeys.end()) return Err("Script `{}` metadata: Unknown Metadata key: {}", scriptPath.filename(), key);
     }
+    
+    // HOW the fuck did i forget this holy fucking SHIT.
+    metadata.insert({"path", scriptPath.string()});
 
     log::debug("Script `{}` metadata: Metadata gathered.", scriptPath.filename());
 
@@ -78,5 +81,6 @@ ScriptMetadata* ScriptMetadata::create(std::map<std::string, std::string>& metad
     ret->version = metadata["version"];
     ret->serpentVersion = metadata["serpent-version"];
     ret->nostd = metadata.contains("nostd");
+    ret->path = metadata["path"];
     return ret;
 }
