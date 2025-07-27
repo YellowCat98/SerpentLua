@@ -10,7 +10,7 @@ RuntimeManager* RuntimeManager::get() {
 }
 
 void RuntimeManager::setLoadedScript(script* script) {
-    loadedScripts.insert({script->getMetadata().id, script});
+    loadedScripts.insert({script->getMetadata()->id, script});
 }
 
 void RuntimeManager::setScript(ScriptMetadata* script) {
