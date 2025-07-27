@@ -9,7 +9,7 @@ void ScriptBuiltin::entry(lua_State* L) {
 }
 
 Result<> ScriptBuiltin::initPlugin() {
-    if (plugin) return Err("Builtin plugin was already initialized.");
+    if (ScriptBuiltin::plugin) return Err("Builtin plugin was already initialized.");
     std::map<std::string, std::string> map = {
         {"name", "SerpentLua Builtin"},
         {"id", "serpentlua_builtin"},
@@ -21,7 +21,7 @@ Result<> ScriptBuiltin::initPlugin() {
     auto res = SerpentLua::Plugin::create(metadata, ScriptBuiltin::entry);
     if (res.isErr()) return Err("{}", res.err().value());
 
-    plugin = res.unwrap();
+    ScriptBuiltin::plugin = res.unwrap();
 
     return Ok();
 }
