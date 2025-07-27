@@ -7,9 +7,11 @@ using namespace geode::prelude;
 void ScriptBuiltin::entry(lua_State* L) {
     sol::state_view state(L);
 
-    auto t = state.new_usertype<ScriptMetadata>("ScriptMetadata", sol::no_constructor);
+    auto table = state.create_table();
 
-    t["getByID"] = [](sol::this_state ts, const std::string& id) -> sol::object {
+    auto _ScriptMetadata = state.new_usertype<ScriptMetadata>("ScriptMetadata", sol::no_constructor);
+
+    _ScriptMetadata["getByID"] = [](sol::this_state ts, const std::string& id) -> sol::object {
         sol::state_view lua(ts); // ts so tuff!
 
         auto result = ScriptMetadata::getScript(id);
@@ -19,7 +21,7 @@ void ScriptBuiltin::entry(lua_State* L) {
         return sol::make_object(lua, result.unwrap());
     };
 
-    t["get"] = [](sol::this_state ts) -> sol::object {
+    _ScriptMetadata["get"] = [](sol::this_state ts) -> sol::object {
         lua_State* L = ts;
     
         for (auto& pair : RuntimeManager::get()->getAllLoadedScripts()) {
@@ -29,12 +31,18 @@ void ScriptBuiltin::entry(lua_State* L) {
         return sol::nil;
     };
 
-    t["name"] = &ScriptMetadata::name;
-    t["id"] = &ScriptMetadata::id;
-    t["version"] = &ScriptMetadata::version;
-    t["serpentVersion"] = &ScriptMetadata::serpentVersion;
-    t["nostd"] = &ScriptMetadata::nostd;
-    
+    _ScriptMetadata["name"] = &ScriptMetadata::name;
+    _ScriptMetadata["id"] = &ScriptMetadata::id;
+    _ScriptMetadata["version"] = &ScriptMetadata::version;
+    _ScriptMetadata["serpentVersion"] = &ScriptMetadata::serpentVersion;
+    _ScriptMetadata["nostd"] = &ScriptMetadata::nostd;
+
+
+    table["ScriptMetadata"] = _ScriptMetadata;
+
+    state["package"]["preload"]["SerpentLua"] = [table]() {
+        return table;
+    };
 }
 
 Result<> ScriptBuiltin::initPlugin() {
