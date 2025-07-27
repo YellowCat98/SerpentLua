@@ -78,7 +78,7 @@ class $modify(MenuLayerHook, MenuLayer) {
 		ScriptBuiltin::plugin->getEntry()(script->getLuaState());
 
 		RuntimeManager::get()->setScript(metadata);
-
+		RuntimeManager::get()->setLoadedScript(script);
 		auto execres = script->execute();
 		if (execres.isErr()) {
 			log::error("exec Err: {}", execres.err().value());
