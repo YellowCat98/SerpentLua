@@ -50,7 +50,7 @@ geode::Result<Plugin*, std::string> Plugin::createNative(const std::filesystem::
 }
 #endif
 
-Result<Plugin*, std::string> Plugin::create(PluginMetadata metadata, std::function<void(lua_State*)> entry) {
+Result<Plugin*, std::string> Plugin::create(PluginMetadata* metadata, std::function<void(lua_State*)> entry) {
     auto ret = new Plugin();
     if (!ret) return Err("Plugin creation: Plugin is nullptr.");
     ret->native = false;

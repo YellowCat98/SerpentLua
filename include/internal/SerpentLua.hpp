@@ -28,6 +28,7 @@ namespace SerpentLua::internal {
     private:
         ScriptMetadata* metadata;
         lua_State* state; // each script requires its own lua state for guaranteed isolation.
+        std::vector<Plugin*> plugins;
         bool executed;
         bool pluginsInitiated;
         void terminate(); // currently only used to terminate scripts that failed execution.

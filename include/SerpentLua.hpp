@@ -26,7 +26,7 @@ extern "C" {
 
 namespace SerpentLua {
     struct SERPENTLUA_DLL PluginMetadata final {
-        static PluginMetadata create(std::map<std::string, std::string>& metadata);
+        static PluginMetadata* create(std::map<std::string, std::string>& metadata);
         std::string name;
         std::string id;
         std::string version;
@@ -34,13 +34,13 @@ namespace SerpentLua {
     };
     class SERPENTLUA_DLL Plugin final {
     public:
-        static geode::Result<Plugin*, std::string> create(PluginMetadata metadata, std::function<void(lua_State*)> entry);
+        static geode::Result<Plugin*, std::string> create(PluginMetadata* metadata, std::function<void(lua_State*)> entry);
         std::function<void(lua_State*)> getEntry();
         #ifdef YELLOWCAT98_SERPENTLUA_EXPORTING
         static geode::Result<Plugin*, std::string> createNative(const std::filesystem::path& path); // meant for plugins that are built using dlls explicitly.
         #endif
     private:
-        PluginMetadata metadata;
+        PluginMetadata* metadata;
         std::function<void(lua_State*)> entry;
         bool native;
         // meant for native plugins.
