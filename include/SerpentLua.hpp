@@ -51,6 +51,4 @@ namespace SerpentLua {
             const char* serpentVersion;
         };
     };
-
-
 }
