@@ -21,7 +21,7 @@ lua_State* script::createState(bool nostd) {
 void script::terminate() {
     log::info("Script {} termination: Initialized.", metadata->id);
     auto theUnfortunate = SerpentLua::internal::RuntimeManager::get()->getScriptByID(metadata->id);
-    if (theUnfortunate.isOk()) theUnfortunate.unwrap()->status = "terminated";
+    if (theUnfortunate.isOk()) theUnfortunate.unwrap()->loaded = false;
     // this is quite sad
     // the next thing i will do is script termination
     delete this;

@@ -1,4 +1,4 @@
-#include <SerpentLua.hpp>
+#include <internal/SerpentLua.hpp>
 
 using namespace geode::prelude;
 using namespace SerpentLua;
@@ -6,6 +6,11 @@ using namespace SerpentLua;
 std::function<void(lua_State*)> Plugin::getEntry() {
     return entry;
 }
+
+Result<PluginMetadata*, std::string> Plugin::getPluginByID(const std::string& id) {
+    return SerpentLua::internal::RuntimeManager::get()->getPluginByID(id);
+}
+
 #ifdef YELLOWCAT98_SERPENTLUA_EXPORTING
 geode::Result<Plugin*, std::string> Plugin::createNative(const std::filesystem::path& path) {
     log::info("Loading Plugin {}", path.filename());

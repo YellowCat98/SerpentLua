@@ -15,7 +15,7 @@ namespace SerpentLua::internal {
         std::string serpentVersion;
         bool nostd;
         std::string path;
-        std::string status;
+        bool loaded;
     };
     class script {
     public:
@@ -27,7 +27,7 @@ namespace SerpentLua::internal {
         geode::Result<> execute(); // Executes THE SCRIPT.
     private:
         ScriptMetadata* metadata;
-        lua_State* state; // each script requires its own lua state for guaranteed isolation.
+        lua_State* state; // each script requires its own lua state for guaranteed isolation. (and also so you can get a script by just a function call!)
         std::vector<Plugin*> plugins;
         bool executed;
         bool pluginsInitiated;
@@ -40,6 +40,9 @@ namespace SerpentLua::internal {
         geode::Result<script*, std::string> getLoadedScriptByID(const std::string& id); // script::getLoadedScriptByID;
         geode::Result<ScriptMetadata*, std::string> getScriptByID(const std::string& id); // ScriptMetadata::getScriptByID();
 
+        geode::Result<Plugin*, std::string> getLoadedPluginByID(const std::string& id);
+        geode::Result<PluginMetadata*, std::string> getPluginByID(const std::string& id);
+
         void setLoadedScript(script* script);
         void setScript(ScriptMetadata* script);
 
@@ -50,7 +53,7 @@ namespace SerpentLua::internal {
         std::map<std::string, script*> loadedScripts;
 
         std::map<std::string, SerpentLua::PluginMetadata*> plugins;
-        std::map<std::string, SerpentLua::Plugin> loadedPlugins;
+        std::map<std::string, SerpentLua::Plugin*> loadedPlugins;
     };
 
     namespace ScriptBuiltin { // builtin plugin, can be included within a script by doing `--@plugins serpentlua_builtin`
