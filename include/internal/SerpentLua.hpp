@@ -48,6 +48,9 @@ namespace SerpentLua::internal {
         // using std::map so i can retrieve a script directly through id
         std::map<std::string, ScriptMetadata*> scripts;
         std::map<std::string, script*> loadedScripts;
+
+        std::map<std::string, SerpentLua::PluginMetadata*> plugins;
+        std::map<std::string, SerpentLua::Plugin> loadedPlugins;
     };
 
     namespace ScriptBuiltin { // builtin plugin, can be included within a script by doing `--@plugins serpentlua_builtin`

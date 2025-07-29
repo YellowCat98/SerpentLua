@@ -9,7 +9,7 @@ void ScriptBuiltin::entry(lua_State* L) {
 
     auto table = state.create_table();
 
-    auto _ScriptMetadata = state.new_usertype<ScriptMetadata>("ScriptMetadata", sol::no_constructor);
+    auto _ScriptMetadata = table.new_usertype<ScriptMetadata>("ScriptMetadata", sol::no_constructor);
 
     _ScriptMetadata["getByID"] = [](sol::this_state ts, const std::string& id) -> sol::object {
         sol::state_view lua(ts); // ts so tuff!
@@ -36,8 +36,49 @@ void ScriptBuiltin::entry(lua_State* L) {
     _ScriptMetadata["serpentVersion"] = &ScriptMetadata::serpentVersion;
     _ScriptMetadata["nostd"] = &ScriptMetadata::nostd;
 
+    auto logging = state.create_table();
 
-    table["ScriptMetadata"] = _ScriptMetadata;
+    logging["info"] = [table](sol::this_state ts, const std::string& msg) -> void {
+        sol::state_view state(ts);
+
+        auto getprotected = table["ScriptMetadata"]["get"]();
+
+        sol::object get = getprotected;
+
+        log::info("[{}]: {}", get.as<ScriptMetadata*>()->name, msg);
+    };
+
+    logging["debug"] = [table](sol::this_state ts, const std::string& msg) -> void {
+        sol::state_view state(ts);
+
+        auto getprotected = table["ScriptMetadata"]["get"]();
+
+        sol::object get = getprotected;
+
+        log::debug("[{}]: {}", get.as<ScriptMetadata*>()->name, msg);
+    };
+
+    logging["warn"] = [table](sol::this_state ts, const std::string& msg) -> void {
+        sol::state_view state(ts);
+
+        auto getprotected = table["ScriptMetadata"]["get"]();
+
+        sol::object get = getprotected;
+
+        log::warn("[{}]: {}", get.as<ScriptMetadata*>()->name, msg);
+    };
+
+    logging["error"] = [table](sol::this_state ts, const std::string& msg) -> void {
+        sol::state_view state(ts);
+
+        auto getprotected = table["ScriptMetadata"]["get"]();
+
+        sol::object get = getprotected;
+
+        log::error("[{}]: {}", get.as<ScriptMetadata*>()->name, msg);
+    };
+
+    table["log"] = logging;
 
     state["package"]["preload"]["SerpentLua"] = [table]() {
         return table;
