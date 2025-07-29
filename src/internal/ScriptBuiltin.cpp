@@ -9,12 +9,12 @@ void ScriptBuiltin::entry(lua_State* L) {
 
     auto table = state.create_table();
 
-    auto _ScriptMetadata = table.new_usertype<ScriptMetadata>("ScriptMetadata", sol::no_constructor);
+    auto _ScriptMetadata = table.new_usertype<SerpentLua::ScriptMetadata>("ScriptMetadata", sol::no_constructor);
 
     _ScriptMetadata["getByID"] = [](sol::this_state ts, const std::string& id) -> sol::object {
         sol::state_view lua(ts); // ts so tuff!
 
-        auto result = ScriptMetadata::getScript(id);
+        auto result = SerpentLua::ScriptMetadata::getScript(id);
 
         if (result.isErr()) return sol::make_object(lua, result.err().value());
 
@@ -30,11 +30,11 @@ void ScriptBuiltin::entry(lua_State* L) {
         return sol::nil;
     };
 
-    _ScriptMetadata["name"] = &ScriptMetadata::name;
-    _ScriptMetadata["id"] = &ScriptMetadata::id;
-    _ScriptMetadata["version"] = &ScriptMetadata::version;
-    _ScriptMetadata["serpentVersion"] = &ScriptMetadata::serpentVersion;
-    _ScriptMetadata["nostd"] = &ScriptMetadata::nostd;
+    _ScriptMetadata["name"] = &SerpentLua::ScriptMetadata::name;
+    _ScriptMetadata["id"] = &SerpentLua::ScriptMetadata::id;
+    _ScriptMetadata["version"] = &SerpentLua::ScriptMetadata::version;
+    _ScriptMetadata["serpentVersion"] = &SerpentLua::ScriptMetadata::serpentVersion;
+    _ScriptMetadata["nostd"] = &SerpentLua::ScriptMetadata::nostd;
 
     auto logging = state.create_table();
 
@@ -45,7 +45,7 @@ void ScriptBuiltin::entry(lua_State* L) {
 
         sol::object get = getprotected;
 
-        log::info("[{}]: {}", get.as<ScriptMetadata*>()->name, msg);
+        log::info("[{}]: {}", get.as<SerpentLua::ScriptMetadata*>()->name, msg);
     };
 
     logging["debug"] = [table](sol::this_state ts, const std::string& msg) -> void {
@@ -55,7 +55,7 @@ void ScriptBuiltin::entry(lua_State* L) {
 
         sol::object get = getprotected;
 
-        log::debug("[{}]: {}", get.as<ScriptMetadata*>()->name, msg);
+        log::debug("[{}]: {}", get.as<SerpentLua::ScriptMetadata*>()->name, msg);
     };
 
     logging["warn"] = [table](sol::this_state ts, const std::string& msg) -> void {
@@ -65,7 +65,7 @@ void ScriptBuiltin::entry(lua_State* L) {
 
         sol::object get = getprotected;
 
-        log::warn("[{}]: {}", get.as<ScriptMetadata*>()->name, msg);
+        log::warn("[{}]: {}", get.as<SerpentLua::ScriptMetadata*>()->name, msg);
     };
 
     logging["error"] = [table](sol::this_state ts, const std::string& msg) -> void {
@@ -75,7 +75,7 @@ void ScriptBuiltin::entry(lua_State* L) {
 
         sol::object get = getprotected;
 
-        log::error("[{}]: {}", get.as<ScriptMetadata*>()->name, msg);
+        log::error("[{}]: {}", get.as<SerpentLua::ScriptMetadata*>()->name, msg);
     };
 
     table["log"] = logging;

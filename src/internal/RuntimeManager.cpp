@@ -38,7 +38,7 @@ Result<script*, std::string> RuntimeManager::getLoadedScriptByID(const std::stri
     return Ok(loadedScripts[id]);
 }
 
-Result<ScriptMetadata*, std::string> RuntimeManager::getScriptByID(const std::string& id) {
+Result<SerpentLua::ScriptMetadata*, std::string> RuntimeManager::getScriptByID(const std::string& id) {
     if (!scripts.contains(id)) return Err("Script Getter: Script {} does not exist.", id);
     return Ok(scripts[id]);
 }

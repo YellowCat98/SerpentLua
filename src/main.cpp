@@ -6,6 +6,7 @@
 
 using namespace geode::prelude;
 using namespace SerpentLua::internal;
+using namespace SerpentLua;
 
 Result<void, std::vector<std::pair<std::string, std::string>>> createDirs(const std::filesystem::path& where, const std::vector<std::string>& dirs) {
 	std::vector<std::pair<std::string, std::string>> errs;

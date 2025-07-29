@@ -4,11 +4,11 @@
 using namespace SerpentLua::internal;
 using namespace geode::prelude;
 
-geode::Result<ScriptMetadata*, std::string> ScriptMetadata::getScript(const std::string& id) {
+geode::Result<SerpentLua::ScriptMetadata*, std::string> SerpentLua::ScriptMetadata::getScript(const std::string& id) {
     return SerpentLua::internal::RuntimeManager::get()->getScriptByID(id);
 }
 
-geode::Result<ScriptMetadata*, std::string> ScriptMetadata::createFromScript(const std::filesystem::path& scriptPath) {
+geode::Result<SerpentLua::ScriptMetadata*, std::string> SerpentLua::ScriptMetadata::createFromScript(const std::filesystem::path& scriptPath) {
     if (!std::filesystem::exists(scriptPath)) return Err("Script {} doesn't exist.", scriptPath.filename());
     log::info("Script `{}` creation: Initialized.", scriptPath.filename());
     std::ifstream file(scriptPath);
@@ -73,8 +73,8 @@ geode::Result<ScriptMetadata*, std::string> ScriptMetadata::createFromScript(con
     return Ok(ScriptMetadata::create(metadata));
 }
 
-ScriptMetadata* ScriptMetadata::create(std::map<std::string, std::string>& metadata) {
-    auto ret = new ScriptMetadata();
+SerpentLua::ScriptMetadata* SerpentLua::ScriptMetadata::create(std::map<std::string, std::string>& metadata) {
+    auto ret = new SerpentLua::ScriptMetadata();
 
     ret->name = metadata["name"];
     ret->id = metadata["id"];

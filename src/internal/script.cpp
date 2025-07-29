@@ -4,7 +4,7 @@ using namespace SerpentLua::internal;
 using namespace geode::prelude;
 
 
-ScriptMetadata* script::getMetadata() {
+SerpentLua::ScriptMetadata* script::getMetadata() {
     return metadata;
 }
 

@@ -5,18 +5,6 @@
 #include <SerpentLua.hpp>
 
 namespace SerpentLua::internal {
-    struct ScriptMetadata {
-        static ScriptMetadata* create(std::map<std::string, std::string>& metadata);
-        static geode::Result<ScriptMetadata*, std::string> createFromScript(const std::filesystem::path& scriptPath);
-        static geode::Result<ScriptMetadata*, std::string> getScript(const std::string& id);
-        std::string name;
-        std::string id;
-        std::string version;
-        std::string serpentVersion;
-        bool nostd;
-        std::string path;
-        bool loaded;
-    };
     class script {
     public:
         static geode::Result<script*, std::string> create(ScriptMetadata* metadata);

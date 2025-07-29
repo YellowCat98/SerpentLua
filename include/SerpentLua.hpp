@@ -25,6 +25,19 @@ extern "C" {
 #endif
 
 namespace SerpentLua {
+    struct ScriptMetadata {
+        static ScriptMetadata* create(std::map<std::string, std::string>& metadata);
+        static geode::Result<ScriptMetadata*, std::string> createFromScript(const std::filesystem::path& scriptPath);
+        static geode::Result<ScriptMetadata*, std::string> getScript(const std::string& id);
+        std::string name;
+        std::string id;
+        std::string version;
+        std::string serpentVersion;
+        bool nostd;
+        std::string path;
+        bool loaded;
+    };
+
     struct SERPENTLUA_DLL PluginMetadata final {
         static PluginMetadata* create(std::map<std::string, std::string>& metadata);
         std::string name;
