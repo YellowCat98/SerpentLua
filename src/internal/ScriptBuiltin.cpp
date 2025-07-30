@@ -100,5 +100,7 @@ Result<> ScriptBuiltin::initPlugin() {
 
     ScriptBuiltin::plugin = res.unwrap();
 
+    ScriptBuiltin::plugin->setPlugin();
+
     return Ok();
 }

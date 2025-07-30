@@ -4,6 +4,24 @@
 using namespace SerpentLua::internal;
 using namespace geode::prelude;
 
+void SerpentLua::ScriptMetadata::setPlugins() {
+    if (this->pluginIDstring.empty()) return;
+    std::vector<std::string> pluginIDs;
+    size_t start = 0;
+    size_t end = this->pluginIDstring.find(' ');
+
+    while (end != std::string::npos) {
+        pluginIDs.push_back(this->pluginIDstring.substr(start, end - start));
+        start = end + 1;
+        end = this->pluginIDstring.find(' ', start);
+    }
+    pluginIDs.push_back(this->pluginIDstring.substr(start));
+
+    log::info("FUICK YOU {}", pluginIDs);
+
+    this->plugins = pluginIDs; // would be better to use metadata->plugins as pluginIDs from the start but i already wrote everything i do not want to replace the stuff
+}
+
 geode::Result<SerpentLua::ScriptMetadata*, std::string> SerpentLua::ScriptMetadata::getScript(const std::string& id) {
     return SerpentLua::internal::RuntimeManager::get()->getScriptByID(id);
 }
@@ -82,5 +100,8 @@ SerpentLua::ScriptMetadata* SerpentLua::ScriptMetadata::create(std::map<std::str
     ret->serpentVersion = metadata["serpent-version"];
     ret->nostd = metadata.contains("nostd");
     ret->path = metadata["path"];
+    ret->pluginIDstring = metadata["plugins"];
+    ret->setPlugins();
+
     return ret;
 }

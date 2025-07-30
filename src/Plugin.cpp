@@ -7,8 +7,8 @@ std::function<void(lua_State*)> Plugin::getEntry() {
     return entry;
 }
 
-Result<PluginMetadata*, std::string> Plugin::getPluginByID(const std::string& id) {
-    return SerpentLua::internal::RuntimeManager::get()->getPluginByID(id);
+void Plugin::setPlugin() {
+    return internal::RuntimeManager::get()->setPlugin(this->metadata->id, this);
 }
 
 #ifdef YELLOWCAT98_SERPENTLUA_EXPORTING

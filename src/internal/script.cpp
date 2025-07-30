@@ -1,4 +1,5 @@
 #include <internal/SerpentLua.hpp>
+#include "SerpentLua.hpp"
 
 using namespace SerpentLua::internal;
 using namespace geode::prelude;
@@ -37,16 +38,32 @@ void script::terminate() {
     // it compiled!! :D
 }
 
+geode::Result<> script::loadPlugins() {
+    for (auto& pluginID : this->metadata->plugins) {
+        auto pluginRes = RuntimeManager::get()->getLoadedPluginByID(pluginID);
+        if (pluginRes.isErr()) {
+            auto err = Err("Script `{}` plugin loading: Plugin getter returned an error:\n{}\nWill terminate for the rest of this session.", this->metadata->id, pluginRes.err());
+            this->terminate();
+            return err;
+        }
+        pluginRes.unwrap()->getEntry()(this->getLuaState());
+    }
+
+    return Ok();
+}
+
 // only terminate when a script fails inital execution, it will crash if anything after initial execution fails, this is to prevent crashes!
 geode::Result<> script::execute() {
     if (luaL_dofile(this->state, this->metadata->path.c_str()) != LUA_OK) {
-        auto err = Err("Script `{}` execution: \n{}\nScript has failed initial execution, will terminate for the rest of the session.", metadata->id, std::string(lua_tostring(this->state, -1)));
+        auto err = Err("Script `{}` execution: \n{}\nScript has failed initial execution, will terminate for the rest of this session.", metadata->id, std::string(lua_tostring(this->state, -1)));
         this->terminate();
         return err;
     }
     metadata->loaded = true;
     return Ok();
 }
+
+
 
 geode::Result<script*, std::string> script::getLoadedScript(const std::string& id) {
     return SerpentLua::internal::RuntimeManager::get()->getLoadedScriptByID(id);

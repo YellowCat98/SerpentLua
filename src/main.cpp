@@ -37,20 +37,24 @@ $on_mod(Loaded) {
 		}
 		return;
 	}
-/*
-	for (auto& file : std::filesystem::directory_iterator(configDir / "scripts")) {
-		if (file.is_directory()) log::warn("Found folder in scripts directory.");
-		if (file.path().extension() != ".lua") log::warn("Found non-lua file in scripts directory.");
+	ScriptBuiltin::initPlugin();
 
-		auto script = SerpentLua::script::create(file.path());
-		if (script.isErr()) {
-			log::error("{}", script.err().value());
-		} else {
-			SerpentLua::scripts.push_back(script.unwrap());
+	// initialize all the native plugins! (mod plugins are initialized by the mods themselves)
+
+	for (const auto& file : std::filesystem::directory_iterator(configDir/"plugins")) {
+		if (file.path().extension().string() != ".dll") {
+			log::warn("Found non-dll file in plugins directory, will be ignored.");
+			continue;
 		}
+
+		auto pluginRes = SerpentLua::Plugin::createNative(file.path());
+		if (pluginRes.isErr()) {
+			log::error("{}", pluginRes.err().value());
+			continue;
+		}
+
+		pluginRes.unwrap()->setPlugin();
 	}
-*/
-	
 }
 
 
@@ -59,7 +63,7 @@ class $modify(MenuLayerHook, MenuLayer) {
 		if (!MenuLayer::init()) return false;
 		return true;
 	}
-
+	/*
 	void onMoreGames(CCObject*) {
 		ScriptBuiltin::initPlugin();
 		auto metadataRes = ScriptMetadata::createFromScript(Mod::get()->getConfigDir() / "scripts" / "yellowcat98_test.lua");
@@ -83,6 +87,33 @@ class $modify(MenuLayerHook, MenuLayer) {
 		auto execres = script->execute();
 		if (execres.isErr()) {
 			log::error("exec Err: {}", execres.err().value());
+		}
+	}
+	*/
+
+	void onMoreGames(CCObject*) {
+		
+		auto metadataRes = ScriptMetadata::createFromScript(Mod::get()->getConfigDir() / "scripts" / "yellowcat98_test.lua");
+		if (metadataRes.isErr()) {
+			log::error("Metadata err: {}", metadataRes.err().value());
+			return;
+		}
+		auto metadata = metadataRes.unwrap();
+		auto res = script::create(metadata);
+		if (res.isErr()) {
+			log::error("Create err: {}", res.err().value());
+			return;
+		}
+
+		auto script = res.unwrap();
+		auto pluginRes = script->loadPlugins();
+		if (pluginRes.isErr()) {
+			log::error("{}", pluginRes.err().value());
+			return;
+		}
+		auto execRes = script->execute();
+		if (execRes.isErr()) {
+			log::error("{}", execRes.err());
 		}
 	}
 };

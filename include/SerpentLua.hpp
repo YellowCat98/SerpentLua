@@ -25,18 +25,7 @@ extern "C" {
 #endif
 
 namespace SerpentLua {
-    struct ScriptMetadata {
-        static ScriptMetadata* create(std::map<std::string, std::string>& metadata);
-        static geode::Result<ScriptMetadata*, std::string> createFromScript(const std::filesystem::path& scriptPath);
-        static geode::Result<ScriptMetadata*, std::string> getScript(const std::string& id);
-        std::string name;
-        std::string id;
-        std::string version;
-        std::string serpentVersion;
-        bool nostd;
-        std::string path;
-        bool loaded;
-    };
+
 
     struct SERPENTLUA_DLL PluginMetadata final {
         static PluginMetadata* create(std::map<std::string, std::string>& metadata);
@@ -53,17 +42,43 @@ namespace SerpentLua {
         static geode::Result<Plugin*, std::string> createNative(const std::filesystem::path& path); // meant for plugins that are built using dlls explicitly.
         #endif
 
-        static geode::Result<PluginMetadata*, std::string> getPluginByID(const std::string& id);
+        //static geode::Result<PluginMetadata*, std::string> getPluginByID(const std::string& id);
+
+        void setPlugin(); // will set the Pulgin.
     private:
         PluginMetadata* metadata;
         std::function<void(lua_State*)> entry;
         bool native;
         // meant for native plugins.
+
+        #ifdef YELLOWCAT98_SERPENTLUA_EXPORTING
         struct __metadata {
             const char* name;
             const char* id;
             const char* version;
             const char* serpentVersion;
         };
+        #endif
     };
+
+    // only exporting this for plugins since its accessible through the serpentlua internal plugin
+    struct ScriptMetadata {
+        #ifdef YELLOWCAT98_SERPENTLUA_EXPORTING
+            static ScriptMetadata* create(std::map<std::string, std::string>& metadata);
+            static geode::Result<ScriptMetadata*, std::string> createFromScript(const std::filesystem::path& scriptPath);
+            static geode::Result<ScriptMetadata*, std::string> getScript(const std::string& id);
+            void setPlugins();
+            ScriptMetadata(){}
+        #endif
+        std::string name;
+        std::string id;
+        std::string version;
+        std::string serpentVersion;
+        bool nostd;
+        std::string path;
+        bool loaded;
+        std::vector<std::string> plugins;
+        std::string pluginIDstring;
+    };
+
 }

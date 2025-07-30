@@ -11,16 +11,16 @@ RuntimeManager* RuntimeManager::get() {
 
 Result<SerpentLua::Plugin*, std::string> RuntimeManager::getLoadedPluginByID(const std::string& id) {
     if (!loadedPlugins.contains(id)) {
-        if (plugins.contains(id)) return Err("Loaded Plugin Getter: Cannot retrieve plugin {} as it did not load.", id);
         return Err("Script Getter: Script {} does not exist.", id);
     }
     return Ok(loadedPlugins[id]);
 }
-
+/*
 Result<SerpentLua::PluginMetadata*, std::string> RuntimeManager::getPluginByID(const std::string& id) {
     if (!plugins.contains(id)) return Err("Plugin Getter: Plugin {} does not exist.", id);
     return Ok(plugins[id]);
 }
+*/
 
 void RuntimeManager::setLoadedScript(script* script) {
     loadedScripts.insert({script->getMetadata()->id, script});
@@ -28,6 +28,10 @@ void RuntimeManager::setLoadedScript(script* script) {
 
 void RuntimeManager::setScript(ScriptMetadata* script) {
     scripts.insert({script->id, script});
+}
+
+void RuntimeManager::setPlugin(const std::string& id, Plugin* plugin) {
+    loadedPlugins.insert({id, plugin});
 }
 
 Result<script*, std::string> RuntimeManager::getLoadedScriptByID(const std::string& id) {
@@ -45,4 +49,8 @@ Result<SerpentLua::ScriptMetadata*, std::string> RuntimeManager::getScriptByID(c
 
 std::map<std::string, script*> RuntimeManager::getAllLoadedScripts() {
     return loadedScripts;
+}
+
+std::map<std::string, SerpentLua::Plugin*> RuntimeManager::getAllLoadedPlugins() {
+    return loadedPlugins;
 }

@@ -13,6 +13,7 @@ namespace SerpentLua::internal {
         lua_State* getLuaState();
         static lua_State* createState(bool nostd);
         geode::Result<> execute(); // Executes THE SCRIPT.
+        geode::Result<> loadPlugins();
     private:
         ScriptMetadata* metadata;
         lua_State* state; // each script requires its own lua state for guaranteed isolation. (and also so you can get a script by just a function call!)
@@ -29,18 +30,23 @@ namespace SerpentLua::internal {
         geode::Result<ScriptMetadata*, std::string> getScriptByID(const std::string& id); // ScriptMetadata::getScriptByID();
 
         geode::Result<Plugin*, std::string> getLoadedPluginByID(const std::string& id);
-        geode::Result<PluginMetadata*, std::string> getPluginByID(const std::string& id);
+        //geode::Result<PluginMetadata*, std::string> getPluginByID(const std::string& id);
 
         void setLoadedScript(script* script);
         void setScript(ScriptMetadata* script);
 
+        void setPlugin(const std::string& id, Plugin* plugin);
+
         std::map<std::string, script*> getAllLoadedScripts();
+        std::map<std::string, SerpentLua::Plugin*> getAllLoadedPlugins();
+
+
     private:
         // using std::map so i can retrieve a script directly through id
         std::map<std::string, ScriptMetadata*> scripts;
         std::map<std::string, script*> loadedScripts;
 
-        std::map<std::string, SerpentLua::PluginMetadata*> plugins;
+        //std::map<std::string, SerpentLua::PluginMetadata*> plugins;
         std::map<std::string, SerpentLua::Plugin*> loadedPlugins;
     };
 
