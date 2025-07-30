@@ -106,6 +106,9 @@ class $modify(MenuLayerHook, MenuLayer) {
 		}
 
 		auto script = res.unwrap();
+
+		RuntimeManager::get()->setLoadedScript(script);
+
 		auto pluginRes = script->loadPlugins();
 		if (pluginRes.isErr()) {
 			log::error("{}", pluginRes.err().value());

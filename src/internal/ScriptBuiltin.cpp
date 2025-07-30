@@ -25,7 +25,7 @@ void ScriptBuiltin::entry(lua_State* L) {
         lua_State* L = ts;
     
         for (auto& pair : RuntimeManager::get()->getAllLoadedScripts()) {
-            if (pair.second->getLuaState() == ts) return sol::make_object(L, pair.second->getMetadata());
+            if (pair.second->getLuaState() == L) return sol::make_object(L, pair.second->getMetadata());
         }
         return sol::nil;
     };
