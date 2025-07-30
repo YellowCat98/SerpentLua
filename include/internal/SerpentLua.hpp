@@ -38,6 +38,8 @@ namespace SerpentLua::internal {
         void setPlugin(const std::string& id, Plugin* plugin);
 
         std::map<std::string, script*> getAllLoadedScripts();
+        std::map<std::string, ScriptMetadata*> getAllScripts();
+
         std::map<std::string, SerpentLua::Plugin*> getAllLoadedPlugins();
 
 

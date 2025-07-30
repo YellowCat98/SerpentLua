@@ -51,6 +51,10 @@ std::map<std::string, script*> RuntimeManager::getAllLoadedScripts() {
     return loadedScripts;
 }
 
+std::map<std::string, SerpentLua::ScriptMetadata*> RuntimeManager::getAllScripts() {
+    return scripts;
+}
+
 std::map<std::string, SerpentLua::Plugin*> RuntimeManager::getAllLoadedPlugins() {
     return loadedPlugins;
 }

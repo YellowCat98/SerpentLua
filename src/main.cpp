@@ -55,6 +55,42 @@ $on_mod(Loaded) {
 
 		pluginRes.unwrap()->setPlugin();
 	}
+
+	// and now for the scripts!
+
+	// setup metadata first
+	for (const auto& file : std::filesystem::directory_iterator(configDir/"scripts")) {
+		if (file.path().extension().string() != ".lua") {
+			log::warn("Non-lua file was found in scripts directory, will be ignored.");
+			continue;
+		}
+
+		auto res = ScriptMetadata::createFromScript(file);
+		if (res.isErr()) {
+			log::error("{}", res.err());
+			continue;
+		}
+		RuntimeManager::get()->setScript(res.unwrap());
+	}
+
+	// TODO: implement script enabling and disabling
+	// assume all scripts are enabled until i do the thing
+	for (auto& pair : RuntimeManager::get()->getAllScripts()) {
+		auto res = script::create(pair.second);
+		if (res.isErr()) {
+			log::error("{}", res.err());
+			continue;
+		}
+		auto script = res.unwrap();
+		
+		RuntimeManager::get()->setLoadedScript(script);
+
+		auto execres = script->execute();
+		if (execres.isErr()) {
+			log::error("{}", execres.err());
+			continue;
+		}
+	}
 }
 
 
