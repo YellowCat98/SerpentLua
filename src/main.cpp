@@ -99,13 +99,13 @@ $on_mod(Loaded) {
 	}
 }
 
-
+/*
 class $modify(MenuLayerHook, MenuLayer) {
 	bool init() {
 		if (!MenuLayer::init()) return false;
 		return true;
 	}
-	/*
+	
 	void onMoreGames(CCObject*) {
 		ScriptBuiltin::initPlugin();
 		auto metadataRes = ScriptMetadata::createFromScript(Mod::get()->getConfigDir() / "scripts" / "yellowcat98_test.lua");
@@ -131,7 +131,7 @@ class $modify(MenuLayerHook, MenuLayer) {
 			log::error("exec Err: {}", execres.err().value());
 		}
 	}
-	*/
+	
 
 	void onMoreGames(CCObject*) {
 		
@@ -162,3 +162,4 @@ class $modify(MenuLayerHook, MenuLayer) {
 		}
 	}
 };
+*/
