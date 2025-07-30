@@ -17,8 +17,6 @@ void SerpentLua::ScriptMetadata::setPlugins() {
     }
     pluginIDs.push_back(this->pluginIDstring.substr(start));
 
-    log::info("FUICK YOU {}", pluginIDs);
-
     this->plugins = pluginIDs; // would be better to use metadata->plugins as pluginIDs from the start but i already wrote everything i do not want to replace the stuff
 }
 

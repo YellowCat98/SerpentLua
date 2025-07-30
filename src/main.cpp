@@ -78,16 +78,22 @@ $on_mod(Loaded) {
 	for (auto& pair : RuntimeManager::get()->getAllScripts()) {
 		auto res = script::create(pair.second);
 		if (res.isErr()) {
-			log::error("{}", res.err());
+			log::error("{}", res.err().value());
 			continue;
 		}
 		auto script = res.unwrap();
 		
 		RuntimeManager::get()->setLoadedScript(script);
 
+		auto loadres = script->loadPlugins();
+
+		if (loadres.isErr()) {
+			log::error("{}", loadres.err().value());
+		}
+
 		auto execres = script->execute();
 		if (execres.isErr()) {
-			log::error("{}", execres.err());
+			log::error("{}", execres.err().value());
 			continue;
 		}
 	}
