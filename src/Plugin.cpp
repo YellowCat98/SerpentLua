@@ -39,6 +39,7 @@ geode::Result<Plugin*, std::string> Plugin::createNative(const std::filesystem::
     log::info("\n{}\n{}\n{}\n{}", rawMeta->name,rawMeta->id,rawMeta->version,rawMeta->serpentVersion);
     std::map<std::string, std::string> mapMetadata = {
         {"name", std::string(rawMeta->name)},
+        {"developer", std::string(rawMeta->developer)},
         {"id", std::string(rawMeta->id)},
         {"version", std::string(rawMeta->version)},
         {"serpent-version", std::string(rawMeta->serpentVersion)}

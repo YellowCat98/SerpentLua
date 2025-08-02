@@ -35,6 +35,7 @@ void ScriptBuiltin::entry(lua_State* L) {
     _ScriptMetadata["version"] = &SerpentLua::ScriptMetadata::version;
     _ScriptMetadata["serpentVersion"] = &SerpentLua::ScriptMetadata::serpentVersion;
     _ScriptMetadata["nostd"] = &SerpentLua::ScriptMetadata::nostd;
+    _ScriptMetadata["developer"] = &SerpentLua::ScriptMetadata::developer;
 
     auto logging = state.create_table();
 
@@ -89,6 +90,7 @@ Result<> ScriptBuiltin::initPlugin() {
     if (ScriptBuiltin::plugin) return Err("Builtin plugin was already initialized.");
     std::map<std::string, std::string> map = {
         {"name", "SerpentLua Builtin"},
+        {"developer", "YellowCat98"},
         {"id", "serpentlua_builtin"},
         {"version", Mod::get()->getVersion().toVString()},
         {"serpent-version", Mod::get()->getVersion().toVString()}

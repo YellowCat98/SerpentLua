@@ -10,6 +10,7 @@ extern "C" {
 
 __declspec(dllexport) extern const struct __metadata {
 	const char* name;
+	const char* developer;
 	const char* id;
 	const char* version;
 	const char* serpentVersion;
@@ -17,6 +18,7 @@ __declspec(dllexport) extern const struct __metadata {
 
 __declspec(dllexport) const struct __metadata plugin_metadata = {
 	"PluginTest",
+	"YellowCat98",
 	"yellowcat98_plugintest",
 	"1.0.0",
 	"1.0.0"

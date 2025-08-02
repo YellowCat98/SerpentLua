@@ -3,6 +3,7 @@
 #include <Geode/modify/MenuLayer.hpp>
 #include <filesystem>
 #include <internal/SerpentLua.hpp>
+#include <internal/ui/ScriptsLayer.hpp>
 
 using namespace geode::prelude;
 using namespace SerpentLua::internal;
@@ -37,7 +38,11 @@ $on_mod(Loaded) {
 		}
 		return;
 	}
-	ScriptBuiltin::initPlugin();
+	auto initpluginres = ScriptBuiltin::initPlugin();
+	if (initpluginres.isErr()) {
+		log::error("{}", initpluginres.err().value());
+		return;
+	}
 
 	// initialize all the native plugins! (mod plugins are initialized by the mods themselves)
 
@@ -99,13 +104,19 @@ $on_mod(Loaded) {
 	}
 }
 
-/*
+
 class $modify(MenuLayerHook, MenuLayer) {
 	bool init() {
 		if (!MenuLayer::init()) return false;
+
+		this->getChildByID("bottom-menu")->addChild(CCMenuItemExt::createSpriteExtra(CCSprite::createWithSpriteFrameName("GJ_arrow_01_001.png"), [](CCObject*) {
+			ui::ScriptsLayer::create()->show();
+		}));
+
 		return true;
 	}
 	
+	/*
 	void onMoreGames(CCObject*) {
 		ScriptBuiltin::initPlugin();
 		auto metadataRes = ScriptMetadata::createFromScript(Mod::get()->getConfigDir() / "scripts" / "yellowcat98_test.lua");
@@ -161,5 +172,5 @@ class $modify(MenuLayerHook, MenuLayer) {
 			log::error("{}", execRes.err());
 		}
 	}
+	*/
 };
-*/

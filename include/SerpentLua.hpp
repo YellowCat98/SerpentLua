@@ -30,6 +30,7 @@ namespace SerpentLua {
     struct SERPENTLUA_DLL PluginMetadata final {
         static PluginMetadata* create(std::map<std::string, std::string>& metadata);
         std::string name;
+        std::string developer;
         std::string id;
         std::string version;
         std::string serpentVersion;
@@ -54,6 +55,7 @@ namespace SerpentLua {
         #ifdef YELLOWCAT98_SERPENTLUA_EXPORTING
         struct __metadata {
             const char* name;
+            const char* developer;
             const char* id;
             const char* version;
             const char* serpentVersion;
@@ -62,7 +64,7 @@ namespace SerpentLua {
     };
 
     // only exporting this for plugins since its accessible through the serpentlua internal plugin
-    struct ScriptMetadata {
+    struct SERPENTLUA_DLL ScriptMetadata final {
         #ifdef YELLOWCAT98_SERPENTLUA_EXPORTING
             static ScriptMetadata* create(std::map<std::string, std::string>& metadata);
             static geode::Result<ScriptMetadata*, std::string> createFromScript(const std::filesystem::path& scriptPath);
@@ -74,6 +76,7 @@ namespace SerpentLua {
         std::string id;
         std::string version;
         std::string serpentVersion;
+        std::string developer; // HOW the fuck did i forget this for this long
         bool nostd;
         std::string path;
         bool loaded;

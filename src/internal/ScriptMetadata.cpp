@@ -99,6 +99,7 @@ SerpentLua::ScriptMetadata* SerpentLua::ScriptMetadata::create(std::map<std::str
     ret->nostd = metadata.contains("nostd");
     ret->path = metadata["path"];
     ret->pluginIDstring = metadata["plugins"];
+    ret->developer = metadata["developer"];
     ret->setPlugins();
 
     return ret;

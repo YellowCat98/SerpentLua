@@ -11,7 +11,7 @@ RuntimeManager* RuntimeManager::get() {
 
 Result<SerpentLua::Plugin*, std::string> RuntimeManager::getLoadedPluginByID(const std::string& id) {
     if (!loadedPlugins.contains(id)) {
-        return Err("Script Getter: Script {} does not exist.", id);
+        return Err("Plugin Getter: Script {} does not exist.", id);
     }
     return Ok(loadedPlugins[id]);
 }
