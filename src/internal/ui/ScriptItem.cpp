@@ -119,10 +119,8 @@ bool SerpentLua::internal::ui::ScriptItem::init(SerpentLua::ScriptMetadata* theM
 // listens for changes and applies them
 void SerpentLua::internal::ui::ScriptItem::listener(float) {
 	auto enabledScripts = Mod::get()->getSavedValue<std::vector<std::string>>("enabled-scripts");
-	log::info("{}", enabledScripts);
-	auto enabled = std::find(enabledScripts.begin(), enabledScripts.end(), this->metadata->id) != enabledScripts.end();
-	log::info("{}", enabled);
-	this->viewBtn->toggle(enabled);
+
+	this->viewBtn->toggle(std::find(enabledScripts.begin(), enabledScripts.end(), this->metadata->id) != enabledScripts.end());
 }
 SerpentLua::internal::ui::ScriptItem* SerpentLua::internal::ui::ScriptItem::create(SerpentLua::ScriptMetadata* metadata, std::function<void(cocos2d::CCObject*)> onButton, const cocos2d::CCSize& size) {
     auto ret = new SerpentLua::internal::ui::ScriptItem();
