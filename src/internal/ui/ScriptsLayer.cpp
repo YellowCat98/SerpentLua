@@ -35,8 +35,11 @@ bool ScriptsLayer::init() {
     this->addChildAtPosition(backMenu, Anchor::TopLeft, {12.0f, -25.0f}, false);
 
     for (auto& script : SerpentLua::internal::RuntimeManager::get()->getAllScripts()) {
-        array->addObject(ScriptItem::create(script.second, [](CCObject* button) {
-            auto metadata = static_cast<ScriptItem*>(static_cast<CCMenuItemToggler*>(button)->getParent())->metadata;
+        array->addObject(ScriptItem::create(script.second, [](CCMenuItemToggler* button) {
+            auto item = typeinfo_cast<ScriptItem*>(button->getParent()->getParent()); // normally this should never return nullptr, but just in case!
+            if (!item) return;
+            auto metadata = item->metadata;
+            Mod::get()->setSavedValue<bool>(fmt::format("enabled-{}", metadata->id), !button->isToggled());
         }, CCSize(358.0f, 30)));
     }
 

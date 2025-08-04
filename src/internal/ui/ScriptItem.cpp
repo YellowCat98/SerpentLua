@@ -2,7 +2,7 @@
 
 using namespace geode::prelude;
 
-bool SerpentLua::internal::ui::ScriptItem::init(SerpentLua::ScriptMetadata* theMetadata, std::function<void(CCObject*)> onButton, const cocos2d::CCSize& size) {
+bool SerpentLua::internal::ui::ScriptItem::init(SerpentLua::ScriptMetadata* theMetadata, std::function<void(CCMenuItemToggler*)> onButton, const cocos2d::CCSize& size) {
 	if (!CCNode::init()) return false;
 	this->metadata = theMetadata;
 	this->setID(fmt::format("script-item/{}", metadata->id));
@@ -120,9 +120,9 @@ bool SerpentLua::internal::ui::ScriptItem::init(SerpentLua::ScriptMetadata* theM
 void SerpentLua::internal::ui::ScriptItem::listener(float) {
 	auto enabledScripts = Mod::get()->getSavedValue<std::vector<std::string>>("enabled-scripts");
 
-	this->viewBtn->toggle(std::find(enabledScripts.begin(), enabledScripts.end(), this->metadata->id) != enabledScripts.end());
+	this->viewBtn->toggle(Mod::get()->getSavedValue<bool>(fmt::format("enabled-{}", metadata->id)));
 }
-SerpentLua::internal::ui::ScriptItem* SerpentLua::internal::ui::ScriptItem::create(SerpentLua::ScriptMetadata* metadata, std::function<void(cocos2d::CCObject*)> onButton, const cocos2d::CCSize& size) {
+SerpentLua::internal::ui::ScriptItem* SerpentLua::internal::ui::ScriptItem::create(SerpentLua::ScriptMetadata* metadata, std::function<void(CCMenuItemToggler*)> onButton, const cocos2d::CCSize& size) {
     auto ret = new SerpentLua::internal::ui::ScriptItem();
     if (ret && ret->init(metadata, onButton, size)) {
         ret->autorelease();
