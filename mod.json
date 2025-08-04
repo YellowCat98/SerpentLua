@@ -16,5 +16,10 @@
 		"include": [
 			"include/SerpentLua.hpp"
 		]
+	},
+	"resources": {
+		"sprites": [
+			"resources/*.png"
+		]
 	}
 }

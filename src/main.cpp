@@ -110,7 +110,7 @@ class $modify(MenuLayerHook, MenuLayer) {
 		if (!MenuLayer::init()) return false;
 
 		this->getChildByID("bottom-menu")->addChild(CCMenuItemExt::createSpriteExtra(CCSprite::createWithSpriteFrameName("GJ_arrow_01_001.png"), [](CCObject*) {
-			ui::ScriptsLayer::create()->show();
+			CCDirector::get()->pushScene(CCTransitionFade::create(0.5f, ui::ScriptsLayer::scene()));
 		}));
 
 		return true;

@@ -4,12 +4,123 @@
 using namespace SerpentLua::internal::ui;
 using namespace geode::prelude;
 
+bool ScriptsLayer::init() {
+    if (!CCLayer::init()) return false;
+    this->setKeypadEnabled(true);
+    auto winSize = CCDirector::get()->getWinSize();
+
+    auto background = geode::createLayerBG();
+    background->setID("background"); // background is better than bg imo
+    background->setZOrder(-1);
+    auto array = CCArray::create();
+
+    auto backMenu = CCMenu::create();
+    backMenu->setID("back-menu");
+    
+    auto backBtn = CCMenuItemExt::createSpriteExtra(CCSprite::createWithSpriteFrameName("GJ_arrow_01_001.png"), [this](CCObject*) {
+        this->keyBackClicked();
+    });
+    backMenu->addChild(backBtn);
+
+    // some parts of the quit button code is taken from geode's own source code
+    // more specifically at
+    // https://github.com/geode-sdk/geode/blob/0da07978549a898c98ff54efdeb08dda3dc55787/loader/src/ui/mods/ModsLayer.cpp#L371
+
+    backMenu->setAnchorPoint({0.0f, 0.5f});
+
+    backMenu->setLayout(SimpleRowLayout::create()
+        ->setMainAxisAlignment(MainAxisAlignment::Start)
+        ->setGap(5.0f)
+    );
+    this->addChildAtPosition(backMenu, Anchor::TopLeft, {12.0f, -25.0f}, false);
+
+    for (auto& script : SerpentLua::internal::RuntimeManager::get()->getAllScripts()) {
+        array->addObject(ScriptItem::create(script.second, [](CCObject* button) {
+            auto metadata = static_cast<ScriptItem*>(static_cast<CCMenuItemToggler*>(button)->getParent())->metadata;
+        }, CCSize(358.0f, 30)));
+    }
+
+    auto listview = ListView::create(array, 30);
+    auto listlayer = GJListLayer::create(listview, "scripts", {194, 114, 62, 255}, 358.0f, 220.0f, 0);
+
+    auto listlayerSize = listlayer->getContentSize();
+    listlayer->setPosition(ccp((winSize.width - listlayerSize.width)/2, (winSize.height - listlayerSize.height)/2));
+
+    this->addChild(listlayer);
+
+    this->addChild(background);
+
+    auto actionsMenu = CCMenu::create();
+    actionsMenu->setLayout(SimpleColumnLayout::create()
+        ->setMainAxisAlignment(MainAxisAlignment::Center)
+        ->setGap(0.5f)
+        ->setMainAxisDirection(AxisDirection::BottomToTop)
+    );
+
+    auto restartBtn = CCMenuItemExt::createSpriteExtraWithFrameName("GJ_updateBtn_001.png", 1.0f, [](CCObject* sender){
+        game::restart();
+    });
+
+    auto testBtn = CCMenuItemExt::createSpriteExtraWithFrameName("GJ_arrow_01_001.png", 1.0f, [](CCObject*) {
+
+    });
+
+    actionsMenu->addChild(restartBtn);
+    
+    this->addChildAtPosition(actionsMenu, Anchor::BottomLeft, {25.0f, 25.0f}, false);
+
+    actionsMenu->updateLayout();
+    backMenu->updateLayout();
+    return true;
+}
+
+
+/*
+bool ScriptsLayer::setup() {
+    this->setTitle(fmt::format("SerpentLua {}", Mod::get()->getVersion().toVString()));
+    CCArray* array = CCArray::create();
+    
+    /*for (auto& script : SerpentLua::internal::RuntimeManager::get()->getAllScripts()) {
+        array->addObject(ScriptItem::create(script.second, [](CCObject*) {
+
+        }, CCSize(winSize.width - 125.0f, 30)));
+    }
+    for (int i = 0; i < 50; i++) {
+        std::map<std::string, std::string> metadata = {
+            {"name", fmt::format("test {}", std::to_string(i))},
+            {"developer", "hi"},
+            {"version", "1.0.0"},
+            {"serpent-version", "yoo"},
+            {"plugins", "hi hi hi hi"}
+        };
+        array->addObject(ScriptItem::create(SerpentLua::ScriptMetadata::create(metadata), [](CCObject*) {
+
+        }, CCSize(winSize.width - 125.0f, 30)));
+    }
+    auto listview = ListView::create(array, 30.0f, winSize.width - 125.0f, 230.0f);
+    
+
+    border = Border::create(listview, {100, 45, 0, 255}, {winSize.width - 125.0f, 230});
+    border->setPadding(0);
+
+    border->setPosition(
+        {
+            (m_bgSprite->getPositionX() - (m_bgSprite->getContentWidth() * m_bgSprite->getAnchorPoint().x)) + 10,
+            m_bgSprite->getPositionY() - 130
+        }
+    );
+
+    m_mainLayer->addChild(border);
+
+    listview->m_tableView->updateLayout();
+    return true;
+}
+
+
 bool ScriptsLayer::setup() {
     scroll = ScrollLayer::create(CCSize(winSize.width - 125.0f, 230));
     this->setTitle(fmt::format("SerpentLua {}", Mod::get()->getVersion().toVString()).c_str(), "goldFont.fnt");
-
-
-    /*
+    
     CCPoint versionLabelPos = {m_title->getPositionX() + (m_title->getContentSize().width - 25), m_title->getPositionY()};
 
     auto versionLabel = CCLabelBMFont::create(Mod::get()->getVersion().toVString().c_str(), "bigFont.fnt");
@@ -19,7 +130,7 @@ bool ScriptsLayer::setup() {
     versionLabel->setScale(m_title->getScale()/2);
 
     m_mainLayer->addChild(versionLabel);
-*/
+
     scroll->setPosition(winSize / 2);
     scroll->m_contentLayer->setLayout(
         ColumnLayout::create()
@@ -77,18 +188,24 @@ bool ScriptsLayer::setup() {
     scroll->scrollToTop();
     return true;
 }
-
-bool ScriptsLayer::initAnchored() {
-    winSize = CCDirector::get()->getWinSize();
-    return Popup::initAnchored(winSize.width - 100.0f, 280.0f);
-}
+*/
 
 ScriptsLayer* ScriptsLayer::create() {
     auto ret = new ScriptsLayer();
-    if (ret->initAnchored()) {
+    if (ret->init()) {
         ret->autorelease();
         return ret;
     }
     delete ret;
     return nullptr;
+}
+
+CCScene* ScriptsLayer::scene() {
+    auto scene = CCScene::create();
+    scene->addChild(ScriptsLayer::create());
+    return scene;
+}
+
+void ScriptsLayer::keyBackClicked() {
+    CCDirector::get()->popSceneWithTransition(0.5f, PopTransition::kPopTransitionFade);
 }
