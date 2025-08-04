@@ -41,16 +41,20 @@ namespace SerpentLua {
         std::function<void(lua_State*)> getEntry();
         #ifdef YELLOWCAT98_SERPENTLUA_EXPORTING
         static geode::Result<Plugin*, std::string> createNative(const std::filesystem::path& path); // meant for plugins that are built using dlls explicitly.
+        void terminate();
         #endif
 
         //static geode::Result<PluginMetadata*, std::string> getPluginByID(const std::string& id);
 
         void setPlugin(); // will set the Pulgin.
+        bool loadedSomewhere; // helps determine whether to terminate the plugin if no script uses it, helps save memory.
     private:
         PluginMetadata* metadata;
         std::function<void(lua_State*)> entry;
         bool native;
         // meant for native plugins.
+
+        std::optional<HMODULE> hDll;
 
         #ifdef YELLOWCAT98_SERPENTLUA_EXPORTING
         struct __metadata {

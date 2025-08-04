@@ -45,7 +45,10 @@ geode::Result<> script::loadPlugins() {
             this->terminate();
             return err;
         }
-        pluginRes.unwrap()->getEntry()(this->getLuaState());
+        auto unwrapped = pluginRes.unwrap();
+        unwrapped->getEntry()(this->getLuaState());
+
+        unwrapped->loadedSomewhere = true;
     }
 
     return Ok();

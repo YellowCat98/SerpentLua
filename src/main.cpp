@@ -102,6 +102,20 @@ $on_mod(Loaded) {
 			continue;
 		}
 	}
+
+	std::vector<std::string> theUnfortunates;
+
+	for (const auto& [key, value] : RuntimeManager::get()->getAllLoadedPlugins()) {
+		if (!possiblyTheUnfortunate.second->loadedSomewhere) {
+			theUnfortunates.push_back(key);
+		}
+	}
+	// the fate has been determined
+
+	for (auto& theUnfortunate : theUnfortunates) {
+		RuntimeManager::get()->getLoadedPluginByID(theUnfortunate).unwrap()->terminate();
+		// imagine this plugin wantign to be used and then getting TERMINATED
+	}
 }
 
 
@@ -115,62 +129,4 @@ class $modify(MenuLayerHook, MenuLayer) {
 
 		return true;
 	}
-	
-	/*
-	void onMoreGames(CCObject*) {
-		ScriptBuiltin::initPlugin();
-		auto metadataRes = ScriptMetadata::createFromScript(Mod::get()->getConfigDir() / "scripts" / "yellowcat98_test.lua");
-		if (metadataRes.isErr()) {
-			log::error("Metadata err: {}", metadataRes.err().value());
-			return;
-		}
-		auto metadata = metadataRes.unwrap();
-		auto res = script::create(metadata);
-		if (res.isErr()) {
-			log::error("Create err: {}", res.err().value());
-			return;
-		}
-
-		auto script = res.unwrap();
-
-		ScriptBuiltin::plugin->getEntry()(script->getLuaState());
-
-		RuntimeManager::get()->setScript(metadata);
-		RuntimeManager::get()->setLoadedScript(script);
-		auto execres = script->execute();
-		if (execres.isErr()) {
-			log::error("exec Err: {}", execres.err().value());
-		}
-	}
-	
-
-	void onMoreGames(CCObject*) {
-		
-		auto metadataRes = ScriptMetadata::createFromScript(Mod::get()->getConfigDir() / "scripts" / "yellowcat98_test.lua");
-		if (metadataRes.isErr()) {
-			log::error("Metadata err: {}", metadataRes.err().value());
-			return;
-		}
-		auto metadata = metadataRes.unwrap();
-		auto res = script::create(metadata);
-		if (res.isErr()) {
-			log::error("Create err: {}", res.err().value());
-			return;
-		}
-
-		auto script = res.unwrap();
-
-		RuntimeManager::get()->setLoadedScript(script);
-
-		auto pluginRes = script->loadPlugins();
-		if (pluginRes.isErr()) {
-			log::error("{}", pluginRes.err().value());
-			return;
-		}
-		auto execRes = script->execute();
-		if (execRes.isErr()) {
-			log::error("{}", execRes.err());
-		}
-	}
-	*/
 };

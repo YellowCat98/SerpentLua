@@ -3,6 +3,15 @@
 using namespace geode::prelude;
 using namespace SerpentLua;
 
+void Plugin::terminate() {
+    if (native) {
+        if (hDll.has_value()) {
+            FreeLibrary(hDll.value());
+        }
+    }
+    delete this;
+}
+
 std::function<void(lua_State*)> Plugin::getEntry() {
     return entry;
 }
@@ -35,7 +44,10 @@ geode::Result<Plugin*, std::string> Plugin::createNative(const std::filesystem::
     log::debug("Plugin {}: DLL loaded, gathering metadata...", path.filename());
 
     auto rawMeta = reinterpret_cast<const Plugin::__metadata*>(GetProcAddress(hDll, "plugin_metadata"));
-    if (!rawMeta) return Err("Plugin {}: No metadata was found.", path.filename());
+    if (!rawMeta) {
+        FreeLibrary(hDll); // i shouldve probably did this before
+        return Err("Plugin {}: No metadata was found.", path.filename());
+    }
     log::info("\n{}\n{}\n{}\n{}", rawMeta->name,rawMeta->id,rawMeta->version,rawMeta->serpentVersion);
     std::map<std::string, std::string> mapMetadata = {
         {"name", std::string(rawMeta->name)},
@@ -47,12 +59,21 @@ geode::Result<Plugin*, std::string> Plugin::createNative(const std::filesystem::
     auto metadata = PluginMetadata::create(mapMetadata);
 
     auto rawEntry = reinterpret_cast<void(*)(lua_State*)>(GetProcAddress(hDll, "entry"));
-    if (!rawEntry) return Err("Plugin {}: Entry function was not found.", path.filename());
+    if (!rawEntry) {
+        FreeLibrary(hDll);
+        return Err("Plugin {}: Entry function was not found.", path.filename());
+    }
 
     auto plugin = Plugin::create(metadata, rawEntry);
-    if (plugin.isErr()) return Err("Plugin {}: {}", path.filename(), plugin.err());
+    if (plugin.isErr()) {
+        return Err("Plugin {}: {}", path.filename(), plugin.err());
+    };
+    auto unwrapped = plugin.unwrap();
 
-    return Ok(plugin.unwrap());
+    unwrapped->native = true;
+
+    unwrapped->hDll = hDll;
+    return Ok(unwrapped);
 }
 #endif
 
