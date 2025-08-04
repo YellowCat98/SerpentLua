@@ -93,7 +93,7 @@ bool SerpentLua::internal::ui::ScriptItem::init(SerpentLua::ScriptMetadata* theM
 	viewMenu->setScale(0.4f);
 
 
-	viewBtn = CCMenuItemExt::createTogglerWithFrameName("GJ_checkOff_001.png", "GJ_checkOn_001.png", 1.5f, onButton);
+	viewBtn = CCMenuItemExt::createTogglerWithFrameName("GJ_checkOn_001.png", "GJ_checkOff_001.png", 1.5f, onButton);
 
 	viewMenu->addChild(viewBtn);
 
