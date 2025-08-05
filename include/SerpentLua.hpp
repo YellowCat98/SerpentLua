@@ -52,10 +52,10 @@ namespace SerpentLua {
         PluginMetadata* metadata;
         std::function<void(lua_State*)> entry;
         bool native;
-        // meant for native plugins.
+
 
         std::optional<HMODULE> hDll;
-
+        // meant for native plugins.
         #ifdef YELLOWCAT98_SERPENTLUA_EXPORTING
         struct __metadata {
             const char* name;
@@ -87,7 +87,7 @@ namespace SerpentLua {
         std::vector<std::string> plugins;
         std::string pluginIDstring;
 
-        std::string errors;
+        std::vector<std::string> errors;
     };
 
 }

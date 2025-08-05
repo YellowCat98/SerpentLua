@@ -23,7 +23,8 @@ void Plugin::setPlugin() {
 
 #ifdef YELLOWCAT98_SERPENTLUA_EXPORTING
 geode::Result<Plugin*, std::string> Plugin::createNative(const std::filesystem::path& path) {
-    log::info("Loading Plugin {}", path.filename());
+    log::info("Loading Native Plugin {}: initialized", path.filename());
+    if (!Mod::get()->getSavedValue<bool>(fmt::format("safe-{}", path.stem()))) return Err("Native Plugin {} was imported manually.\nThis plugin will not load unless it's reimported manually.");
     auto configDir = Mod::get()->getConfigDir();
     bool depsDir = std::filesystem::exists(configDir/"plugin_deps"/path.filename().string());
     if (!depsDir) {
@@ -79,6 +80,7 @@ geode::Result<Plugin*, std::string> Plugin::createNative(const std::filesystem::
 #endif
 
 Result<Plugin*, std::string> Plugin::create(PluginMetadata* metadata, std::function<void(lua_State*)> entry) {
+    log::info("Plugin creation: initialized.");
     auto ret = new Plugin();
     if (!ret) return Err("Plugin creation: Plugin is nullptr.");
     ret->native = false;

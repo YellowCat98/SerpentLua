@@ -23,7 +23,8 @@ void script::terminate() {
     log::info("Script {} termination: Initialized.", metadata->id);
     // this is quite sad
     // the next thing i will do is script termination
-    RuntimeManager::get()->removeLoadedScript(this->metadata->id); // maybe we should remove it from loaded scripts too!
+    auto res = RuntimeManager::get()->removeLoadedScript(this->metadata->id); // maybe we should remove it from loaded scripts too!
+    if (res.isErr()) log::error("Script {} termination: ", res.err().value());
     delete this;
     // will thi even compiling
     // ok c/c++ extension thinks it will compile
@@ -41,7 +42,7 @@ geode::Result<> script::loadPlugins() {
     for (auto& pluginID : this->metadata->plugins) {
         auto pluginRes = RuntimeManager::get()->getLoadedPluginByID(pluginID);
         if (pluginRes.isErr()) {
-            auto err = Err("Script `{}` plugin loading: Plugin getter returned an error:\n{}\nWill terminate for the rest of this session.", this->metadata->id, pluginRes.err());
+            auto err = Err("Script `{}` plugin loading: Plugin getter returned an error:\n\n{}\n\nWill terminate for the rest of this session.", this->metadata->id, pluginRes.err().value());
             this->terminate();
             return err;
         }
@@ -57,7 +58,7 @@ geode::Result<> script::loadPlugins() {
 // only terminate when a script fails inital execution, it will crash if anything after initial execution fails, this is to prevent crashes!
 geode::Result<> script::execute() {
     if (luaL_dofile(this->state, this->metadata->path.c_str()) != LUA_OK) {
-        auto err = Err("Script `{}` execution: \n{}\nScript has failed initial execution, will terminate for the rest of this session.", metadata->id, std::string(lua_tostring(this->state, -1)));
+        auto err = Err("Script `{}` execution: \n\n{}\n\nScript has failed initial execution, will terminate for the rest of this session.", metadata->id, std::string(lua_tostring(this->state, -1)));
         this->terminate();
         return err;
     }

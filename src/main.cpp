@@ -72,7 +72,7 @@ $on_mod(Loaded) {
 
 		auto res = ScriptMetadata::createFromScript(file);
 		if (res.isErr()) {
-			log::error("{}", res.err());
+			log::error("{}", res.err().value());
 			continue;
 		}
 		RuntimeManager::get()->setScript(res.unwrap());
@@ -82,6 +82,7 @@ $on_mod(Loaded) {
 		if (Mod::get()->getSavedValue<bool>(fmt::format("enabled-{}", pair.first))) {
 			auto res = script::create(pair.second);
 			if (res.isErr()) {
+				pair.second->errors.push_back(res.err().value());
 				log::error("{}", res.err().value());
 				continue;
 			}
@@ -92,12 +93,14 @@ $on_mod(Loaded) {
 			auto loadres = script->loadPlugins();
 
 			if (loadres.isErr()) {
+				pair.second->errors.push_back(loadres.err().value());
 				log::error("{}", loadres.err().value());
 				continue;
 			}
 
 			auto execres = script->execute();
 			if (execres.isErr()) {
+				pair.second->errors.push_back(execres.err().value());
 				log::error("{}", execres.err().value());
 				continue;
 			}

@@ -95,7 +95,17 @@ bool SerpentLua::internal::ui::ScriptItem::init(SerpentLua::ScriptMetadata* theM
 
 	viewBtn = CCMenuItemExt::createTogglerWithFrameName("GJ_checkOn_001.png", "GJ_checkOff_001.png", 1.5f, onButton);
 
+	// @geode-ignore(unknown-resource)
+	auto errorBtn = CCMenuItemExt::createSpriteExtraWithFrameName("geode.loader/info-alert.png", 1.5f, [this](CCMenuItemSpriteExtra*) {
+		std::string errorString = fmt::format("{}", fmt::join(this->metadata->errors, "\n"));
+		MDPopup::create("Errors", errorString, "OK")->show();
+	});
+
 	viewMenu->addChild(viewBtn);
+
+	if (metadata->errors.empty()) errorBtn->setVisible(false);
+
+	viewMenu->addChild(errorBtn);
 
 	viewMenu->setLayout(
 		RowLayout::create()
