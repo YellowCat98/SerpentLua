@@ -11,16 +11,10 @@ RuntimeManager* RuntimeManager::get() {
 
 Result<SerpentLua::Plugin*, std::string> RuntimeManager::getLoadedPluginByID(const std::string& id) {
     if (!loadedPlugins.contains(id)) {
-        return Err("Plugin Getter: Script {} does not exist.", id);
+        return Err("Plugin Getter: Plugin {} does not exist.", id);
     }
     return Ok(loadedPlugins[id]);
 }
-/*
-Result<SerpentLua::PluginMetadata*, std::string> RuntimeManager::getPluginByID(const std::string& id) {
-    if (!plugins.contains(id)) return Err("Plugin Getter: Plugin {} does not exist.", id);
-    return Ok(plugins[id]);
-}
-*/
 
 void RuntimeManager::setLoadedScript(script* script) {
     loadedScripts.insert({script->getMetadata()->id, script});
@@ -57,4 +51,18 @@ std::map<std::string, SerpentLua::ScriptMetadata*> RuntimeManager::getAllScripts
 
 std::map<std::string, SerpentLua::Plugin*> RuntimeManager::getAllLoadedPlugins() {
     return loadedPlugins;
+}
+
+Result<> RuntimeManager::removeLoadedScript(const std::string& id) {
+    if (!loadedScripts.contains(id)) return Err("Loaded Script remover: The unfortunate script was not found.");
+    loadedScripts.erase(id);
+
+    return Ok();
+}
+
+Result<> RuntimeManager::removeLoadedPlugin(const std::string& id) {
+    if (!loadedPlugins.contains(id)) return Err("Loaded Plugin remover: The unfortunate plugin was not found.");
+    loadedPlugins.erase(id);
+
+    return Ok();
 }

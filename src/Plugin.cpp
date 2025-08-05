@@ -9,6 +9,7 @@ void Plugin::terminate() {
             FreeLibrary(hDll.value());
         }
     }
+    internal::RuntimeManager::get()->removeLoadedPlugin(this->metadata->id);
     delete this;
 }
 
@@ -46,9 +47,9 @@ geode::Result<Plugin*, std::string> Plugin::createNative(const std::filesystem::
     auto rawMeta = reinterpret_cast<const Plugin::__metadata*>(GetProcAddress(hDll, "plugin_metadata"));
     if (!rawMeta) {
         FreeLibrary(hDll); // i shouldve probably did this before
-        return Err("Plugin {}: No metadata was found.", path.filename());
+        return Err("Plugin {}: No metadata was found within the DLL.", path.filename());
     }
-    log::info("\n{}\n{}\n{}\n{}", rawMeta->name,rawMeta->id,rawMeta->version,rawMeta->serpentVersion);
+    log::debug("Native DLL info: \n{}\n{}\n{}\n{}", rawMeta->name,rawMeta->id,rawMeta->version,rawMeta->serpentVersion);
     std::map<std::string, std::string> mapMetadata = {
         {"name", std::string(rawMeta->name)},
         {"developer", std::string(rawMeta->developer)},
@@ -61,7 +62,7 @@ geode::Result<Plugin*, std::string> Plugin::createNative(const std::filesystem::
     auto rawEntry = reinterpret_cast<void(*)(lua_State*)>(GetProcAddress(hDll, "entry"));
     if (!rawEntry) {
         FreeLibrary(hDll);
-        return Err("Plugin {}: Entry function was not found.", path.filename());
+        return Err("Plugin {}: Entry function was not found within the DLL.", path.filename());
     }
 
     auto plugin = Plugin::create(metadata, rawEntry);
@@ -81,6 +82,7 @@ Result<Plugin*, std::string> Plugin::create(PluginMetadata* metadata, std::funct
     auto ret = new Plugin();
     if (!ret) return Err("Plugin creation: Plugin is nullptr.");
     ret->native = false;
+    ret->loadedSomewhere = false; // assume false until reassigned.
 
     ret->metadata = metadata;
     ret->entry = entry;

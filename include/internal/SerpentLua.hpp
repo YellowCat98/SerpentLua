@@ -42,7 +42,9 @@ namespace SerpentLua::internal {
 
         std::map<std::string, SerpentLua::Plugin*> getAllLoadedPlugins();
 
+        geode::Result<> removeLoadedScript(const std::string& id);
 
+        geode::Result<> removeLoadedPlugin(const std::string& id);
     private:
         // using std::map so i can retrieve a script directly through id
         std::map<std::string, ScriptMetadata*> scripts;

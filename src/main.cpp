@@ -81,32 +81,36 @@ $on_mod(Loaded) {
 	// TODO: implement script enabling and disabling
 	// assume all scripts are enabled until i do the thing
 	for (auto& pair : RuntimeManager::get()->getAllScripts()) {
-		auto res = script::create(pair.second);
-		if (res.isErr()) {
-			log::error("{}", res.err().value());
-			continue;
-		}
-		auto script = res.unwrap();
-		
-		RuntimeManager::get()->setLoadedScript(script);
+		if (Mod::get()->getSavedValue<bool>(fmt::format("enabled-{}", pair.first))) {
+			auto res = script::create(pair.second);
+			if (res.isErr()) {
+				log::error("{}", res.err().value());
+				continue;
+			}
+			auto script = res.unwrap();
+			
+			RuntimeManager::get()->setLoadedScript(script);
 
-		auto loadres = script->loadPlugins();
+			auto loadres = script->loadPlugins();
 
-		if (loadres.isErr()) {
-			log::error("{}", loadres.err().value());
-		}
+			if (loadres.isErr()) {
+				log::error("{}", loadres.err().value());
+				continue;
+			}
 
-		auto execres = script->execute();
-		if (execres.isErr()) {
-			log::error("{}", execres.err().value());
-			continue;
+			auto execres = script->execute();
+			if (execres.isErr()) {
+				log::error("{}", execres.err().value());
+				continue;
+			}
 		}
 	}
 
 	std::vector<std::string> theUnfortunates;
 
 	for (const auto& [key, value] : RuntimeManager::get()->getAllLoadedPlugins()) {
-		if (!possiblyTheUnfortunate.second->loadedSomewhere) {
+		if (!value->loadedSomewhere) {
+			log::debug("THE UNFORTUNATE: {}", key);
 			theUnfortunates.push_back(key);
 		}
 	}
@@ -128,5 +132,15 @@ class $modify(MenuLayerHook, MenuLayer) {
 		}));
 
 		return true;
+	}
+
+	void onMoreGames(CCObject* sender) {
+		for (auto& plugin : RuntimeManager::get()->getAllLoadedPlugins()) {
+			log::info("{}: {}", plugin.first, plugin.second ? "valid" : "invalid");
+		}
+
+		for (auto& script : RuntimeManager::get()->getAllLoadedScripts()) {
+			log::info("{}: {}", script.first, script.second ? "valid" : "invalid");
+		}
 	}
 };
