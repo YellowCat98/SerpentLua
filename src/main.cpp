@@ -78,8 +78,6 @@ $on_mod(Loaded) {
 		RuntimeManager::get()->setScript(res.unwrap());
 	}
 
-	// TODO: implement script enabling and disabling
-	// assume all scripts are enabled until i do the thing
 	for (auto& pair : RuntimeManager::get()->getAllScripts()) {
 		if (Mod::get()->getSavedValue<bool>(fmt::format("enabled-{}", pair.first))) {
 			auto res = script::create(pair.second);

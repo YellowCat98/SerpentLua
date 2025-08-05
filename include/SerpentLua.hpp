@@ -86,6 +86,8 @@ namespace SerpentLua {
         bool loaded;
         std::vector<std::string> plugins;
         std::string pluginIDstring;
+
+        std::string errors;
     };
 
 }
