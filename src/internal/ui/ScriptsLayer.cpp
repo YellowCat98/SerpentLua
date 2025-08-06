@@ -59,16 +59,18 @@ bool ScriptsLayer::init() {
         ->setGap(0.5f)
         ->setMainAxisDirection(AxisDirection::BottomToTop)
     );
+    actionsMenu->setID("actions-menu");
 
     auto restartBtn = CCMenuItemExt::createSpriteExtraWithFrameName("GJ_updateBtn_001.png", 1.0f, [](CCObject* sender){
         game::restart();
     });
 
-    auto testBtn = CCMenuItemExt::createSpriteExtraWithFrameName("GJ_arrow_01_001.png", 1.0f, [](CCObject*) {
-
+    auto pluginsBtn = CCMenuItemExt::createSpriteExtra(CircleButtonSprite::create(CCSprite::create("plugin.png"_spr)), [](CCObject*) {
+        log::info("H");
     });
 
     actionsMenu->addChild(restartBtn);
+    actionsMenu->addChild(pluginsBtn);
     
     this->addChildAtPosition(actionsMenu, Anchor::BottomLeft, {25.0f, 25.0f}, false);
 
