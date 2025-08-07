@@ -36,6 +36,7 @@ void ScriptBuiltin::entry(lua_State* L) {
     _ScriptMetadata["serpentVersion"] = &SerpentLua::ScriptMetadata::serpentVersion;
     _ScriptMetadata["nostd"] = &SerpentLua::ScriptMetadata::nostd;
     _ScriptMetadata["developer"] = &SerpentLua::ScriptMetadata::developer;
+    _ScriptMetadata["path"] = &SerpentLua::ScriptMetadata::path;
 
     auto logging = state.create_table();
 
