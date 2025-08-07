@@ -81,7 +81,7 @@ void ScriptBuiltin::entry(lua_State* L) {
 
     table["log"] = logging;
 
-    state["package"]["preload"]["SerpentLua"] = [table]() {
+    state["serpentlua_modules"]["SerpentLua"] = [table]() {
         return table;
     };
 }
