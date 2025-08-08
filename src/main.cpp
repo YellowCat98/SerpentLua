@@ -4,6 +4,7 @@
 #include <filesystem>
 #include <internal/SerpentLua.hpp>
 #include <internal/ui/ScriptsLayer.hpp>
+#include <random>
 
 using namespace geode::prelude;
 using namespace SerpentLua::internal;
@@ -43,6 +44,25 @@ $on_mod(Loaded) {
 		log::error("{}", initpluginres.err().value());
 		return;
 	}
+
+	geode::listenForSettingChanges("dev-mode", +[](bool change) {
+		if (change) {
+			geode::createQuickPopup(
+				"WARNING!",
+				"Enabling dev mode bypasses Plugin validation!"
+				"\nThis allows ALL plugins found in the plugins directory of this mod to be loaded."
+				"\nThis option is only meant for developers."
+				"\nEnable at your own risk.",
+				"Cancel", "Proceed", // this is a reference to the hit game Deltarune.
+				[](FLAlertLayer*, bool btn2) {
+					if (!btn2) {
+						log::info("btn2");
+						Mod::get()->setSettingValue<bool>("dev-mode", false);
+					}
+				}
+			);
+		}
+	});
 
 	// initialize all the native plugins! (mod plugins are initialized by the mods themselves)
 
@@ -128,20 +148,19 @@ class $modify(MenuLayerHook, MenuLayer) {
 	bool init() {
 		if (!MenuLayer::init()) return false;
 
-		this->getChildByID("bottom-menu")->addChild(CCMenuItemExt::createSpriteExtra(CCSprite::createWithSpriteFrameName("GJ_arrow_01_001.png"), [](CCObject*) {
+		auto bottomMenu = static_cast<CCMenu*>(this->getChildByID("bottom-menu"));
+		bottomMenu->addChild(CCMenuItemExt::createSpriteExtra(CircleButtonSprite::create(CCSprite::create("serpentluaButton.png"_spr)), [](CCObject*) {
 			CCDirector::get()->pushScene(CCTransitionFade::create(0.5f, ui::ScriptsLayer::scene()));
 		}));
+
+		bottomMenu->updateLayout();
 
 		return true;
 	}
 
 	void onMoreGames(CCObject* sender) {
-		for (auto& plugin : RuntimeManager::get()->getAllLoadedPlugins()) {
-			log::info("{}: {}", plugin.first, plugin.second ? "valid" : "invalid");
-		}
-
-		for (auto& script : RuntimeManager::get()->getAllLoadedScripts()) {
-			log::info("{}: {}", script.first, script.second ? "valid" : "invalid");
-		}
+		auto scene = CCScene::create();
+		
+		CCDirector::get()->replaceScene(scene);
 	}
 };
