@@ -65,7 +65,7 @@ $on_mod(Loaded) {
 
 	// setup metadata first
 	for (const auto& file : std::filesystem::directory_iterator(configDir/"scripts")) {
-		if (file.path().extension().string() != ".lua") {
+		if (file.path().extension().string() != ".lua" && file.path().extension().string() != ".luau" && file.path().extension().string() != ".luac") {
 			log::warn("Non-lua file was found in scripts directory, will be ignored.");
 			continue;
 		}

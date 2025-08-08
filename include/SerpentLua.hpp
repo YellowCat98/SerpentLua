@@ -8,11 +8,10 @@
 #include <filesystem>
 #include <fstream>
 #include <sstream>
-extern "C" {
-    #include <lua.h>
-    #include <lualib.h>
-    #include <lauxlib.h>
-}
+#include <lua.h>
+#include <lualib.h>
+#include <luacode.h>
+
 
 #ifdef GEODE_IS_WINDOWS
     #ifdef YELLOWCAT98_SERPENTLUA_EXPORTING
@@ -84,6 +83,7 @@ namespace SerpentLua {
         bool nostd;
         std::string path;
         bool loaded;
+        bool isLuac = false;
         std::vector<std::string> plugins;
         std::string pluginIDstring;
 

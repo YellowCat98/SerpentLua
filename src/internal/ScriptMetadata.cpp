@@ -80,7 +80,7 @@ geode::Result<SerpentLua::ScriptMetadata*, std::string> SerpentLua::ScriptMetada
         auto it = std::find(requiredKeys.begin(), requiredKeys.end(), key);
         if (it == requiredKeys.end()) return Err("Script `{}` metadata: Unknown Metadata key: {}", scriptPath.filename(), key);
     }
-    
+    if (scriptPath.extension().string() == ".luac") metadata.insert({"isLuac","true"});
     // HOW the fuck did i forget this holy fucking SHIT.
     metadata.insert({"path", scriptPath.string()});
 
@@ -100,6 +100,7 @@ SerpentLua::ScriptMetadata* SerpentLua::ScriptMetadata::create(std::map<std::str
     ret->path = metadata["path"];
     ret->pluginIDstring = metadata["plugins"];
     ret->developer = metadata["developer"];
+    ret->isLuac = metadata.contains("isLuac");
     ret->setPlugins();
 
     return ret;
