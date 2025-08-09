@@ -81,7 +81,6 @@ SCRIPT_METADATA_FIELD(id)
 SCRIPT_METADATA_FIELD(version)
 SCRIPT_METADATA_FIELD(serpentVersion)
 SCRIPT_METADATA_FIELD(developer)
-
 static int l_ScriptMetadata_nostd(lua_State* L) {
     auto* meta = *(SerpentLua::ScriptMetadata**)luaL_checkudata(L, 1, "ScriptMetadataMeta");
     lua_pushboolean(L, meta->nostd);

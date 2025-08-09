@@ -21,5 +21,13 @@
 		"sprites": [
 			"resources/*.png"
 		]
+	},
+	"settings": {
+		"dev-mode": {
+			"name": "Dev Mode",
+			"description": "Allows loading unapproved plugins.",
+			"type": "bool",
+			"default": false
+		}
 	}
 }

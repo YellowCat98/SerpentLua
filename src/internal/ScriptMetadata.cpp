@@ -69,13 +69,14 @@ geode::Result<SerpentLua::ScriptMetadata*, std::string> SerpentLua::ScriptMetada
 
 
     // checking for metadata validity
-    std::vector<std::string> requiredKeys = {"name", "id", "version", "serpent-version", "developer", "plugins"};
+    std::vector<std::string> requiredKeys = {"name", "id", "version", "serpent-version", "developer"};
 
     for (auto& req : requiredKeys) {
         if (!metadata.contains(req)) return Err("Script `{}` metadata: Metadata is missing `{}` key.", scriptPath.filename(), req);
     }
 
     requiredKeys.push_back("nostd"); // nostd is not required, im only adding nostd to it because requiredKeys is now repurposed to check for unknown keys!
+    requiredKeys.push_back("plugins"); // same for this one
     for (const auto& [key, value] : metadata) { // this also disallows things like `--@  developer hello`
         auto it = std::find(requiredKeys.begin(), requiredKeys.end(), key);
         if (it == requiredKeys.end()) return Err("Script `{}` metadata: Unknown Metadata key: {}", scriptPath.filename(), key);
@@ -98,7 +99,8 @@ SerpentLua::ScriptMetadata* SerpentLua::ScriptMetadata::create(std::map<std::str
     ret->serpentVersion = metadata["serpent-version"];
     ret->nostd = metadata.contains("nostd");
     ret->path = metadata["path"];
-    ret->pluginIDstring = metadata["plugins"];
+    if (metadata.contains("plugins")) ret->pluginIDstring = metadata["plugins"];
+    else ret->pluginIDstring = "";
     ret->developer = metadata["developer"];
     ret->isLuac = metadata.contains("isLuac");
     ret->setPlugins();

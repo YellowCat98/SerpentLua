@@ -11,7 +11,7 @@ namespace SerpentLua::internal {
         static geode::Result<script*, std::string> getLoadedScript(const std::string& id);
         ScriptMetadata* getMetadata();
         lua_State* getLuaState();
-        static lua_State* createState(bool nostd);
+        lua_State* createState();
         geode::Result<> execute(); // Executes THE SCRIPT.
         geode::Result<> loadPlugins();
     private:

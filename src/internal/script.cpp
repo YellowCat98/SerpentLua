@@ -13,8 +13,10 @@ lua_State* script::getLuaState() {
     return state;
 }
 
-lua_State* script::createState(bool nostd) {
+lua_State* script::createState() {
+    log::debug("Script {} state creation: Initialized.", this->metadata->id);
     lua_State* state = luaL_newstate();
+
     lua_getglobal(state, "package");
     if (lua_isnil(state, -1)) {
         lua_pop(state, 1);
@@ -30,7 +32,64 @@ lua_State* script::createState(bool nostd) {
         lua_setfield(state, -3, "preload");
     }
 
-    if (!nostd) luaL_openlibs(state);
+    if (!this->metadata->nostd) {
+        luaL_openlibs(state);
+        luaL_requiref(state, "_G", luaopen_base, 1);
+        // nil out the bad guys from _G before continuing loading!
+
+        lua_pushnil(state); lua_setglobal(state, "dofile");
+        lua_pushnil(state); lua_setglobal(state, "loadfile");
+        lua_pushnil(state); lua_setglobal(state, "require");
+        lua_pushnil(state); lua_setglobal(state, "load");
+
+
+        luaL_requiref(state, LUA_MATHLIBNAME, luaopen_math, 1);
+        luaL_requiref(state, LUA_TABLIBNAME, luaopen_table, 1);
+        luaL_requiref(state, LUA_COLIBNAME, luaopen_coroutine, 1);
+        luaL_requiref(state, LUA_STRLIBNAME, luaopen_string, 1);
+        lua_pop(state, 5);
+
+        lua_newtable(state);
+        lua_setglobal(state, "serpentlua_modules");
+
+        lua_pushcfunction(state, [](lua_State* L) -> int {
+            const char* module = luaL_checkstring(L, 1);
+
+            lua_getglobal(L, "serpentlua_modules");
+            if (!lua_istable(L, -1)) {
+                return luaL_error(L, "serpentlua_modules is not defined.");
+            }
+
+            lua_getfield(L, -1, module);
+
+            if (lua_isnil(L, -1)) {
+                return luaL_error(L, "Module %s was not found.", module);
+            }
+
+            if (lua_isfunction(L, -1)) {
+                lua_pushvalue(L, -1);
+                lua_call(L, 0, 1);
+
+                lua_pushvalue(L, -1);
+                lua_getglobal(L, "serpentlua_modules");
+
+                lua_insert(L, -2);
+
+                lua_setfield(L, -1, module);
+
+                lua_pop(L, 1);
+            }
+
+            return 1;
+        });
+        lua_setglobal(state, "serpentlua_require");
+
+    }
+
+    lua_atpanic(state, [](lua_State* L) -> int {
+        log::error("LUA PANIC: {}", lua_tostring(L, -1));
+        return 0;
+    });
     return state;
 }
 
@@ -92,14 +151,11 @@ geode::Result<script*, std::string> script::getLoadedScript(const std::string& i
 }
 // luau scripts can be lua (roblox saves as) | luau (luau) | luac (luau but already in bytecode)
 geode::Result<script*, std::string> script::create(ScriptMetadata* metadata) {
-    lua_State* state = script::createState(metadata->nostd);
-    if (!state) {
-        return Err("Script `{}` creation: An error occured creating lua state.", metadata->id);
-    }
 
     auto ret = new script();
     if (!ret) return Err("Script `{}` creation: Couldn't create.", metadata->id);
     ret->metadata = metadata;
+  
     ret->state = state;
     geode::Result<std::string> fileinfo = utils::file::readString(metadata->path);
     if (fileinfo.isErr()) {

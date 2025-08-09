@@ -55,27 +55,43 @@ bool ScriptsLayer::init() {
 
     auto actionsMenu = CCMenu::create();
     actionsMenu->setLayout(SimpleColumnLayout::create()
-        ->setMainAxisAlignment(MainAxisAlignment::Center)
+        ->setMainAxisAlignment(MainAxisAlignment::Start)
         ->setGap(0.5f)
         ->setMainAxisDirection(AxisDirection::BottomToTop)
     );
+    actionsMenu->setAnchorPoint({0.0f, 0.0f});
+    actionsMenu->setContentSize({38.0f, 200.0f});
+
     actionsMenu->setID("actions-menu");
 
     auto restartBtn = CCMenuItemExt::createSpriteExtraWithFrameName("GJ_updateBtn_001.png", 1.0f, [](CCObject* sender){
         game::restart();
     });
 
-    auto pluginsBtn = CCMenuItemExt::createSpriteExtra(CircleButtonSprite::create(CCSprite::create("plugin.png"_spr)), [](CCObject*) {
-        log::info("H");
+    std::map<std::string, std::string> dummyMetadataMap = {
+        {"name", "test"},
+        {"developer", "hi"},
+        {"version", "1.0.0"},
+        {"serpent-version", "yoo"},
+        {"plugins", "hi hi hi hi"}
+    };
+
+    auto dummyMetadata = ScriptMetadata::create(dummyMetadataMap);
+    auto pluginsBtn = CCMenuItemExt::createSpriteExtra(CircleButtonSprite::create(CCSprite::create("plugin.png"_spr)), [&](CCObject*) {
+        array->addObject(ScriptItem::create(dummyMetadata, [&](CCMenuItemToggler*) {
+
+        }, CCSize(358.0f, 30)));
+        //listview->m_tableView->reloadData();
     });
 
     actionsMenu->addChild(restartBtn);
     actionsMenu->addChild(pluginsBtn);
     
-    this->addChildAtPosition(actionsMenu, Anchor::BottomLeft, {25.0f, 25.0f}, false);
+    this->addChildAtPosition(actionsMenu, Anchor::BottomLeft, {5.0f, 0.0f}, false);
 
     actionsMenu->updateLayout();
     backMenu->updateLayout();
+
     return true;
 }
 
