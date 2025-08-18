@@ -8,10 +8,27 @@ namespace SerpentLua::internal::ui {
 		static ScriptsLayer* create();
 		static cocos2d::CCScene* scene();
 	private:
-		bool init();
-		geode::ScrollLayer* scroll;
-		geode::Border* border;
-		cocos2d::CCSize winSize;
+
 		void keyBackClicked() override;
+
+		bool init();
+
+		void setupScriptsList();
+
+		void loadPage(int page);
+		void refreshWith(cocos2d::CCArray* array);
+
+		GJListLayer* m_scriptsListLayer;
+		
+		CCMenuItemSpriteExtra* nextBtn;
+		CCMenuItemSpriteExtra* backBtn;
+		// these buttons are needed here so that we can change their opacity in loadPage
+		void callbackMovePage(cocos2d::CCObject*);
+
+		int currentPage;
+		int itemsPerPage;
+
+		cocos2d::CCSize winSize;
+		std::map<std::string, ScriptMetadata*> scripts;
 	};
 }
