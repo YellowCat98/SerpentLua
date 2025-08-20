@@ -1,5 +1,6 @@
 #pragma once
 #include <internal/SerpentLua.hpp>
+#include <internal/ui/ScriptsLayer.hpp>
 
 namespace SerpentLua::internal::ui {
 	class ScriptItem : public cocos2d::CCNode {
@@ -17,6 +18,7 @@ namespace SerpentLua::internal::ui {
 		
 	public:
 		static ScriptItem* create(SerpentLua::ScriptMetadata* metadata, std::function<void(CCMenuItemToggler*)> onButton, const cocos2d::CCSize& size);
+		static ScriptItem* createWithPlugin(SerpentLua::PluginMetadata* metadata); // you cant really enable or disable plugins.
 		CCMenuItemToggler* viewBtn;
 		SerpentLua::ScriptMetadata* metadata; // nvm this was the one that was needed to access within ScriptsLayer!
 	};

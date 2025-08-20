@@ -47,20 +47,7 @@ $on_mod(Loaded) {
 
 	geode::listenForSettingChanges("dev-mode", +[](bool change) {
 		if (change) {
-			geode::createQuickPopup(
-				"WARNING!",
-				"Enabling dev mode bypasses Plugin validation!"
-				"\nThis allows ALL plugins found in the plugins directory of this mod to be loaded."
-				"\nThis option is only meant for developers."
-				"\nEnable at your own risk.",
-				"Cancel", "Proceed", // this is a reference to the hit game Deltarune.
-				[](FLAlertLayer*, bool btn2) {
-					if (!btn2) {
-						log::info("btn2");
-						Mod::get()->setSettingValue<bool>("dev-mode", false);
-					}
-				}
-			);
+			Mod::get()->setSavedValue<bool>("should-show-warning", true); // basically, since this function gets called after the setting was set, it makes it a little wonky to add a warning here
 		}
 	});
 
@@ -148,9 +135,54 @@ class $modify(MenuLayerHook, MenuLayer) {
 	bool init() {
 		if (!MenuLayer::init()) return false;
 
+		if (!std::filesystem::exists(Mod::get()->getConfigDir()/"plugin_global_deps"/"lua.dll")) {
+			auto alert = FLAlertLayer::create("Missing DLL.",
+				fmt::format(
+					"lua.dll was not found in the mod's config directory.\n"
+					"lua.dll is essential for plugins to work.\n"
+					"Scripts will load fine, however they will not be able to use plugins.\n"
+					"Please install lua.dll in the following directory:\n{}",
+					(Mod::get()->getConfigDir()/"plugin_global_deps"/"lua.dll").string()
+				).c_str(),
+				"OK"
+			);
+
+			alert->m_scene = this;
+			alert->show();
+		}
+
+		if (Mod::get()->setSavedValue<bool>("should-show-warning", false)) {
+			auto popup = geode::createQuickPopup("SerpentLua: Dev mode enabled!",
+				"It appears that you have enabled dev mode.\n"
+				"Dev mode is a setting that allows any plugin to load.\n"
+				"This setting is meant for developers who are looking to test their plugins.\n"
+				"This setting did not apply as a safety measure.\n"
+				"If you want this setting to apply, restart the game.\n"
+				"Otherwise, disable this setting.",
+				"Disable", "Cancel",
+				[](FLAlertLayer*, bool btn2) {
+					if (btn2) {
+						
+					} else {
+						Mod::get()->setSettingValue<bool>("dev-mode", false);
+					}
+
+					geode::createQuickPopup("Restart",
+						"Would you like to restart now?",
+						"Restart", "Later",
+						[](FLAlertLayer*, bool btn2) {
+							if (!btn2) utils::game::restart();
+						}
+					);
+				}, false);
+
+			popup->m_scene = this;
+			popup->show();
+		}
+
 		auto bottomMenu = static_cast<CCMenu*>(this->getChildByID("bottom-menu"));
 		bottomMenu->addChild(CCMenuItemExt::createSpriteExtra(CircleButtonSprite::create(CCSprite::create("serpentluaButton.png"_spr)), [](CCObject*) {
-			CCDirector::get()->pushScene(CCTransitionFade::create(0.5f, ui::ScriptsLayer::scene()));
+			CCDirector::get()->pushScene(CCTransitionFade::create(0.5f, ui::ScriptsLayer::scene(false)));
 		}));
 
 		bottomMenu->updateLayout();

@@ -27,7 +27,8 @@
 			"name": "Dev Mode",
 			"description": "Allows loading unapproved plugins.",
 			"type": "bool",
-			"default": false
+			"default": false,
+			"requires-restart": true
 		}
 	}
 }

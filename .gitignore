@@ -69,3 +69,6 @@ build-*/
 
 # what
 *.exp
+
+# ignore .temp folder
+.temp/

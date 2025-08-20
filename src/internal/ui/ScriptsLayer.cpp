@@ -81,7 +81,7 @@ void ScriptsLayer::setupScriptsList() {
 
     auto listView = ListView::create(CCArray::create(), 30);
     
-    m_scriptsListLayer = GJListLayer::create(listView, "scripts", {194, 114, 62, 255}, 358.0f, 220.0f, 0);
+    m_scriptsListLayer = GJListLayer::create(listView, plugin ? "scripts" : "plugins", {194, 114, 62, 255}, 358.0f, 220.0f, 0);
 
     auto listlayerSize = m_scriptsListLayer->getContentSize();
     m_scriptsListLayer->setPosition(ccp((winSize.width - listlayerSize.width)/2, (winSize.height - listlayerSize.height)/2));
@@ -123,11 +123,15 @@ void ScriptsLayer::setupScriptsList() {
     this->loadPage(1); // load the first page after all nodes are added as if we call it too early backBtn and nextBtn would be nullptr
 }
 
+void ScriptsLayer::setupPluginsList() {
+
+}
+
 void ScriptsLayer::callbackMovePage(CCObject* object) {
     this->loadPage(this->currentPage + object->getTag());
 }
 
-bool ScriptsLayer::init() {
+bool ScriptsLayer::init(bool plugin) {
     if (!CCLayer::init()) return false;
     this->setKeypadEnabled(true);
     winSize = CCDirector::get()->getWinSize();
@@ -190,9 +194,9 @@ bool ScriptsLayer::init() {
 }
 
 
-ScriptsLayer* ScriptsLayer::create() {
+ScriptsLayer* ScriptsLayer::create(bool plugin) {
     auto ret = new ScriptsLayer();
-    if (ret->init()) {
+    if (ret->init(plugin)) {
         ret->autorelease();
         return ret;
     }
@@ -200,9 +204,9 @@ ScriptsLayer* ScriptsLayer::create() {
     return nullptr;
 }
 
-CCScene* ScriptsLayer::scene() {
+CCScene* ScriptsLayer::scene(bool plugin) {
     auto scene = CCScene::create();
-    scene->addChild(ScriptsLayer::create());
+    scene->addChild(ScriptsLayer::create(plugin));
     return scene;
 }
 

@@ -5,15 +5,16 @@
 namespace SerpentLua::internal::ui {
     class ScriptsLayer : public cocos2d::CCLayer {
 	public:
-		static ScriptsLayer* create();
-		static cocos2d::CCScene* scene();
+		static ScriptsLayer* create(bool plugin); // whether to make it show plugins or show scripts
+		static cocos2d::CCScene* scene(bool plugin);
 	private:
 
 		void keyBackClicked() override;
 
-		bool init();
+		bool init(bool plugin);
 
 		void setupScriptsList();
+		void setupPluginsList();
 
 		void loadPage(int page);
 		void refreshWith(cocos2d::CCArray* array);
@@ -29,6 +30,8 @@ namespace SerpentLua::internal::ui {
 		int itemsPerPage;
 
 		cocos2d::CCSize winSize;
-		std::map<std::string, ScriptMetadata*> scripts;
+		std::map<std::string, ScriptMetadata*> scripts; // for convenience, PluginMetadata is easily convertible to ScriptMetadata
+
+		bool plugin;
 	};
 }
