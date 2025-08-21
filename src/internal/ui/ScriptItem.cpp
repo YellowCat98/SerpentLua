@@ -1,11 +1,19 @@
 #include <internal/ui/ScriptItem.hpp>
 
 using namespace geode::prelude;
+using namespace SerpentLua::internal::ui;
 
-bool SerpentLua::internal::ui::ScriptItem::init(SerpentLua::ScriptMetadata* theMetadata, std::function<void(CCMenuItemToggler*)> onButton, const cocos2d::CCSize& size) {
+bool ScriptItem::init(void* theMetadata, std::function<void(CCMenuItemToggler*)> onButton, const cocos2d::CCSize& size, bool plugin) {
 	if (!CCNode::init()) return false;
-	this->metadata = theMetadata;
-	this->setID(fmt::format("script-item/{}", metadata->id));
+	this->plugin = plugin;
+
+	if (plugin)
+		this->metadata = static_cast<PluginMetadata*>(theMetadata);
+	else
+		this->metadata = static_cast<ScriptMetadata*>(theMetadata);
+
+
+	this->setID(fmt::format("script-item/{}", METADATA_GET(id)));
 
 
 	auto bg = CCScale9Sprite::create("GJ_square01.png");
@@ -46,7 +54,7 @@ bool SerpentLua::internal::ui::ScriptItem::init(SerpentLua::ScriptMetadata* theM
 	devContainer->ignoreAnchorPointForPosition(false);
 	devContainer->setAnchorPoint({0.0f, 0.0f});
 
-	dev = CCLabelBMFont::create(metadata->developer.c_str(), "goldFont.fnt");
+	dev = CCLabelBMFont::create(METADATA_GET(developer).c_str(), "goldFont.fnt");
 
 	devContainer->addChild(dev);
 
@@ -64,12 +72,12 @@ bool SerpentLua::internal::ui::ScriptItem::init(SerpentLua::ScriptMetadata* theM
 
 	mainContainer->addChild(title);
 
-	titleLabel = CCLabelBMFont::create(metadata->name.c_str(), "bigFont.fnt");
+	titleLabel = CCLabelBMFont::create(METADATA_GET(name).c_str(), "bigFont.fnt");
 	titleLabel->setID("title-label");
 	titleLabel->setLayoutOptions(AxisLayoutOptions::create()->setScalePriority(1));
 	title->addChild(titleLabel);
 
-    versionLabel = CCLabelBMFont::create(metadata->version.c_str(), "bigFont.fnt");
+    versionLabel = CCLabelBMFont::create(METADATA_GET(version).c_str(), "bigFont.fnt");
     versionLabel->setID("version-label");
     versionLabel->setLayoutOptions(AxisLayoutOptions::create()
         ->setScalePriority(1)
@@ -94,16 +102,19 @@ bool SerpentLua::internal::ui::ScriptItem::init(SerpentLua::ScriptMetadata* theM
 
 
 	viewBtn = CCMenuItemExt::createTogglerWithFrameName("GJ_checkOn_001.png", "GJ_checkOff_001.png", 1.5f, onButton);
-
+	viewBtn->setID("toggle");
 	// @geode-ignore(unknown-resource)
 	auto errorBtn = CCMenuItemExt::createSpriteExtraWithFrameName("geode.loader/info-alert.png", 1.5f, [this](CCMenuItemSpriteExtra*) {
-		std::string errorString = fmt::format("{}", fmt::join(this->metadata->errors, "\n"));
+		std::string errorString = fmt::format("{}", fmt::join(std::get<ScriptMetadata*>(metadata)->errors, "\n"));
 		MDPopup::create("Errors", errorString, "OK")->show();
 	});
+	errorBtn->setID("error-button");
 
 	viewMenu->addChild(viewBtn);
 
-	if (metadata->errors.empty()) errorBtn->setVisible(false);
+	if (plugin) {
+		errorBtn->setVisible(false);
+	} else if (std::get<ScriptMetadata*>(metadata)->errors.empty()) errorBtn->setVisible(false);
 
 	viewMenu->addChild(errorBtn);
 
@@ -113,6 +124,7 @@ bool SerpentLua::internal::ui::ScriptItem::init(SerpentLua::ScriptMetadata* theM
 			->setAxisAlignment(AxisAlignment::End)
 			->setGap(10)
 	);
+	if (plugin) viewBtn->setVisible(false);
 
 	this->addChild(bg);
 	this->addChild(mainContainer);
@@ -127,14 +139,13 @@ bool SerpentLua::internal::ui::ScriptItem::init(SerpentLua::ScriptMetadata* theM
 }
 
 // listens for changes and applies them
-void SerpentLua::internal::ui::ScriptItem::listener(float) {
-	auto enabledScripts = Mod::get()->getSavedValue<std::vector<std::string>>("enabled-scripts");
-
-	this->viewBtn->toggle(Mod::get()->getSavedValue<bool>(fmt::format("enabled-{}", metadata->id)));
+void ScriptItem::listener(float) {
+	if (!plugin)
+		this->viewBtn->toggle(Mod::get()->getSavedValue<bool>(fmt::format("enabled-{}", std::get<ScriptMetadata*>(metadata)->id)));
 }
-SerpentLua::internal::ui::ScriptItem* SerpentLua::internal::ui::ScriptItem::create(SerpentLua::ScriptMetadata* metadata, std::function<void(CCMenuItemToggler*)> onButton, const cocos2d::CCSize& size) {
-    auto ret = new SerpentLua::internal::ui::ScriptItem();
-    if (ret && ret->init(metadata, onButton, size)) {
+ScriptItem* ScriptItem::create(void* metadata, std::function<void(CCMenuItemToggler*)> onButton, const cocos2d::CCSize& size, bool plugin) {
+    auto ret = new ScriptItem();
+    if (ret && ret->init(metadata, onButton, size, plugin)) {
         ret->autorelease();
         return ret;
     }

@@ -2,6 +2,7 @@
 #include <Geode/Geode.hpp>
 #include <internal/SerpentLua.hpp>
 
+
 namespace SerpentLua::internal::ui {
     class ScriptsLayer : public cocos2d::CCLayer {
 	public:
@@ -14,7 +15,6 @@ namespace SerpentLua::internal::ui {
 		bool init(bool plugin);
 
 		void setupScriptsList();
-		void setupPluginsList();
 
 		void loadPage(int page);
 		void refreshWith(cocos2d::CCArray* array);
@@ -30,7 +30,7 @@ namespace SerpentLua::internal::ui {
 		int itemsPerPage;
 
 		cocos2d::CCSize winSize;
-		std::map<std::string, ScriptMetadata*> scripts; // for convenience, PluginMetadata is easily convertible to ScriptMetadata
+		std::map<std::string, void*> scripts; // it appears that it was a pain in the ass to use templates here, so im using a raw pointer and then converting it to either pluginmetadata or scriptmetadata! all of this just to avoid copying
 
 		bool plugin;
 	};

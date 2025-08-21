@@ -12,6 +12,7 @@ void Plugin::terminate() {
     auto annoyingNoDiscardWarningFix = internal::RuntimeManager::get()->removeLoadedPlugin(this->metadata->id);
     if (annoyingNoDiscardWarningFix.isErr()) {
         log::warn("{}", annoyingNoDiscardWarningFix.err().value());
+        return;
     }
     delete this;
 }

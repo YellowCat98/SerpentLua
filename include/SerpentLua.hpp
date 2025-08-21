@@ -48,8 +48,8 @@ namespace SerpentLua {
 
         void setPlugin(); // will set the Pulgin.
         bool loadedSomewhere; // helps determine whether to terminate the plugin if no script uses it, helps save memory.
-    private:
         PluginMetadata* metadata;
+    private:
         std::function<void(lua_State*)> entry;
         bool native;
 

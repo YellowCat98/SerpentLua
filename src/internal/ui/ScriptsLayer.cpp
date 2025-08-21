@@ -14,7 +14,7 @@ void ScriptsLayer::refreshWith(CCArray* array) {
 void ScriptsLayer::loadPage(int page) {
     //auto allScripts = internal::RuntimeManager::get()->getAllScripts();
 
-    std::vector<ScriptMetadata*> scriptsInPage;
+    std::vector<void*> scriptsInPage;
 
     int start = (page - 1) * itemsPerPage; // reason we do page - 1 is because indexes start at 0
     int end = start + itemsPerPage - 1; // pages overlap when you dont do the -1
@@ -29,12 +29,21 @@ void ScriptsLayer::loadPage(int page) {
 
     CCArray* array = CCArray::create(); // in this case, using CCArrayExt doesnt really make much of a difference cause literally all i do is push back, and listView handles everything.
     for (auto& item : scriptsInPage) {
-        array->addObject(ScriptItem::create(item, [](CCMenuItemToggler*){}, CCSize(358.0f, 30)));
+        array->addObject(ScriptItem::create(item, [](CCMenuItemToggler* button) {
+            auto item = typeinfo_cast<ScriptItem*>(button->getParent()->getParent()); // normally this should never return nullptr, but just in case!
+            if (!item) return;
+            auto metadata = item->metadata;
+            if (std::holds_alternative<PluginMetadata*>(metadata)) {
+                Notification::create("You cannot enable/disable a plugin!")->show();
+                return; // even though by default you shouldnt be able to reach this button, you can make it visible and clickable through devtools, which is bad
+            }
+            Mod::get()->setSavedValue<bool>(fmt::format("enabled-{}", std::get<ScriptMetadata*>(metadata)->id), !button->isToggled());
+        }, CCSize(358.0f, 30), plugin));
     }
 
     //backBtn->setVisible(true);
     //nextBtn->setVisible(true);
-
+    
     if (scriptsInPage.front() == scripts.begin()->second) { // basically if were on the first page
         backBtn->setVisible(false);
     }
@@ -52,7 +61,17 @@ void ScriptsLayer::loadPage(int page) {
 
 void ScriptsLayer::setupScriptsList() {
     CCArray* scriptItems = CCArray::create();
-    scripts = SerpentLua::internal::RuntimeManager::get()->getAllScripts();
+    
+    if (!plugin) {
+        for (const auto [k, v] : RuntimeManager::get()->getAllScripts()) {
+            scripts[k] = static_cast<void*>(v);
+        }
+    } else {
+        for (const auto [k, v] : RuntimeManager::get()->getAllLoadedPlugins()) {
+            scripts[k] = static_cast<void*>(v->metadata);
+        }
+    }
+
 /*
     for (auto& script : SerpentLua::internal::RuntimeManager::get()->getAllScripts()) {
         scriptItems->addObject(ScriptItem::create(script.second, [](CCMenuItemToggler* button) {
@@ -81,7 +100,7 @@ void ScriptsLayer::setupScriptsList() {
 
     auto listView = ListView::create(CCArray::create(), 30);
     
-    m_scriptsListLayer = GJListLayer::create(listView, plugin ? "scripts" : "plugins", {194, 114, 62, 255}, 358.0f, 220.0f, 0);
+    m_scriptsListLayer = GJListLayer::create(listView, plugin ? "plugins" : "scripts", {194, 114, 62, 255}, 358.0f, 220.0f, 0);
 
     auto listlayerSize = m_scriptsListLayer->getContentSize();
     m_scriptsListLayer->setPosition(ccp((winSize.width - listlayerSize.width)/2, (winSize.height - listlayerSize.height)/2));
@@ -104,7 +123,8 @@ void ScriptsLayer::setupScriptsList() {
     arrowMenu->addChild(backBtn);
 
     auto pluginsBtn = CCMenuItemExt::createSpriteExtra(CircleButtonSprite::create(CCSprite::create("plugin.png"_spr)), [this](CCObject*) {
-        this->loadPage(this->currentPage + 1);
+        auto layer = ScriptsLayer::scene(true);
+        CCDirector::get()->pushScene(CCTransitionFade::create(0.5f, layer));
     });
 
     this->getChildByID("actions-menu")->addChild(pluginsBtn);
@@ -123,10 +143,6 @@ void ScriptsLayer::setupScriptsList() {
     this->loadPage(1); // load the first page after all nodes are added as if we call it too early backBtn and nextBtn would be nullptr
 }
 
-void ScriptsLayer::setupPluginsList() {
-
-}
-
 void ScriptsLayer::callbackMovePage(CCObject* object) {
     this->loadPage(this->currentPage + object->getTag());
 }
@@ -138,6 +154,7 @@ bool ScriptsLayer::init(bool plugin) {
 
     this->currentPage = 1;
     this->itemsPerPage = 10;
+    this->plugin = plugin;
 
     auto background = geode::createLayerBG();
     background->setID("background"); // background is better than bg imo
