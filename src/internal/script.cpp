@@ -114,7 +114,7 @@ geode::Result<> script::loadPlugins() {
     return Ok();
 }
 
-// only terminate when a script fails inital execution, it will crash if anything after initial execution fails, this is to prevent crashes!
+// only terminate when a script fails inital execution, it will crash if anything after initial execution fails, this is to prevent before-the-game-loads crashes!
 geode::Result<> script::execute() {
     if (luaL_dofile(this->state, this->metadata->path.c_str()) != LUA_OK) {
         auto err = Err("Script `{}` execution: \n\n{}\n\nScript has failed initial execution, will terminate for the rest of this session.", metadata->id, std::string(lua_tostring(this->state, -1)));
