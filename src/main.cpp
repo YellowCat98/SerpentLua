@@ -87,6 +87,10 @@ $on_mod(Loaded) {
 
 	for (auto& pair : RuntimeManager::get()->getAllScripts()) {
 		if (Mod::get()->getSavedValue<bool>(fmt::format("enabled-{}", pair.first))) {
+			if (pair.second->serpentVersion != Mod::get()->getVersion().toNonVString()) {
+				pair.second->errors.push_back(res.err().value());
+				log::warn("Script {} was made for serpent version {} but you are on {}", pair.first, pair.second->serpentVersion, Mod::get()->getVersion().toNonVString());
+			}
 			auto res = script::create(pair.second);
 			if (res.isErr()) {
 				pair.second->errors.push_back(res.err().value());
@@ -188,11 +192,5 @@ class $modify(MenuLayerHook, MenuLayer) {
 		bottomMenu->updateLayout();
 
 		return true;
-	}
-
-	void onMoreGames(CCObject* sender) {
-		auto scene = CCScene::create();
-		
-		CCDirector::get()->replaceScene(scene);
 	}
 };
