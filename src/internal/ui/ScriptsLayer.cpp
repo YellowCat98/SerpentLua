@@ -107,7 +107,7 @@ void ScriptsLayer::setupScriptsList() {
     auto listView = ListView::create(CCArray::create(), 30);
     
     m_scriptsListLayer = GJListLayer::create(listView, plugin ? "plugins" : "scripts", {194, 114, 62, 255}, 358.0f, 220.0f, 0);
-
+    m_scriptsListLayer->setID("script-list"); // normally i WOULD make it so it would be plugins-list if it was a plugin but eh it would be too wonky
     auto listlayerSize = m_scriptsListLayer->getContentSize();
     m_scriptsListLayer->setPosition(ccp((winSize.width - listlayerSize.width)/2, (winSize.height - listlayerSize.height)/2));
 
@@ -116,13 +116,16 @@ void ScriptsLayer::setupScriptsList() {
     
 
     auto arrowMenu = CCMenu::create(); // luckily, positioning a ccmenu at 0, 0 makes it fill the entire screen! meaning i can just do some layout stuff to get these working!
+    arrowMenu->setID("arrow-menu");
 
     nextBtn = CCMenuItemSpriteExtra::create(CCSprite::createWithSpriteFrameName("GJ_arrow_02_001.png"), this, menu_selector(ScriptsLayer::callbackMovePage));
     nextBtn->setTag(1);
+    nextBtn->setID("arrow-next");
     nextBtn->m_pNormalImage->setScaleX(-1.0f); // it works!
 
     backBtn = CCMenuItemSpriteExtra::create(CCSprite::createWithSpriteFrameName("GJ_arrow_02_001.png"), this, menu_selector(ScriptsLayer::callbackMovePage));
     backBtn->setTag(-1);
+    backBtn->setID("arrow-back");
 
 
     arrowMenu->addChild(nextBtn);
