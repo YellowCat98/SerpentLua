@@ -44,13 +44,19 @@ void ScriptsLayer::loadPage(int page) {
     //backBtn->setVisible(true);
     //nextBtn->setVisible(true);
     
-    if (scriptsInPage.front() == scripts.begin()->second) { // basically if were on the first page
-        backBtn->setVisible(false);
-    }
+    if (!scriptsInPage.empty()) {
+        if (scriptsInPage.front() == scripts.begin()->second) { // basically if were on the first page
+            backBtn->setVisible(false);
+        }
 
-    if (scriptsInPage.back() == scripts.rbegin()->second) { // basically if were on the last page
+        if (scriptsInPage.back() == scripts.rbegin()->second) { // basically if were on the last page
+            nextBtn->setVisible(false);
+        }
+    } else {
+        backBtn->setVisible(false);
         nextBtn->setVisible(false);
     }
+
 
     this->refreshWith(array);
 
