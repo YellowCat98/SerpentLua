@@ -47,7 +47,8 @@ namespace SerpentLua {
         //static geode::Result<PluginMetadata*, std::string> getPluginByID(const std::string& id);
 
         void setPlugin(); // will set the Pulgin.
-        bool loadedSomewhere; // helps determine whether to terminate the plugin if no script uses it, helps save memory.
+        int loadCount; // helps determine whether to terminate the plugin if no script uses it, helps save memory.
+        // instead of a simple `loadedSomewhere` bool, we count how many times a script loaded it!
         PluginMetadata* metadata;
     private:
         std::function<void(lua_State*)> entry;

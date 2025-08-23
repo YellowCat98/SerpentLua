@@ -28,7 +28,7 @@ void Plugin::setPlugin() {
 #ifdef YELLOWCAT98_SERPENTLUA_EXPORTING
 geode::Result<Plugin*, std::string> Plugin::createNative(const std::filesystem::path& path) {
     log::info("Loading Native Plugin {}: initialized", path.filename());
-    if (!Mod::get()->getSavedValue<bool>(fmt::format("safe-{}", path.stem())) && !Mod::get()->getSettingValue<bool>("dev-mode")) return Err("Native Plugin {} was imported manually.\nThis plugin will not load unless it's imported through the plugin importer in-game.", path.stem());
+    if (!Mod::get()->getSavedValue<bool>(fmt::format("safe-{}", path.stem())) && !Mod::get()->getSettingValue<bool>("dev-mode") && !Mod::get()->getSavedValue<bool>("should-show-warning")) return Err("Native Plugin {} was imported manually.\nThis plugin will not load unless it's imported through the plugin importer in-game.", path.stem());
     auto configDir = Mod::get()->getConfigDir();
     bool depsDir = std::filesystem::exists(configDir/"plugin_deps"/path.filename().string());
     if (!depsDir) {
@@ -88,7 +88,7 @@ Result<Plugin*, std::string> Plugin::create(PluginMetadata* metadata, std::funct
     auto ret = new Plugin();
     if (!ret) return Err("Plugin creation: Plugin is nullptr.");
     ret->native = false;
-    ret->loadedSomewhere = false; // assume false until reassigned.
+    ret->loadCount = 0;
 
     ret->metadata = metadata;
     ret->entry = entry;

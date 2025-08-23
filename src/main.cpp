@@ -117,7 +117,7 @@ $on_mod(Loaded) {
 	std::vector<std::string> theUnfortunates;
 
 	for (const auto& [key, value] : RuntimeManager::get()->getAllLoadedPlugins()) {
-		if (!value->loadedSomewhere) {
+		if (value->loadCount == 0) {
 			log::debug("THE UNFORTUNATE: {}", key);
 			theUnfortunates.push_back(key);
 		}

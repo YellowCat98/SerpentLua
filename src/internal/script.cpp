@@ -108,7 +108,7 @@ geode::Result<> script::loadPlugins() {
         auto unwrapped = pluginRes.unwrap();
         unwrapped->getEntry()(this->getLuaState());
 
-        unwrapped->loadedSomewhere = true;
+        pendingPlugins.push_back(unwrapped);
     }
 
     return Ok();
@@ -122,10 +122,15 @@ geode::Result<> script::execute() {
         return err;
     }
     metadata->loaded = true;
+    this->commitLoadedPlugins(); // this code is SUPPOSED to only be reached after plugins were loaded in
     return Ok();
 }
 
-
+void script::commitLoadedPlugins() {
+    for (auto& plugin : pendingPlugins) {
+        plugin->loadCount++;
+    }
+}
 
 geode::Result<script*, std::string> script::getLoadedScript(const std::string& id) {
     return SerpentLua::internal::RuntimeManager::get()->getLoadedScriptByID(id);
