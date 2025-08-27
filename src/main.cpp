@@ -4,7 +4,7 @@
 #include <filesystem>
 #include <internal/SerpentLua.hpp>
 #include <internal/ui/ScriptsLayer.hpp>
-#include <random>
+#include <internal/std/PluginEntry.hpp>
 
 using namespace geode::prelude;
 using namespace SerpentLua::internal;
@@ -88,8 +88,9 @@ $on_mod(Loaded) {
 	for (auto& pair : RuntimeManager::get()->getAllScripts()) {
 		if (Mod::get()->getSavedValue<bool>(fmt::format("enabled-{}", pair.first))) {
 			if (pair.second->serpentVersion != Mod::get()->getVersion().toNonVString()) {
-				pair.second->errors.push_back(res.err().value());
-				log::warn("Script {} was made for serpent version {} but you are on {}", pair.first, pair.second->serpentVersion, Mod::get()->getVersion().toNonVString());
+				auto err = fmt::format("Script {} was made for serpent version {} but you are on {}", pair.first, pair.second->serpentVersion, Mod::get()->getVersion().toNonVString());
+				pair.second->errors.push_back(err);
+				log::warn("{}", err);
 			}
 			auto res = script::create(pair.second);
 			if (res.isErr()) {
