@@ -32,7 +32,7 @@ $on_mod(Loaded) {
 
 	auto configDir = Mod::get()->getConfigDir();
 	
-	auto res = createDirs(configDir, {"plugin_global_deps", "plugin_deps", "plugins", "scripts"});
+	auto res = createDirs(configDir, {"plugin_global_deps", "plugin_deps", "plugins", "scripts", "playground"});
 	if (res.isErr()) {
 		for (auto& err : res.err().value()) {
 			log::error("Creating directory {} failed: {}", err.first, err.second);

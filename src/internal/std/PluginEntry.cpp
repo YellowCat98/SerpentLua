@@ -1,4 +1,5 @@
 #include <internal/std/PluginEntry.hpp>
+#include <internal/std/Playground.hpp>
 #include <sol/sol.hpp>
 
 using namespace SerpentLua::internal;
@@ -39,10 +40,13 @@ void ScriptBuiltin::entry(lua_State* L) {
     _ScriptMetadata["path"] = &SerpentLua::ScriptMetadata::path;
 
     ScriptBuiltin::mainModule["log"] = logging(state);
+    ScriptBuiltin::mainModule["playground"] = ScriptBuiltin::Playground::entry(state);
 
     state["serpentlua_modules"]["SerpentLua"] = []() {
         return ScriptBuiltin::mainModule;
     };
+
+    
 }
 
 sol::table ScriptBuiltin::logging(sol::state_view state) {
