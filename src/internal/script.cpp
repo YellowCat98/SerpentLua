@@ -66,7 +66,7 @@ lua_State* script::createState() {
 
             return 1;
         });
-        lua_setglobal(state, "serpentlua_require");
+        lua_setglobal(state, "require");
 
     }
 

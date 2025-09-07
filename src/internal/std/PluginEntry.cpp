@@ -45,8 +45,6 @@ void ScriptBuiltin::entry(lua_State* L) {
     state["serpentlua_modules"]["SerpentLua"] = []() {
         return ScriptBuiltin::mainModule;
     };
-
-    
 }
 
 sol::table ScriptBuiltin::logging(sol::state_view state) {
