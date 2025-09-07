@@ -32,11 +32,15 @@ ScriptBuiltin::Playground::File ScriptBuiltin::Playground::File::create(const st
 }
 
 bool ScriptBuiltin::Playground::File::hasErrs() {
-    return errs.empty();
+    return !errs.empty();
 }
 
 std::string ScriptBuiltin::Playground::File::getErr(int index) {
     return errs[index - 1];
+}
+
+int ScriptBuiltin::Playground::File::errSize() {
+    return errs.size();
 }
 
 std::string ScriptBuiltin::Playground::File::read() {
@@ -118,6 +122,7 @@ sol::table ScriptBuiltin::Playground::entry(sol::state_view state) {
         "write", &File::write,
         "append", &File::append,
         "hasErrs", &File::hasErrs, // it looks like a staircase!
+        "errSize", &File::errSize,
         "getErr", &File::getErr
     );
 

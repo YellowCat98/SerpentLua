@@ -13,6 +13,7 @@ namespace SerpentLua::internal::ScriptBuiltin::Playground {
 
         bool hasErrs();
         std::string getErr(int index); // yes this index starts at 1 so that we stay faithful to lua's shitty shit
+        int errSize();
     private:
         std::vector<std::string> errs;
         std::string path; // i really dont want to wrap sol2 around std::filesystem::path
