@@ -24,6 +24,29 @@ geode::Result<SerpentLua::ScriptMetadata*, std::string> SerpentLua::ScriptMetada
     return SerpentLua::internal::RuntimeManager::get()->getScriptByID(id);
 }
 
+// all this does is convert a `--@key value` into a `{"key", "value"}`
+std::pair<std::string, std::string> SerpentLua::ScriptMetadata::createPair(std::string& line) {
+    if (line.rfind("--@", 0) != 0) return std::pair<std::string, std::string>({});
+    // if (line.rfind("--@", 0) != 0) return Err("Script `{}` metadata: The first {} lines in a script must be metadata.", scriptPath.filename(), max+1);
+    line.erase(0,3);
+    
+    std::string key, value; // now we separate the data!
+    
+    auto pos = line.find(' '); // keys and values are separated with SPACES
+
+    if (pos != std::string::npos) {
+        key = line.substr(0, pos);
+        value = line.substr(pos + 1);
+    } else {
+        key = line;
+        value = "";
+    }
+
+    //if (metadata.contains(key)) return Err("Script `{}` metadata: Metadata already contains key {}", scriptPath.filename(), key);
+
+    return {key, value};
+}
+
 geode::Result<SerpentLua::ScriptMetadata*, std::string> SerpentLua::ScriptMetadata::createFromScript(const std::filesystem::path& scriptPath) {
     if (!std::filesystem::exists(scriptPath)) return Err("Script {} doesn't exist.", scriptPath.filename());
     log::info("Script `{}` creation: Initialized.", scriptPath.filename());
@@ -46,24 +69,15 @@ geode::Result<SerpentLua::ScriptMetadata*, std::string> SerpentLua::ScriptMetada
         if (std::all_of(line.begin(), line.end(), [](unsigned char c) {
             return std::isspace(c);
         })) continue;
-        if (line.rfind("--@", 0) != 0) return Err("Script `{}` metadata: The first {} lines in a script must be metadata.", scriptPath.filename(), max+1);
-        line.erase(0,3);
+        auto pair = SerpentLua::ScriptMetadata::createPair(line);
+        if (pair == std::pair<std::string, std::string>({})) return Err("Script `{}` metadata: The first {} lines in a script must be metadata.", scriptPath.filename(), max+1);
+
         
-        std::string key, value; // now we separate the data!
-        
-        auto pos = line.find(' '); // keys and values are separated with SPACES
 
-        if (pos != std::string::npos) {
-            key = line.substr(0, pos);
-            value = line.substr(pos + 1);
-        } else {
-            key = line;
-            value = "";
-        }
 
-        if (metadata.contains(key)) return Err("Script `{}` metadata: Metadata already contains key {}", scriptPath.filename(), key);
+        if (metadata.contains(pair.first)) return Err("Script `{}` metadata: Metadata already contains key {}", scriptPath.filename(), pair.first);
 
-        metadata.insert({key,value});
+        metadata.insert(pair);
     }
     log::debug("Script `{}` metadata: Retrieved metadata, checking metadata validity...", scriptPath.filename());
 

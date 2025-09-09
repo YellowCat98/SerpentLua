@@ -66,9 +66,8 @@ build-*/
 # ignore test folder libs and lua
 .test/lib
 .test/lua
-
-# what
-*.exp
+.test/.output
+*.res
 
 # ignore .temp folder
 .temp/

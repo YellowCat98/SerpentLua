@@ -1,4 +1,6 @@
 #include <iostream>
+#include <string>
+#include <Windows.h>
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -7,35 +9,39 @@ extern "C" {
 #include <lualib.h>
 #include <lauxlib.h>
 
+HMODULE getHandle() {
+	HMODULE hModule = nullptr;
+	GetModuleHandleExA(
+		GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
+		GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+		reinterpret_cast<LPCSTR>(&getHandle),
+		&hModule
+	);
+	return hModule;
+}
 
-__declspec(dllexport) extern const struct __metadata {
-	const char* name;
-	const char* developer;
-	const char* id;
-	const char* version;
-	const char* serpentVersion;
-} plugin_metadata;
-
-__declspec(dllexport) const struct __metadata plugin_metadata = {
-	"PluginTest",
-	"YellowCat98",
-	"yellowcat98_plugintest",
-	"1.0.0",
-	"1.0.0"
+struct h {
+	static std::string metadata;
 };
 
-struct __declspec(dllexport) __script_metadata {
-    const char* name;
-    const char* id;
-    const char* version;
-    const char* serpentVersion;
-    const bool nostd;
-    const char* path;
-};
+std::string h::metadata;
 
 __declspec(dllexport) void entry(lua_State* L) {
+
+	HMODULE hModule = getHandle();
+
+	HRSRC res = FindResource(hModule, TEXT("SERPENTLUA_METADATA"), RT_RCDATA);
+
+	HGLOBAL hRes = LoadResource(hModule, res);
+	void* data = LockResource(hRes);
+	DWORD size = SizeofResource(hModule, res);
+
+	std::string metadata(reinterpret_cast<char*>(data), size);
+	h::metadata = metadata;
+
 	lua_pushcfunction(L, [](lua_State* L) -> int {
-		std::cout << "hello world, this is the Dll." << std::endl;
+		std::cout << "METADATA FROM THE DLL BOI!!!!" << "\n" << h::metadata;
+		
 		return 0;
 	});
 	lua_setglobal(L, "the_Function");

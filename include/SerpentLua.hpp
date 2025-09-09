@@ -74,6 +74,7 @@ namespace SerpentLua {
             static ScriptMetadata* create(std::map<std::string, std::string>& metadata);
             static geode::Result<ScriptMetadata*, std::string> createFromScript(const std::filesystem::path& scriptPath);
             static geode::Result<ScriptMetadata*, std::string> getScript(const std::string& id);
+            static std::pair<std::string, std::string> createPair(std::string& lines);
             void setPlugins();
             ScriptMetadata(){}
         #endif

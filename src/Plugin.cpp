@@ -39,30 +39,87 @@ geode::Result<Plugin*, std::string> Plugin::createNative(const std::filesystem::
     
     DLL_DIRECTORY_COOKIE cookie2 = AddDllDirectory((configDir/"plugin_global_deps").wstring().c_str());
 
+    //auto hDll = LoadLibraryExA(path.string().c_str(), NULL, LOAD_LIBRARY_SEARCH_USER_DIRS);
+
+    auto temphDll = LoadLibraryExA(path.string().c_str(), NULL, LOAD_LIBRARY_AS_DATAFILE);
+    if (!temphDll) {
+        return Err("Plugin {}: Failed to load DLL.", path.filename());
+    }
+
+    log::debug("Plugin {}: DLL loaded, gathering metadata...", path.filename());
+
+    HRSRC res = FindResource(temphDll, "SERPENTLUA_METADATA", RT_RCDATA);
+    if (!res) {
+        FreeLibrary(temphDll);
+        return Err("Plugin {}: Resource \"SERPENTLUA_METADATA\" was not found.", path.filename());
+    }
+    HGLOBAL hRes = LoadResource(temphDll, res);
+    if (!hRes) {
+        FreeLibrary(temphDll);
+        return Err("Plugin {}: Failed to load resource (err {})", path.filename(), GetLastError());
+    }
+    void* rawMeta = LockResource(hRes);
+    if (!rawMeta) {
+        FreeLibrary(temphDll);
+        return Err("Plugin {}: Failed to lock resource.", path.filename());
+    }
+    DWORD size = SizeofResource(temphDll, res);
+    if (size == 0) {
+        FreeLibrary(temphDll);
+        return Err("Plugin {}: Resource size is equal to 0.", path.filename());
+    }
+
+    std::string metadataMiniRaw(reinterpret_cast<char*>(rawMeta), size); // this means that its a tiny bit raw, not too much raw. (basically meaning that its in a format thats too hard to understand)
+
+    std::vector<std::string> lines;
+    std::string line;
+    std::stringstream ss(metadataMiniRaw);
+
+    while (std::getline(ss, line, '\n')) {
+        if (!line.empty() && line.back() == '\r') {
+            line.pop_back();
+        }
+        lines.push_back(line);
+    }
+
+    std::map<std::string, std::string> metadataMap;
+
+    for (auto& line : lines) {
+        auto pair = ScriptMetadata::createPair(line);
+        if (pair == std::pair<std::string, std::string>({})) return Err("Plugin {}: Invalid metadata.", path.filename());
+        if (metadataMap.contains(pair.first)) log::warn("Plugin {}: Metadata already contains {}, skipping.", path.filename(), pair.first);
+        metadataMap.insert(pair);
+    }
+
+    // checking for metadata validity
+    std::vector<std::string> requiredKeys = {"name", "id", "version", "serpent-version", "developer"};
+
+    for (auto& req : requiredKeys) {
+        if (!metadataMap.contains(req)) return Err("Plugin {}: Metadata is missing `{}` key.", path.filename(), req);
+    }
+
+    // repurposes requiredKeys to check for unknown keys
+    for (const auto& [key, value] : metadataMap) { // this also disallows things like `--@  developer hello`
+        auto it = std::find(requiredKeys.begin(), requiredKeys.end(), key);
+        if (it == requiredKeys.end()) return Err("Plugin {}: Unknown Metadata key: {}", path.filename(), key);
+    }
+
+    auto metadata = PluginMetadata::create(metadataMap);
+
+    FreeLibrary(temphDll);
+
+    log::debug("Plugin {}: Metadata gathered, executing...", path.filename());
+
+
     auto hDll = LoadLibraryExA(path.string().c_str(), NULL, LOAD_LIBRARY_SEARCH_USER_DIRS);
 
     if (depsDir) RemoveDllDirectory(cookie1);
     RemoveDllDirectory(cookie2);
 
-    if (!hDll) return Err("Plugin {}: Failed to load with error {}", path.filename(), GetLastError());
+    //if (!hDll) return Err("Plugin {}: Failed to load with error {}", path.filename(), GetLastError());
 
     // now we handle METADATA.
-    log::debug("Plugin {}: DLL loaded, gathering metadata...", path.filename());
-
-    auto rawMeta = reinterpret_cast<const Plugin::__metadata*>(GetProcAddress(hDll, "plugin_metadata"));
-    if (!rawMeta) {
-        FreeLibrary(hDll); // i shouldve probably did this before
-        return Err("Plugin {}: No metadata was found within the DLL.", path.filename());
-    }
-    log::debug("Native DLL info: \n{}\n{}\n{}\n{}", rawMeta->name,rawMeta->id,rawMeta->version,rawMeta->serpentVersion);
-    std::map<std::string, std::string> mapMetadata = {
-        {"name", std::string(rawMeta->name)},
-        {"developer", std::string(rawMeta->developer)},
-        {"id", std::string(rawMeta->id)},
-        {"version", std::string(rawMeta->version)},
-        {"serpent-version", std::string(rawMeta->serpentVersion)}
-    };
-    auto metadata = PluginMetadata::create(mapMetadata);
+    log::debug("Plugin {}: DLL executed.", path.filename());
 
     auto rawEntry = reinterpret_cast<void(*)(lua_State*)>(GetProcAddress(hDll, "entry"));
     if (!rawEntry) {
@@ -84,10 +141,9 @@ geode::Result<Plugin*, std::string> Plugin::createNative(const std::filesystem::
 #endif
 
 Result<Plugin*, std::string> Plugin::create(PluginMetadata* metadata, std::function<void(lua_State*)> entry) {
-    log::info("Plugin creation: initialized.");
+    log::info("Plugin {} creation: initialized.", metadata->id);
     auto ret = new Plugin();
     if (!ret) return Err("Plugin creation: Plugin is nullptr.");
-    ret->native = false;
     ret->loadCount = 0;
 
     ret->metadata = metadata;
