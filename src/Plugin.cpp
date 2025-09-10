@@ -26,6 +26,18 @@ void Plugin::setPlugin() {
 }
 
 #ifdef YELLOWCAT98_SERPENTLUA_EXPORTING
+
+void Plugin::SerpentLuaAPIImpl::log(__metadata m, const char* msg, const char* type) {
+    if (std::strcmp(type, "info") == 0) log::info("[{}]: {}", m.name, msg);
+    else if (strcmp(type, "warn") == 0) log::warn("[{}]: ", m.name, msg);
+    else if (strcmp(type, "error")) log::error("[{}]: {}", m.name, msg);
+    else log::debug("[{}]: {}", m.name, msg); // always default to debug if type isnt those things
+}
+
+void Plugin::SerpentLuaAPIImpl::test() {
+    log::info("plugin test");
+}
+
 geode::Result<Plugin*, std::string> Plugin::createNative(const std::filesystem::path& path) {
     log::info("Loading Native Plugin {}: initialized", path.filename());
     if (!Mod::get()->getSavedValue<bool>(fmt::format("safe-{}", path.stem())) && !Mod::get()->getSettingValue<bool>("dev-mode") && !Mod::get()->getSavedValue<bool>("should-show-warning")) return Err("Native Plugin {} was imported manually.\nThis plugin will not load unless it's imported through the plugin importer in-game.", path.stem());
@@ -116,10 +128,32 @@ geode::Result<Plugin*, std::string> Plugin::createNative(const std::filesystem::
     if (depsDir) RemoveDllDirectory(cookie1);
     RemoveDllDirectory(cookie2);
 
-    //if (!hDll) return Err("Plugin {}: Failed to load with error {}", path.filename(), GetLastError());
+    if (!hDll) return Err("Plugin {}: Failed to load with error {}", path.filename(), GetLastError());
 
-    // now we handle METADATA.
+    // now we... DONT handle METADATA? it has already retrieved metadata. now we.. handle API FUNCTIONS...!
     log::debug("Plugin {}: DLL executed.", path.filename());
+
+    auto INITFUCKINGAPI = reinterpret_cast<void(*)(Plugin::SerpentLuaAPI)>(GetProcAddress(hDll, "initNativeAPI"));
+    if (!INITFUCKINGAPI) {
+        FreeLibrary(hDll);
+        // return Err("THE FUCKING FUNCTION WASNT FOUND")
+        return Err("Plugin {}: initNativeAPI function was not found.", path.filename());
+    }
+
+    Plugin::__metadata __md;
+    __md.name = metadata->name.c_str();
+    __md.developer = metadata->developer.c_str();
+    __md.id = metadata->id.c_str();
+    __md.version = metadata->version.c_str();
+    __md.serpentVersion = metadata->serpentVersion.c_str();
+
+    Plugin::SerpentLuaAPI API;
+    API.log = &Plugin::SerpentLuaAPIImpl::log;
+    API.test = &Plugin::SerpentLuaAPIImpl::test;
+    API.metadata = __md;
+    API.handle = hDll;
+
+    INITFUCKINGAPI(API);
 
     auto rawEntry = reinterpret_cast<void(*)(lua_State*)>(GetProcAddress(hDll, "entry"));
     if (!rawEntry) {

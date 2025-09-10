@@ -65,6 +65,18 @@ namespace SerpentLua {
             const char* version;
             const char* serpentVersion;
         };
+
+        struct SerpentLuaAPI {
+            void (*log)(__metadata, const char*, const char*);
+            void (*test)();
+            __metadata metadata;
+            HMODULE handle;
+        };
+
+        struct SerpentLuaAPIImpl {
+            static void log(__metadata, const char* msg, const char* type);
+            static void test();
+        };
         #endif
     };
 

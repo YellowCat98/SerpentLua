@@ -9,39 +9,34 @@ extern "C" {
 #include <lualib.h>
 #include <lauxlib.h>
 
-HMODULE getHandle() {
-	HMODULE hModule = nullptr;
-	GetModuleHandleExA(
-		GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
-		GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
-		reinterpret_cast<LPCSTR>(&getHandle),
-		&hModule
-	);
-	return hModule;
-}
-
-struct h {
-	static std::string metadata;
+struct __metadata {
+    const char* name;
+    const char* developer;
+    const char* id;
+    const char* version;
+    const char* serpentVersion;
 };
 
-std::string h::metadata;
+struct SerpentLuaAPI {
+    void (*log)(__metadata, const char*, const char*);
+	void (*test)();
+    __metadata metadata;
+    HMODULE handle;
+};
+
+static SerpentLuaAPI api;
+
+__declspec(dllexport) void initNativeAPI(SerpentLuaAPI toiletAPI) {
+	api = toiletAPI;
+}
 
 __declspec(dllexport) void entry(lua_State* L) {
 
-	HMODULE hModule = getHandle();
-
-	HRSRC res = FindResource(hModule, TEXT("SERPENTLUA_METADATA"), RT_RCDATA);
-
-	HGLOBAL hRes = LoadResource(hModule, res);
-	void* data = LockResource(hRes);
-	DWORD size = SizeofResource(hModule, res);
-
-	std::string metadata(reinterpret_cast<char*>(data), size);
-	h::metadata = metadata;
-
 	lua_pushcfunction(L, [](lua_State* L) -> int {
-		std::cout << "METADATA FROM THE DLL BOI!!!!" << "\n" << h::metadata;
-		
+		api.log(api.metadata, "hello", "info");
+		api.log(api.metadata, "hello1", "warn");
+		api.log(api.metadata, "hello2", "debug");
+		api.log(api.metadata, "hello3", "error");
 		return 0;
 	});
 	lua_setglobal(L, "the_Function");
