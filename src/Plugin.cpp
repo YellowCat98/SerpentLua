@@ -29,13 +29,9 @@ void Plugin::setPlugin() {
 
 void Plugin::SerpentLuaAPIImpl::log(__metadata m, const char* msg, const char* type) {
     if (std::strcmp(type, "info") == 0) log::info("[{}]: {}", m.name, msg);
-    else if (strcmp(type, "warn") == 0) log::warn("[{}]: ", m.name, msg);
+    else if (strcmp(type, "warn") == 0) log::warn("[{}]: {}", m.name, msg);
     else if (strcmp(type, "error")) log::error("[{}]: {}", m.name, msg);
     else log::debug("[{}]: {}", m.name, msg); // always default to debug if type isnt those things
-}
-
-void Plugin::SerpentLuaAPIImpl::test() {
-    log::info("plugin test");
 }
 
 geode::Result<Plugin*, std::string> Plugin::createNative(const std::filesystem::path& path) {
@@ -55,10 +51,10 @@ geode::Result<Plugin*, std::string> Plugin::createNative(const std::filesystem::
 
     auto temphDll = LoadLibraryExA(path.string().c_str(), NULL, LOAD_LIBRARY_AS_DATAFILE);
     if (!temphDll) {
-        return Err("Plugin {}: Failed to load DLL.", path.filename());
+        return Err("Plugin {}: Failed to load SLP.", path.filename());
     }
 
-    log::debug("Plugin {}: DLL loaded, gathering metadata...", path.filename());
+    log::debug("Plugin {}: SLP loaded, gathering metadata...", path.filename());
 
     HRSRC res = FindResource(temphDll, "SERPENTLUA_METADATA", RT_RCDATA);
     if (!res) {
@@ -131,7 +127,7 @@ geode::Result<Plugin*, std::string> Plugin::createNative(const std::filesystem::
     if (!hDll) return Err("Plugin {}: Failed to load with error {}", path.filename(), GetLastError());
 
     // now we... DONT handle METADATA? it has already retrieved metadata. now we.. handle API FUNCTIONS...!
-    log::debug("Plugin {}: DLL executed.", path.filename());
+    log::debug("Plugin {}: SLP executed.", path.filename());
 
     auto INITFUCKINGAPI = reinterpret_cast<void(*)(Plugin::SerpentLuaAPI)>(GetProcAddress(hDll, "initNativeAPI"));
     if (!INITFUCKINGAPI) {
@@ -148,17 +144,16 @@ geode::Result<Plugin*, std::string> Plugin::createNative(const std::filesystem::
     __md.serpentVersion = metadata->serpentVersion.c_str();
 
     Plugin::SerpentLuaAPI API;
-    API.log = &Plugin::SerpentLuaAPIImpl::log;
-    API.test = &Plugin::SerpentLuaAPIImpl::test;
-    API.metadata = __md;
     API.handle = hDll;
+    API.metadata = __md;
+    API.log = &Plugin::SerpentLuaAPIImpl::log;
 
     INITFUCKINGAPI(API);
 
     auto rawEntry = reinterpret_cast<void(*)(lua_State*)>(GetProcAddress(hDll, "entry"));
     if (!rawEntry) {
         FreeLibrary(hDll);
-        return Err("Plugin {}: Entry function was not found within the DLL.", path.filename());
+        return Err("Plugin {}: Entry function was not found within the SLP.", path.filename());
     }
 
     auto plugin = Plugin::create(metadata, rawEntry);

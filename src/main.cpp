@@ -54,14 +54,25 @@ $on_mod(Loaded) {
 	// initialize all the native plugins! (mod plugins are initialized by the mods themselves)
 
 	for (const auto& file : std::filesystem::directory_iterator(configDir/"plugins")) {
-		if (file.path().extension().string() != ".dll") {
-			log::warn("Found non-dll file in plugins directory, will be ignored.");
+
+		if (file.path().extension().string() == ".dll") {
+			log::error("All plugins must have the .slp extension, DLLs will not load.");
+		}
+
+		if (file.path().extension().string() != ".slp") {
+			log::warn("Found non-slp file in plugins directory, will be ignored.");
 			continue;
 		}
 
 		auto pluginRes = SerpentLua::Plugin::createNative(file.path());
 		if (pluginRes.isErr()) {
 			log::error("{}", pluginRes.err().value());
+			continue;
+		}
+
+		auto unwrapped = pluginRes.unwrap();
+		if (unwrapped->metadata->serpentVersion != Mod::get()->getVersion().toNonVString()) {
+			log::error("Plugin {} was made for serpent version {} but you are on {}", unwrapped->metadata->id, unwrapped->metadata->serpentVersion, Mod::get()->getVersion().toNonVString());
 			continue;
 		}
 
@@ -91,6 +102,7 @@ $on_mod(Loaded) {
 				auto err = fmt::format("Script {} was made for serpent version {} but you are on {}", pair.first, pair.second->serpentVersion, Mod::get()->getVersion().toNonVString());
 				pair.second->errors.push_back(err);
 				log::warn("{}", err);
+				continue; // why didnt i do this before
 			}
 			auto res = script::create(pair.second);
 			if (res.isErr()) {
