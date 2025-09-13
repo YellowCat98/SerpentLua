@@ -63,7 +63,7 @@ sol::table ScriptBuiltin::logging(sol::state_view state) {
             return;
         }
 
-        log::info("[{}]: {}", get.as<SerpentLua::ScriptMetadata*>()->name, msg);
+        log::info("[SCRIPT] [{}]: {}", get.as<SerpentLua::ScriptMetadata*>()->name, msg);
     };
 
     logging["debug"] = [](sol::this_state ts, const std::string& msg) -> void {
@@ -78,7 +78,7 @@ sol::table ScriptBuiltin::logging(sol::state_view state) {
             return;
         }
 
-        log::debug("[{}]: {}", get.as<SerpentLua::ScriptMetadata*>()->name, msg);
+        log::debug("[SCRIPT] [{}]: {}", get.as<SerpentLua::ScriptMetadata*>()->name, msg);
     };
 
     logging["warn"] = [](sol::this_state ts, const std::string& msg) -> void {
@@ -93,7 +93,7 @@ sol::table ScriptBuiltin::logging(sol::state_view state) {
             return;
         }
 
-        log::warn("[{}]: {}", get.as<SerpentLua::ScriptMetadata*>()->name, msg);
+        log::warn("[SCRIPT] [{}]: {}", get.as<SerpentLua::ScriptMetadata*>()->name, msg);
     };
 
     logging["error"] = [](sol::this_state ts, const std::string& msg) -> void {
@@ -108,7 +108,7 @@ sol::table ScriptBuiltin::logging(sol::state_view state) {
             return;
         }
 
-        log::error("[{}]: {}", get.as<SerpentLua::ScriptMetadata*>()->name, msg);
+        log::error("[SCRIPT] [{}]: {}", get.as<SerpentLua::ScriptMetadata*>()->name, msg);
     };
 
     return logging;

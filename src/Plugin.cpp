@@ -28,10 +28,10 @@ void Plugin::setPlugin() {
 #ifdef YELLOWCAT98_SERPENTLUA_EXPORTING
 
 void Plugin::SerpentLuaAPIImpl::log(__metadata m, const char* msg, const char* type) {
-    if (std::strcmp(type, "info") == 0) log::info("[{}]: {}", m.name, msg);
-    else if (strcmp(type, "warn") == 0) log::warn("[{}]: {}", m.name, msg);
-    else if (strcmp(type, "error")) log::error("[{}]: {}", m.name, msg);
-    else log::debug("[{}]: {}", m.name, msg); // always default to debug if type isnt those things
+    if (std::strcmp(type, "info") == 0) log::info("[PLUGIN] [{}]: {}", m.name, msg);
+    else if (strcmp(type, "warn") == 0) log::warn("[PLUGIN] [{}]: {}", m.name, msg);
+    else if (strcmp(type, "error")) log::error("[PLUGIN] [{}]: {}", m.name, msg);
+    else log::debug("[PLUGIN] [{}]: {}", m.name, msg); // always default to debug if type isnt those things
 }
 
 geode::Result<Plugin*, std::string> Plugin::createNative(const std::filesystem::path& path) {

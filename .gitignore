@@ -64,9 +64,9 @@ build-*/
 /cmake-build-*/
 
 # ignore test folder libs and lua
-.test/lib
-.test/lua
-.test/.output
+lib
+lua
+.output
 *.res
 
 # ignore .temp folder
