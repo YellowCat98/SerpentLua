@@ -5,6 +5,7 @@
 #include <internal/SerpentLua.hpp>
 #include <internal/ui/ScriptsLayer.hpp>
 #include <internal/std/PluginEntry.hpp>
+#include <tulip/TulipHook.hpp>
 
 using namespace geode::prelude;
 using namespace SerpentLua::internal;

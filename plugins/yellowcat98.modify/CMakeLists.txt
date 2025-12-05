@@ -23,16 +23,30 @@ set_target_properties(yellowcat98_modify PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/.output"
 )
 
+add_subdirectory($ENV{GEODE_SDK} ${CMAKE_CURRENT_BINARY_DIR}/geode)
+
 CPMAddPackage(
     NAME sol2
     GITHUB_REPOSITORY ThePhD/sol2
     VERSION 3.5.0 # wonder who taught it was a good idea to not make the actual latest version the latest version!
 )
 
-target_include_directories(${PROJECT_NAME} PRIVATE ${sol2_SOURCE_DIR}/include)
+#set(TULIP_LINK_SOURCE ON)
+#CPMAddPackage(
+#    NAME tuliphook
+#    GITHUB_REPOSITORY geode-sdk/tuliphook
+#    VERSION 3.1.4
+#) # for geode bindings to work
 
-target_link_libraries(yellowcat98_modify PRIVATE
+
+target_include_directories(${PROJECT_NAME} PRIVATE ${sol2_SOURCE_DIR}/include)
+#target_include_directories(${PROJECT_NAME} PRIVATE ${tuliphook_SOURCE_DIR}/include)
+
+target_link_libraries(yellowcat98_modify PUBLIC
     "${CMAKE_SOURCE_DIR}/lib/lua.lib"
+    #TulipHook
+    #TulipHookInclude
+    GeodeResult
 )
 
 set(RESOURCE_FILE "${CMAKE_SOURCE_DIR}/serpentlua.rc")
@@ -54,3 +68,5 @@ target_include_directories(yellowcat98_modify PRIVATE
     "${CMAKE_SOURCE_DIR}/lua"
 )
 
+target_compile_definitions(${PROJECT_NAME} PUBLIC GEODE_MOD_ID="yellowcat98modify") # required to compile some stuff in geode itself
+target_link_libraries(${PROJECT_NAME} PUBLIC geode-sdk)

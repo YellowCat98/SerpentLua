@@ -131,9 +131,10 @@ void ScriptsLayer::setupScriptsList() {
     arrowMenu->addChild(nextBtn);
     arrowMenu->addChild(backBtn);
 
-    auto pluginsBtn = CCMenuItemExt::createSpriteExtra(CircleButtonSprite::create(CCSprite::create("plugin.png"_spr)), [this](CCObject*) {
-        auto layer = ScriptsLayer::scene(true);
-        CCDirector::get()->pushScene(CCTransitionFade::create(0.5f, layer));
+    auto pluginsBtn = CCMenuItemExt::createSpriteExtra(CircleButtonSprite::create(CCSprite::create(this->plugin ? "script.png"_spr : "plugin.png"_spr)), [this](CCObject*) {
+        auto layer = ScriptsLayer::scene(!this->plugin);
+        CCDirector::get()->replaceScene(CCTransitionFade::create(0.5f, layer)); // we shouldnt really do pushScene here, as then pressing the button repeatedly will cause the scene stack to fill up
+        // doing popScene after replaceScene was called will send you back to the main menu.
     });
 
     this->getChildByID("actions-menu")->addChild(pluginsBtn);
@@ -203,8 +204,17 @@ bool ScriptsLayer::init(bool plugin) {
 
     actionsMenu->setID("actions-menu");
 
-    auto restartBtn = CCMenuItemExt::createSpriteExtraWithFrameName("GJ_updateBtn_001.png", 1.0f, [](CCObject* sender){
-        game::restart();
+    auto restartBtn = CCMenuItemExt::createSpriteExtraWithFrameName("GJ_updateBtn_001.png", 1.0f, [](CCObject* sender) {
+        geode::createQuickPopup(
+            "Restart Game",
+            "Would you like to restart?",
+            "Yes", "No",
+            [](FLAlertLayer*, bool btn2) {
+                if (!btn2) {
+                    game::restart();
+                }
+            }
+        );
     });
 
     actionsMenu->addChild(restartBtn);
