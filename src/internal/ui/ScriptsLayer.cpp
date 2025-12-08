@@ -131,14 +131,6 @@ void ScriptsLayer::setupScriptsList() {
     arrowMenu->addChild(nextBtn);
     arrowMenu->addChild(backBtn);
 
-    auto pluginsBtn = CCMenuItemExt::createSpriteExtra(CircleButtonSprite::create(CCSprite::create(this->plugin ? "script.png"_spr : "plugin.png"_spr)), [this](CCObject*) {
-        auto layer = ScriptsLayer::scene(!this->plugin);
-        CCDirector::get()->replaceScene(CCTransitionFade::create(0.5f, layer)); // we shouldnt really do pushScene here, as then pressing the button repeatedly will cause the scene stack to fill up
-        // doing popScene after replaceScene was called will send you back to the main menu.
-    });
-
-    this->getChildByID("actions-menu")->addChild(pluginsBtn);
-
     float buttonGap = m_scriptsListLayer->getContentWidth() + 50;
 
     arrowMenu->setLayout(
@@ -217,6 +209,13 @@ bool ScriptsLayer::init(bool plugin) {
         );
     });
 
+    auto pluginsBtn = CCMenuItemExt::createSpriteExtra(CircleButtonSprite::create(CCSprite::create(this->plugin ? "script.png"_spr : "plugin.png"_spr)), [this](CCObject*) {
+        auto layer = ScriptsLayer::scene(!this->plugin);
+        CCDirector::get()->replaceScene(CCTransitionFade::create(0.5f, layer)); // we shouldnt really do pushScene here, as then pressing the button repeatedly will cause the scene stack to fill up
+        // doing popScene after replaceScene was called will send you back to the main menu.
+    });
+
+    actionsMenu->addChild(pluginsBtn);
     actionsMenu->addChild(restartBtn);
     
     this->addChildAtPosition(actionsMenu, Anchor::BottomLeft, {5.0f, 0.0f}, false);
