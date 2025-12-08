@@ -215,8 +215,11 @@ bool ScriptsLayer::init(bool plugin) {
         // doing popScene after replaceScene was called will send you back to the main menu.
     });
 
+    auto JeomETRYdASH = CCMenuItemSpriteExtra::create(CircleButtonSprite::create(CCSprite::create("plugin_import.png"_spr)), this, menu_selector(ScriptsLayer::importPlugin));
+
     actionsMenu->addChild(pluginsBtn);
     actionsMenu->addChild(restartBtn);
+    actionsMenu->addChild(JeomETRYdASH);
     
     this->addChildAtPosition(actionsMenu, Anchor::BottomLeft, {5.0f, 0.0f}, false);
 
@@ -228,6 +231,20 @@ bool ScriptsLayer::init(bool plugin) {
     return true;
 }
 
+void ScriptsLayer::importPlugin(CCObject*) {
+    file::pick(file::PickMode::OpenFile, file::FilePickOptions {
+        .filters = { file::FilePickOptions::Filter {
+            .description = "SerpentLua Plugins",
+            .files = { "*.slp" }
+        }}
+    }).listen([](geode::Result<std::filesystem::path>* path) {
+        if (path->isErr()) {
+            log::error("Error pathing the Path.");
+            return;
+        }
+        log::info("Thou Path Selected: {}", path->unwrap());
+    });
+}
 
 ScriptsLayer* ScriptsLayer::create(bool plugin) {
     auto ret = new ScriptsLayer();

@@ -26,6 +26,9 @@ namespace SerpentLua::internal::ui {
 		// these buttons are needed here so that we can change their opacity in loadPage
 		void callbackMovePage(cocos2d::CCObject*);
 
+		
+		void importPlugin(cocos2d::CCObject*);
+
 		int currentPage;
 		int itemsPerPage;
 
