@@ -232,18 +232,62 @@ bool ScriptsLayer::init(bool plugin) {
 }
 
 void ScriptsLayer::importPlugin(CCObject*) {
-    file::pick(file::PickMode::OpenFile, file::FilePickOptions {
-        .filters = { file::FilePickOptions::Filter {
-            .description = "SerpentLua Plugins",
-            .files = { "*.slp" }
-        }}
-    }).listen([](geode::Result<std::filesystem::path>* path) {
-        if (path->isErr()) {
-            log::error("Error pathing the Path.");
-            return;
-        }
-        log::info("Thou Path Selected: {}", path->unwrap());
-    });
+    geode::createQuickPopup(
+        "Import Plugin",
+        "Would you like to import a plugin?",
+        "Yes", "No",
+        [](FLAlertLayer*, bool btn2) {
+            if (!btn2) {
+                file::pick(file::PickMode::OpenFile, file::FilePickOptions {
+                    .filters = { file::FilePickOptions::Filter {
+                        .description = "SerpentLua Plugins",
+                        .files = { "*.slp" }
+                    }}
+                }).listen([](geode::Result<std::filesystem::path>* path) {
+                    if (path->isErr()) {
+                        FLAlertLayer::create(
+                            "Error",
+                            fmt::format("An error occurred importing plugin: \n", path->err().value()).c_str(),
+                            "OK"
+                        )->show();
+                        return;
+                    }
+                    auto unwrapped = path->unwrap();
+                    geode::createQuickPopup(
+                        "Confirm",
+                        fmt::format("Are you sure you want to import {}?", unwrapped.filename()),
+                        "Yes", "No",
+                        [=](FLAlertLayer*, bool btn2) {
+                            if (!btn2) {
+                                std::error_code ec;
+                                
+                                std::filesystem::copy_file(unwrapped, Mod::get()->getConfigDir()/"plugins"/unwrapped.filename(), ec);
+
+                                if (ec) {
+                                    FLAlertLayer::create(
+                                        "Error",
+                                        fmt::format("An error occurred importing {}!\nErr: {}", unwrapped.filename(), ec.message()),
+                                        "OK"
+                                    )->show();
+                                } else {
+                                    geode::createQuickPopup(
+                                        "Error",
+                                        fmt::format("{} has been imported successfully!\nWould you like to restart for it to take effect?", unwrapped.filename()),
+                                        "Yes", "No",
+                                        [](FLAlertLayer*, bool btn2) {
+                                            // look at this fatass indent :heart:
+                                            if (!btn2) {
+                                                utils::game::restart();
+                                            }
+                                        }
+                                    );
+                                }
+                            }
+                        }
+                    );
+                });
+            }
+        });
 }
 
 ScriptsLayer* ScriptsLayer::create(bool plugin) {
