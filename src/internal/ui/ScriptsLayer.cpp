@@ -270,6 +270,7 @@ void ScriptsLayer::importPlugin(CCObject*) {
                                         "OK"
                                     )->show();
                                 } else {
+                                    Mod::get()->setSavedValue<bool>(fmt::format("safe-{}", unwrapped.stem()), true);
                                     geode::createQuickPopup(
                                         "Error",
                                         fmt::format("{} has been imported successfully!\nWould you like to restart for it to take effect?", unwrapped.filename()),

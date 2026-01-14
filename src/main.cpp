@@ -172,8 +172,8 @@ class $modify(MenuLayerHook, MenuLayer) {
 		if (Mod::get()->setSavedValue<bool>("should-show-warning", false)) {
 			auto popup = geode::createQuickPopup("SerpentLua: Dev mode enabled!",
 				"It appears that you have enabled dev mode.\n"
-				"Dev mode is a setting that allows any plugin to load.\n"
-				"This setting is meant for developers who are looking to test their plugins.\n"
+				"Dev mode is a setting that allows any plugin to load, regardless if it was imported through the plugin importer or not.\n"
+				"This setting is meant for plugin developers.\n"
 				"This setting did not apply as a safety measure.\n"
 				"If you want this setting to apply, restart the game.\n"
 				"Otherwise, disable this setting.",
