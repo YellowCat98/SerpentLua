@@ -37,8 +37,6 @@ bool ScriptItem::init(void* theMetadata, std::function<void(CCMenuItemToggler*)>
 			->setCrossAxisLineAlignment(AxisAlignment::Start)
 			->setGap(0)
 	);
-	mainContainer->getLayout()->ignoreInvisibleChildren(true);
-
 
 	title = CCNode::create();
 	title->setID("title-container");
@@ -89,7 +87,7 @@ bool ScriptItem::init(void* theMetadata, std::function<void(CCMenuItemToggler*)>
 
 	title->setContentWidth((titleSpace.width) / mainContainer->getScale());
 
-	devContainer->setContentWidth({titleSpace.width / mainContainer->getScale()});
+	devContainer->setContentWidth(titleSpace.width / mainContainer->getScale());
 
 	mainContainer->setPosition(10, m_obContentSize.height / 2);
 	mainContainer->setContentSize(ccp(titleSpace.width, titleSpace.height) / mainContainer->getScale());

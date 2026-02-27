@@ -35,7 +35,8 @@ $on_mod(Loaded) {
 	
 	auto res = createDirs(configDir, {"plugin_global_deps", "plugin_deps", "plugins", "scripts", "playground"});
 	if (res.isErr()) {
-		for (auto& err : res.err().value()) {
+		auto errs = *(res.err());
+		for (auto& err : errs) {
 			log::error("Creating directory {} failed: {}", err.first, err.second);
 		}
 		return;
@@ -46,7 +47,7 @@ $on_mod(Loaded) {
 		return;
 	}
 
-	geode::listenForSettingChanges("dev-mode", +[](bool change) {
+	geode::listenForSettingChanges<bool>("dev-mode", +[](bool change) {
 		if (change) {
 			Mod::get()->setSavedValue<bool>("should-show-warning", true); // basically, since this function gets called after the setting was set, it makes it a little wonky to add a warning here
 		}
@@ -189,7 +190,7 @@ class $modify(MenuLayerHook, MenuLayer) {
 						"Would you like to restart now?",
 						"Restart", "Later",
 						[](FLAlertLayer*, bool btn2) {
-							if (!btn2) utils::game::restart();
+							if (!btn2) utils::game::restart(true);
 						}
 					);
 				}, false);

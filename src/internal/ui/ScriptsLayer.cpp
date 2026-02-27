@@ -1,5 +1,6 @@
 #include <internal/ui/ScriptsLayer.hpp>
 #include <internal/ui/ScriptItem.hpp>
+#include <Geode/utils/async.hpp>
 
 using namespace SerpentLua::internal::ui;
 using namespace geode::prelude;
@@ -113,8 +114,6 @@ void ScriptsLayer::setupScriptsList() {
 
     this->addChild(m_scriptsListLayer);
 
-    
-
     auto arrowMenu = CCMenu::create(); // luckily, positioning a ccmenu at 0, 0 makes it fill the entire screen! meaning i can just do some layout stuff to get these working!
     arrowMenu->setID("arrow-menu");
 
@@ -203,7 +202,7 @@ bool ScriptsLayer::init(bool plugin) {
             "Yes", "No",
             [](FLAlertLayer*, bool btn2) {
                 if (!btn2) {
-                    game::restart();
+                    game::restart(true);
                 }
             }
         );
@@ -215,7 +214,7 @@ bool ScriptsLayer::init(bool plugin) {
         // doing popScene after replaceScene was called will send you back to the main menu.
     });
 
-    auto JeomETRYdASH = CCMenuItemSpriteExtra::create(CircleButtonSprite::create(CCSprite::create("plugin_import.png"_spr)), this, menu_selector(ScriptsLayer::importPlugin));
+    auto JeomETRYdASH = CCMenuItemSpriteExtra::create(CircleButtonSprite::create(CCSprite::create(this->plugin ? "plugin_import.png"_spr : "script_import.png"_spr)), this, menu_selector(ScriptsLayer::importPlugin));
 
     actionsMenu->addChild(pluginsBtn);
     actionsMenu->addChild(restartBtn);
@@ -233,35 +232,39 @@ bool ScriptsLayer::init(bool plugin) {
 
 void ScriptsLayer::importPlugin(CCObject*) {
     geode::createQuickPopup(
-        "Import Plugin",
-        "Would you like to import a plugin?",
+        "Import",
+        fmt::format("Would you like to import a {}?", this->plugin ? "plugin" : "script"),
         "Yes", "No",
-        [](FLAlertLayer*, bool btn2) {
+        [this](FLAlertLayer*, bool btn2) {
             if (!btn2) {
-                file::pick(file::PickMode::OpenFile, file::FilePickOptions {
+                async::spawn(file::pick(file::PickMode::OpenFile, file::FilePickOptions {
                     .filters = { file::FilePickOptions::Filter {
-                        .description = "SerpentLua Plugins",
-                        .files = { "*.slp" }
+                        .description = this->plugin ? "SerpentLua Plugins" : "Lua Scripts",
+                        .files = { this->plugin ? "*.slp" : "*.lua"}
                     }}
-                }).listen([](geode::Result<std::filesystem::path>* path) {
-                    if (path->isErr()) {
+                }), ([this](geode::Result<std::optional<std::filesystem::path>> result) {
+                    if (result.isErr()) {
                         FLAlertLayer::create(
                             "Error",
-                            fmt::format("An error occurred importing plugin: \n", path->err().value()).c_str(),
+                            fmt::format("An error occurred importing: \n", *(result.err())).c_str(),
                             "OK"
                         )->show();
                         return;
                     }
-                    auto unwrapped = path->unwrap();
+
+                    auto opt = result.unwrap();
+
+                    if (!opt) return; // cancelled
+                    auto unwrapped = *opt;
                     geode::createQuickPopup(
                         "Confirm",
                         fmt::format("Are you sure you want to import {}?", unwrapped.filename()),
                         "Yes", "No",
-                        [=](FLAlertLayer*, bool btn2) {
+                        [=, this](FLAlertLayer*, bool btn2) {
                             if (!btn2) {
                                 std::error_code ec;
                                 
-                                std::filesystem::copy_file(unwrapped, Mod::get()->getConfigDir()/"plugins"/unwrapped.filename(), ec);
+                                std::filesystem::copy_file(unwrapped, Mod::get()->getConfigDir()/(this->plugin ? "plugins" : "scripts")/unwrapped.filename(), ec);
 
                                 if (ec) {
                                     FLAlertLayer::create(
@@ -270,7 +273,7 @@ void ScriptsLayer::importPlugin(CCObject*) {
                                         "OK"
                                     )->show();
                                 } else {
-                                    Mod::get()->setSavedValue<bool>(fmt::format("safe-{}", unwrapped.stem()), true);
+                                    if (this->plugin) Mod::get()->setSavedValue<bool>(fmt::format("safe-{}", unwrapped.stem()), true);
                                     geode::createQuickPopup(
                                         "Error",
                                         fmt::format("{} has been imported successfully!\nWould you like to restart for it to take effect?", unwrapped.filename()),
@@ -278,7 +281,7 @@ void ScriptsLayer::importPlugin(CCObject*) {
                                         [](FLAlertLayer*, bool btn2) {
                                             // look at this fatass indent :heart:
                                             if (!btn2) {
-                                                utils::game::restart();
+                                                utils::game::restart(true);
                                             }
                                         }
                                     );
@@ -286,7 +289,7 @@ void ScriptsLayer::importPlugin(CCObject*) {
                             }
                         }
                     );
-                });
+                }));
             }
         });
 }

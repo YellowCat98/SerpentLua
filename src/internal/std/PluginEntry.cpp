@@ -31,13 +31,41 @@ void ScriptBuiltin::entry(lua_State* L) {
         return sol::nil;
     };
 
-    _ScriptMetadata["name"] = &SerpentLua::ScriptMetadata::name;
-    _ScriptMetadata["id"] = &SerpentLua::ScriptMetadata::id;
-    _ScriptMetadata["version"] = &SerpentLua::ScriptMetadata::version;
-    _ScriptMetadata["serpentVersion"] = &SerpentLua::ScriptMetadata::serpentVersion;
-    _ScriptMetadata["nostd"] = &SerpentLua::ScriptMetadata::nostd;
-    _ScriptMetadata["developer"] = &SerpentLua::ScriptMetadata::developer;
-    _ScriptMetadata["path"] = &SerpentLua::ScriptMetadata::path;
+    _ScriptMetadata["name"] = sol::property(
+        [](ScriptMetadata& self) -> std::string& {
+            return self.name;
+        }
+    );
+    _ScriptMetadata["id"] = sol::property(
+        [](ScriptMetadata& self) -> std::string& {
+            return self.id;
+        }
+    );
+    _ScriptMetadata["version"] = sol::property(
+        [](ScriptMetadata& self) -> std::string& {
+            return self.version;
+        }
+    );
+    _ScriptMetadata["serpentVersion"] = sol::property(
+        [](ScriptMetadata& self) -> std::string& {
+            return self.serpentVersion;
+        }
+    );
+    _ScriptMetadata["nostd"] = sol::property(
+        [](ScriptMetadata& self) -> bool& {
+            return self.nostd;
+        }
+    );
+    _ScriptMetadata["developer"] = sol::property(
+        [](ScriptMetadata& self) -> std::string& {
+            return self.developer;
+        }
+    );
+    _ScriptMetadata["path"] = sol::property(
+        [](ScriptMetadata& self) -> std::string& {
+            return self.path;
+        }
+    );
 
     ScriptBuiltin::mainModule["log"] = logging(state);
     ScriptBuiltin::mainModule["playground"] = ScriptBuiltin::Playground::entry(state);
