@@ -10,7 +10,7 @@
 	"name": "SerpentLua",
 	"version": "v1.0.0",
 	"developer": "YellowCat98",
-	"description": "Run Lua script and import bindings.",
+	"description": "Make your own mods in Lua.",
 	"early-load": true,
 	"api": {
 		"include": [
