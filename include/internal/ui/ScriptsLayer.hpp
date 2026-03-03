@@ -26,6 +26,8 @@ namespace SerpentLua::internal::ui {
 		// these buttons are needed here so that we can change their opacity in loadPage
 		void callbackMovePage(cocos2d::CCObject*);
 
+		cocos2d::CCLabelBMFont* infoLabel; // shows info about what page it is, how many pages, and how many items
+
 		
 		void importPlugin(cocos2d::CCObject*);
 

@@ -200,7 +200,7 @@ class $modify(MenuLayerHook, MenuLayer) {
 		}
 
 		auto bottomMenu = static_cast<CCMenu*>(this->getChildByID("bottom-menu"));
-		bottomMenu->addChild(CCMenuItemExt::createSpriteExtra(CircleButtonSprite::create(CCSprite::create("serpentluaButton.png"_spr)), [](CCObject*) {
+		bottomMenu->addChild(CCMenuItemExt::createSpriteExtra(CircleButtonSprite::create(CCSprite::create("serpentluaButton.png"_spr), CircleBaseColor::Green, CircleBaseSize::MediumAlt), [](CCObject*) {
 			CCDirector::get()->pushScene(CCTransitionFade::create(0.5f, ui::ScriptsLayer::scene(false)));
 		}));
 

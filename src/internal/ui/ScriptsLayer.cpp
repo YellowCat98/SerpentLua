@@ -1,6 +1,7 @@
 #include <internal/ui/ScriptsLayer.hpp>
 #include <internal/ui/ScriptItem.hpp>
 #include <Geode/utils/async.hpp>
+#include <Geode/ui/GeodeUI.hpp>
 
 using namespace SerpentLua::internal::ui;
 using namespace geode::prelude;
@@ -42,8 +43,8 @@ void ScriptsLayer::loadPage(int page) {
         }, CCSize(358.0f, 30), plugin));
     }
 
-    //backBtn->setVisible(true);
-    //nextBtn->setVisible(true);
+    backBtn->setVisible(true);
+    nextBtn->setVisible(true);
     
     if (!scriptsInPage.empty()) {
         if (scriptsInPage.front() == scripts.begin()->second) { // basically if were on the first page
@@ -63,12 +64,15 @@ void ScriptsLayer::loadPage(int page) {
 
     this->currentPage = page;
 
+    infoLabel->setString(fmt::format("Page {}/{} ({} Items)", currentPage, (scripts.size() + itemsPerPage - 1) / itemsPerPage, scripts.size()).c_str());
+
 }
 
 
 void ScriptsLayer::setupScriptsList() {
     CCArray* scriptItems = CCArray::create();
     
+    /*
     if (!plugin) {
         for (const auto [k, v] : RuntimeManager::get()->getAllScripts()) {
             scripts[k] = static_cast<void*>(v);
@@ -77,7 +81,7 @@ void ScriptsLayer::setupScriptsList() {
         for (const auto [k, v] : RuntimeManager::get()->getAllLoadedPlugins()) {
             scripts[k] = static_cast<void*>(v->metadata);
         }
-    }
+    }*/
 
 /*
     for (auto& script : SerpentLua::internal::RuntimeManager::get()->getAllScripts()) {
@@ -90,7 +94,7 @@ void ScriptsLayer::setupScriptsList() {
     }
 */
     
-/*
+
     for (int i = 0; i < 81; i++) {
         std::map<std::string, std::string> metadatamap = {
             {"name", fmt::format("test, {}", i)},
@@ -103,7 +107,7 @@ void ScriptsLayer::setupScriptsList() {
 
         scripts.insert({metadatamap["id"], ScriptMetadata::create(metadatamap)});
     }
-*/
+
 
     auto listView = ListView::create(CCArray::create(), 30);
     
@@ -156,11 +160,14 @@ bool ScriptsLayer::init(bool plugin) {
     this->currentPage = 1;
     this->itemsPerPage = 10;
     this->plugin = plugin;
+    this->infoLabel = CCLabelBMFont::create("", "goldFont.fnt");
 
     auto background = geode::createLayerBG();
     background->setID("background"); // background is better than bg imo
     background->setZOrder(-1);
     auto array = CCArray::create();
+
+    geode::addSideArt(this);
 
     auto backMenu = CCMenu::create();
     backMenu->setID("back-menu");
@@ -192,10 +199,33 @@ bool ScriptsLayer::init(bool plugin) {
     );
     actionsMenu->setAnchorPoint({0.0f, 0.0f});
     actionsMenu->setContentSize({38.0f, 200.0f});
-
     actionsMenu->setID("actions-menu");
 
-    auto restartBtn = CCMenuItemExt::createSpriteExtraWithFrameName("GJ_updateBtn_001.png", 1.0f, [](CCObject* sender) {
+
+    auto pluginsBtn = CCMenuItemExt::createSpriteExtra(CircleButtonSprite::create(CCSprite::create(this->plugin ? "script.png"_spr : "plugin.png"_spr), CircleBaseColor::Green, CircleBaseSize::Small), [this](CCObject*) {
+        auto layer = ScriptsLayer::scene(!this->plugin);
+        CCDirector::get()->replaceScene(CCTransitionFade::create(0.5f, layer)); // we shouldnt really do pushScene here, as then pressing the button repeatedly will cause the scene stack to fill up
+        // doing popScene after replaceScene was called will send you back to the main menu.
+    });
+    pluginsBtn->setID("plugins-btn");
+
+    auto JeomETRYdASH = CCMenuItemSpriteExtra::create(CircleButtonSprite::create(CCSprite::create(this->plugin ? "plugin_import.png"_spr : "script_import.png"_spr), CircleBaseColor::Green, CircleBaseSize::Small), this, menu_selector(ScriptsLayer::importPlugin));
+    JeomETRYdASH->setID("import-btn");
+
+    actionsMenu->addChild(pluginsBtn);
+    actionsMenu->addChild(JeomETRYdASH);
+
+    auto rightActionsMenu = CCMenu::create();
+    rightActionsMenu->setLayout(SimpleColumnLayout::create()
+        ->setMainAxisAlignment(MainAxisAlignment::Start)
+        ->setGap(0.5f)
+        ->setMainAxisDirection(AxisDirection::BottomToTop)
+    );
+    rightActionsMenu->setAnchorPoint({1.0f, 0.0f});
+    rightActionsMenu->setContentSize({38.0f, 200.0f});
+    rightActionsMenu->setID("right-actions-menu");
+
+    auto restartBtn = CCMenuItemExt::createSpriteExtra(CircleButtonSprite::createWithSpriteFrameName("geode.loader/reload.png", 1.0f, CircleBaseColor::Green, CircleBaseSize::Small), [](CCObject* sender) {
         geode::createQuickPopup(
             "Restart Game",
             "Would you like to restart?",
@@ -208,23 +238,25 @@ bool ScriptsLayer::init(bool plugin) {
         );
     });
 
-    auto pluginsBtn = CCMenuItemExt::createSpriteExtra(CircleButtonSprite::create(CCSprite::create(this->plugin ? "script.png"_spr : "plugin.png"_spr)), [this](CCObject*) {
-        auto layer = ScriptsLayer::scene(!this->plugin);
-        CCDirector::get()->replaceScene(CCTransitionFade::create(0.5f, layer)); // we shouldnt really do pushScene here, as then pressing the button repeatedly will cause the scene stack to fill up
-        // doing popScene after replaceScene was called will send you back to the main menu.
+    restartBtn->setID("restart-btn");
+
+    auto sextingsBtn = CCMenuItemExt::createSpriteExtra(CircleButtonSprite::createWithSpriteFrameName("geode.loader/settings.png", 1.0f, CircleBaseColor::Green, CircleBaseSize::Small), [](CCObject*) {
+        openSettingsPopup(Mod::get(), true);
     });
+    sextingsBtn->setID("settings-btn");
 
-    auto JeomETRYdASH = CCMenuItemSpriteExtra::create(CircleButtonSprite::create(CCSprite::create(this->plugin ? "plugin_import.png"_spr : "script_import.png"_spr)), this, menu_selector(ScriptsLayer::importPlugin));
+    rightActionsMenu->addChild(sextingsBtn);
+    rightActionsMenu->addChild(restartBtn);
 
-    actionsMenu->addChild(pluginsBtn);
-    actionsMenu->addChild(restartBtn);
-    actionsMenu->addChild(JeomETRYdASH);
-    
     this->addChildAtPosition(actionsMenu, Anchor::BottomLeft, {5.0f, 0.0f}, false);
+    this->addChildAtPosition(rightActionsMenu, Anchor::BottomRight, {-5.0f, 0.0f}, false);
 
     this->setupScriptsList();
 
+    this->addChildAtPosition(infoLabel, Anchor::TopRight, {5.0f, 0.0f}, false);
+
     actionsMenu->updateLayout();
+    rightActionsMenu->updateLayout();
     backMenu->updateLayout();
 
     return true;
