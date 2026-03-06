@@ -72,9 +72,6 @@ geode::Result<SerpentLua::ScriptMetadata*, std::string> SerpentLua::ScriptMetada
         auto pair = SerpentLua::ScriptMetadata::createPair(line);
         if (pair == std::pair<std::string, std::string>({})) return Err("Script `{}` metadata: The first {} lines in a script must be metadata.", scriptPath.filename(), max+1);
 
-        
-
-
         if (metadata.contains(pair.first)) return Err("Script `{}` metadata: Metadata already contains key {}", scriptPath.filename(), pair.first);
 
         metadata.insert(pair);
@@ -98,6 +95,8 @@ geode::Result<SerpentLua::ScriptMetadata*, std::string> SerpentLua::ScriptMetada
     
     // HOW the fuck did i forget this holy fucking SHIT.
     metadata.insert({"path", scriptPath.string()});
+
+    if (scriptPath.stem() != metadata.at("id")) return Err("Script `{}` metadata: Script filename must match Script ID. ({} != {})", scriptPath.filename(), scriptPath.filename(), metadata.at("id"));
 
     log::debug("Script `{}` metadata: Metadata gathered.", scriptPath.filename());
 
