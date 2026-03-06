@@ -31,6 +31,8 @@ namespace SerpentLua::internal::ui {
 		
 		void importPlugin(cocos2d::CCObject*);
 
+		void startImport(std::filesystem::path path, std::filesystem::path dest, std::filesystem::copy_options options);
+
 		int currentPage;
 		int itemsPerPage;
 

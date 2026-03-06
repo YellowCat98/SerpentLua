@@ -72,7 +72,7 @@ void ScriptsLayer::loadPage(int page) {
 void ScriptsLayer::setupScriptsList() {
     CCArray* scriptItems = CCArray::create();
     
-    /*
+    
     if (!plugin) {
         for (const auto [k, v] : RuntimeManager::get()->getAllScripts()) {
             scripts[k] = static_cast<void*>(v);
@@ -81,7 +81,7 @@ void ScriptsLayer::setupScriptsList() {
         for (const auto [k, v] : RuntimeManager::get()->getAllLoadedPlugins()) {
             scripts[k] = static_cast<void*>(v->metadata);
         }
-    }*/
+    }
 
 /*
     for (auto& script : SerpentLua::internal::RuntimeManager::get()->getAllScripts()) {
@@ -95,6 +95,7 @@ void ScriptsLayer::setupScriptsList() {
 */
     
 
+/*
     for (int i = 0; i < 81; i++) {
         std::map<std::string, std::string> metadatamap = {
             {"name", fmt::format("test, {}", i)},
@@ -107,7 +108,7 @@ void ScriptsLayer::setupScriptsList() {
 
         scripts.insert({metadatamap["id"], ScriptMetadata::create(metadatamap)});
     }
-
+*/
 
     auto listView = ListView::create(CCArray::create(), 30);
     
@@ -161,6 +162,9 @@ bool ScriptsLayer::init(bool plugin) {
     this->itemsPerPage = 10;
     this->plugin = plugin;
     this->infoLabel = CCLabelBMFont::create("", "goldFont.fnt");
+
+    this->infoLabel->setScale(0.5f);
+    this->infoLabel->setAnchorPoint({1.0f, 1.0f});
 
     auto background = geode::createLayerBG();
     background->setID("background"); // background is better than bg imo
@@ -225,13 +229,15 @@ bool ScriptsLayer::init(bool plugin) {
     rightActionsMenu->setContentSize({38.0f, 200.0f});
     rightActionsMenu->setID("right-actions-menu");
 
-    auto restartBtn = CCMenuItemExt::createSpriteExtra(CircleButtonSprite::createWithSpriteFrameName("geode.loader/reload.png", 1.0f, CircleBaseColor::Green, CircleBaseSize::Small), [](CCObject* sender) {
+    auto restartSpr = CCSprite::createWithSpriteFrameName("geode.loader/reload.png");
+    restartSpr->setColor({255, 215, 65});
+    auto restartBtn = CCMenuItemExt::createSpriteExtra(CircleButtonSprite::create(restartSpr, CircleBaseColor::Green, CircleBaseSize::Small), [](CCObject* sender) {
         geode::createQuickPopup(
             "Restart Game",
             "Would you like to restart?",
-            "Yes", "No",
+            "Cancel", "Restart",
             [](FLAlertLayer*, bool btn2) {
-                if (!btn2) {
+                if (btn2) {
                     game::restart(true);
                 }
             }
@@ -253,7 +259,7 @@ bool ScriptsLayer::init(bool plugin) {
 
     this->setupScriptsList();
 
-    this->addChildAtPosition(infoLabel, Anchor::TopRight, {5.0f, 0.0f}, false);
+    this->addChildAtPosition(infoLabel, Anchor::TopRight, {-3.5f, -0.5f}, false);
 
     actionsMenu->updateLayout();
     rightActionsMenu->updateLayout();
@@ -262,13 +268,39 @@ bool ScriptsLayer::init(bool plugin) {
     return true;
 }
 
+void ScriptsLayer::startImport(std::filesystem::path path, std::filesystem::path dest, std::filesystem::copy_options options) {
+	std::error_code ec;
+    std::filesystem::copy_file(path, dest, options, ec);
+
+    if (ec) {
+        FLAlertLayer::create(
+            "Error",
+            fmt::format("An error occurred importing {}!\nErr: {}", path.filename(), ec.message()),
+            "OK"
+        )->show();
+    } else {
+        if (this->plugin) Mod::get()->setSavedValue<bool>(fmt::format("safe-{}", path.stem()), true);
+		else if (!Mod::get()->hasSavedValue(fmt::format("enabled-{}", path.stem()))) Mod::get()->setSavedValue<bool>(fmt::format("enabled-{}", path.stem()), true); // auto enable script on import
+        geode::createQuickPopup(
+            "Success",
+			fmt::format("{} has been imported successfully!\nWould you like to restart for it to take effect?", path.filename()),
+            "Cancel", "Restart",
+            [](FLAlertLayer*, bool btn2) {
+                if (btn2) {
+                    utils::game::restart(true);
+                }
+            }
+        );
+    }
+}
+
 void ScriptsLayer::importPlugin(CCObject*) {
     geode::createQuickPopup(
         "Import",
         fmt::format("Would you like to import a {}?", this->plugin ? "plugin" : "script"),
-        "Yes", "No",
+        "Cancel", "Import",
         [this](FLAlertLayer*, bool btn2) {
-            if (!btn2) {
+            if (btn2) {
                 async::spawn(file::pick(file::PickMode::OpenFile, file::FilePickOptions {
                     .filters = { file::FilePickOptions::Filter {
                         .description = this->plugin ? "SerpentLua Plugins" : "Lua Scripts",
@@ -287,36 +319,34 @@ void ScriptsLayer::importPlugin(CCObject*) {
                     auto opt = result.unwrap();
 
                     if (!opt) return; // cancelled
-                    auto unwrapped = *opt;
+                    auto path = *opt;
                     geode::createQuickPopup(
                         "Confirm",
-                        fmt::format("Are you sure you want to import {}?", unwrapped.filename()),
-                        "Yes", "No",
+                        fmt::format("Are you sure you want to import {}?", path.filename()),
+                        "Cancel", "Confirm",
                         [=, this](FLAlertLayer*, bool btn2) {
-                            if (!btn2) {
-                                std::error_code ec;
-                                
-                                std::filesystem::copy_file(unwrapped, Mod::get()->getConfigDir()/(this->plugin ? "plugins" : "scripts")/unwrapped.filename(), ec);
+                            if (btn2) {
+                                auto dest = Mod::get()->getConfigDir()/(this->plugin ? "plugins" : "scripts")/path.filename();
 
-                                if (ec) {
-                                    FLAlertLayer::create(
-                                        "Error",
-                                        fmt::format("An error occurred importing {}!\nErr: {}", unwrapped.filename(), ec.message()),
-                                        "OK"
-                                    )->show();
-                                } else {
-                                    if (this->plugin) Mod::get()->setSavedValue<bool>(fmt::format("safe-{}", unwrapped.stem()), true);
+                                std::error_code ec;
+								if (Mod::get()->getSettingValue<bool>("overwrite")) {
+									this->startImport(path, dest, std::filesystem::copy_options::overwrite_existing);
+									return;
+								}
+                                if (std::filesystem::exists(dest)) {
+									std::string tip = !Mod::get()->setSavedValue<bool>("show-overwrite-tip", true) ? "\n<cy>Tip</c>: Enabling the <cr>\"Skip Overwrite Confirmation\"</c> setting will skip overwrite confirmation in the future." : "";
                                     geode::createQuickPopup(
-                                        "Error",
-                                        fmt::format("{} has been imported successfully!\nWould you like to restart for it to take effect?", unwrapped.filename()),
-                                        "Yes", "No",
-                                        [](FLAlertLayer*, bool btn2) {
-                                            // look at this fatass indent :heart:
-                                            if (!btn2) {
-                                                utils::game::restart(true);
-                                            }
+                                        "File Exists",
+                                        fmt::format("{} already exists! would you like to overwrite it?{}", path.filename(), tip),
+                                        "Cancel", "Overwrite",
+                                        [path, dest, this](FLAlertLayer*, bool btn2) {
+                                            if (!btn2) return;
+
+                                            this->startImport(path, dest, std::filesystem::copy_options::overwrite_existing);
                                         }
                                     );
+                                } else {
+                                    this->startImport(path, dest, std::filesystem::copy_options::none);
                                 }
                             }
                         }

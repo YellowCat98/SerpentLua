@@ -180,17 +180,15 @@ class $modify(MenuLayerHook, MenuLayer) {
 				"Otherwise, disable this setting.",
 				"Disable", "Cancel",
 				[](FLAlertLayer*, bool btn2) {
-					if (btn2) {
-						
-					} else {
+					if (!btn2) {
 						Mod::get()->setSettingValue<bool>("dev-mode", false);
 					}
 
 					geode::createQuickPopup("Restart",
 						"Would you like to restart now?",
-						"Restart", "Later",
+						"Later", "Restart",
 						[](FLAlertLayer*, bool btn2) {
-							if (!btn2) utils::game::restart(true);
+							if (btn2) utils::game::restart(true);
 						}
 					);
 				}, false);

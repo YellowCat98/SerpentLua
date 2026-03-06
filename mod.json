@@ -25,10 +25,17 @@
 	"settings": {
 		"dev-mode": {
 			"name": "Dev Mode",
-			"description": "Allows loading unapproved plugins.",
+			"description": "Allows loading plugins that aren't imported through the plugin importer.",
 			"type": "bool",
 			"default": false,
 			"requires-restart": true
+		},
+		"overwrite": {
+			"name": "Skip Overwrite Confirmation",
+			"description": "Overwrites existing plugins/scripts when importing.",
+			"type": "bool",
+			"default": false,
+			"requires-restart": false
 		}
 	}
 }
