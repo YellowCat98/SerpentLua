@@ -70,7 +70,7 @@ void ScriptBuiltin::entry(lua_State* L) {
     ScriptBuiltin::mainModule["log"] = logging(state);
     ScriptBuiltin::mainModule["playground"] = ScriptBuiltin::Playground::entry(state);
 
-    state["serpentlua_modules"]["SerpentLua"] = []() {
+    state["serpentlua_modules"]["serpentlua.std"] = []() {
         return ScriptBuiltin::mainModule;
     };
 }
@@ -147,7 +147,7 @@ Result<> ScriptBuiltin::initPlugin() {
     std::map<std::string, std::string> map = {
         {"name", "SerpentLua"},
         {"developer", "YellowCat98"},
-        {"id", "serpentlua_builtin"},
+        {"id", "serpentlua.std"},
         {"version", Mod::get()->getVersion().toVString()},
         {"serpent-version", Mod::get()->getVersion().toVString()}
     };
