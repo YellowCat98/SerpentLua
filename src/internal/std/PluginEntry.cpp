@@ -5,8 +5,20 @@
 using namespace SerpentLua::internal;
 using namespace geode::prelude;
 
+SerpentLua::ScriptMetadata* ScriptBuiltin::getMetadata() {
+    auto getprotected = ScriptBuiltin::mainModule["ScriptMetadata"]["get"]();
+
+    sol::object get = getprotected;
+
+    if (get == sol::nil) return nullptr;
+
+    return get.as<SerpentLua::ScriptMetadata*>();
+}
+
 void ScriptBuiltin::entry(lua_State* L) {
     sol::state_view state(L);
+
+    ScriptBuiltin::L = L;
 
     ScriptBuiltin::mainModule = state.create_table();
 
@@ -73,6 +85,12 @@ void ScriptBuiltin::entry(lua_State* L) {
     state["serpentlua_modules"]["serpentlua.std"] = []() {
         return ScriptBuiltin::mainModule;
     };
+
+    auto metadata = ScriptBuiltin::getMetadata();
+    if (!metadata) 
+        log::error("Failed to get metadata.");
+    else
+        ScriptBuiltin::metadata = metadata;
 }
 
 sol::table ScriptBuiltin::logging(sol::state_view state) {

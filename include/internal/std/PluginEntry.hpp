@@ -7,7 +7,12 @@ namespace SerpentLua::internal::ScriptBuiltin { // builtin plugin, can be includ
 
     inline SerpentLua::Plugin* plugin = nullptr;
     inline sol::table mainModule;
+    inline lua_State* L;
+    inline ScriptMetadata* metadata;
+
     geode::Result<> initPlugin();
 
     sol::table logging(sol::state_view state);
+
+    ScriptMetadata* getMetadata();
 };
