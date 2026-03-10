@@ -31,6 +31,8 @@ $on_mod(Loaded) {
 	log::info("Running Lua version: {}", LUA_VERSION);
 	SetDefaultDllDirectories(LOAD_LIBRARY_SEARCH_DEFAULT_DIRS);
 
+	(void)Mod::get()->registerCustomSettingType("open-scripts-btn", &OpenScriptsSettingV3::parse);
+
 	auto configDir = Mod::get()->getConfigDir();
 	
 	auto res = createDirs(configDir, {"plugin_global_deps", "plugin_deps", "plugins", "scripts", "playground"});
