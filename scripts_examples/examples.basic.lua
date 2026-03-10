@@ -26,9 +26,9 @@ SL.log.error("There is no error, yet. This function will be useful in the future
 
 --[[
 SL.log: A table containing 4 logging functions.
-    info: Typical info log, pretty much.
-    debug: Debug logs do not show up when your log level is not set to Debug or Trace in Geode Settings, these are used for more verbose logs.
-    warn: A warning message, self explanatory.
-    error: An error message, self explanatory.
-    
+	info: Typical info log, pretty much.
+	debug: Debug logs do not show up when your log level is not set to Debug or Trace in Geode Settings, these are used for more verbose logs.
+	warn: A warning message, self explanatory.
+	error: An error message, self explanatory.
+	
 ]]

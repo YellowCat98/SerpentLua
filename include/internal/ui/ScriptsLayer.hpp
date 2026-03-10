@@ -4,7 +4,7 @@
 
 
 namespace SerpentLua::internal::ui {
-    class ScriptsLayer : public cocos2d::CCLayer {
+	class ScriptsLayer : public cocos2d::CCLayer {
 	public:
 		static ScriptsLayer* create(bool plugin); // whether to make it show plugins or show scripts
 		static cocos2d::CCScene* scene(bool plugin);

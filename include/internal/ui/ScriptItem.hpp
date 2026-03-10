@@ -12,7 +12,7 @@ namespace SerpentLua::internal::ui {
 		cocos2d::CCNode* title;
 		cocos2d::CCNode* mainContainer;
 		cocos2d::CCLabelBMFont* titleLabel;
-        cocos2d::CCLabelBMFont* versionLabel; // use the title container for the version too
+		cocos2d::CCLabelBMFont* versionLabel; // use the title container for the version too
 		cocos2d::CCMenu* devContainer;
 		cocos2d::CCLabelBMFont* dev;
 		cocos2d::CCMenu* viewMenu;

@@ -75,15 +75,15 @@ bool ScriptItem::init(void* theMetadata, std::function<void(CCMenuItemToggler*)>
 	titleLabel->setLayoutOptions(AxisLayoutOptions::create()->setScalePriority(1));
 	title->addChild(titleLabel);
 
-    versionLabel = CCLabelBMFont::create(METADATA_GET(version).c_str(), "bigFont.fnt");
-    versionLabel->setID("version-label");
-    versionLabel->setLayoutOptions(AxisLayoutOptions::create()
-        ->setScalePriority(1)
-        ->setAutoScale(false)
-    );
-    versionLabel->setScale(0.7f);
-    versionLabel->setColor({0,255,255});
-    title->addChild(versionLabel);
+	versionLabel = CCLabelBMFont::create(METADATA_GET(version).c_str(), "bigFont.fnt");
+	versionLabel->setID("version-label");
+	versionLabel->setLayoutOptions(AxisLayoutOptions::create()
+		->setScalePriority(1)
+		->setAutoScale(false)
+	);
+	versionLabel->setScale(0.7f);
+	versionLabel->setColor({0,255,255});
+	title->addChild(versionLabel);
 
 	title->setContentWidth((titleSpace.width) / mainContainer->getScale());
 
@@ -142,11 +142,11 @@ void ScriptItem::listener(float) {
 		this->viewBtn->toggle(Mod::get()->getSavedValue<bool>(fmt::format("enabled-{}", std::get<ScriptMetadata*>(metadata)->id)));
 }
 ScriptItem* ScriptItem::create(void* metadata, std::function<void(CCMenuItemToggler*)> onButton, const cocos2d::CCSize& size, bool plugin) {
-    auto ret = new ScriptItem();
-    if (ret && ret->init(metadata, onButton, size, plugin)) {
-        ret->autorelease();
-        return ret;
-    }
-    delete ret;
-    return nullptr;
+	auto ret = new ScriptItem();
+	if (ret && ret->init(metadata, onButton, size, plugin)) {
+		ret->autorelease();
+		return ret;
+	}
+	delete ret;
+	return nullptr;
 }

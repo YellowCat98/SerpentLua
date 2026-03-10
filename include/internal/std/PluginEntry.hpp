@@ -3,16 +3,16 @@
 #include <sol/sol.hpp> // since the builtin plugin isnt in internal/SerpentLua.hpp, its no longer a part of the serpentlua core so i can include sol2
 
 namespace SerpentLua::internal::ScriptBuiltin { // builtin plugin, can be included within a script by doing `--@plugins serpentlua_builtin`
-    void entry(lua_State* L);
+	void entry(lua_State* L);
 
-    inline SerpentLua::Plugin* plugin = nullptr;
-    inline sol::table mainModule;
-    inline lua_State* L;
-    inline ScriptMetadata* metadata;
+	inline SerpentLua::Plugin* plugin = nullptr;
+	inline sol::table mainModule;
+	inline lua_State* L;
+	inline ScriptMetadata* metadata;
 
-    geode::Result<> initPlugin();
+	geode::Result<> initPlugin();
 
-    sol::table logging(sol::state_view state);
+	sol::table logging(sol::state_view state);
 
-    ScriptMetadata* getMetadata();
+	ScriptMetadata* getMetadata();
 };
