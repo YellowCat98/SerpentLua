@@ -155,7 +155,7 @@ std::string ScriptBuiltin::Playground::File::getPath() {
     return path;
 }
 
-std::string ScriptBuiltin::Playground::File::getFilename(bool withExtension) {
+std::string ScriptBuiltin::Playground::File::getName(bool withExtension) {
     return withExtension ? std::filesystem::path(path).filename().string() : std::filesystem::path(path).stem().string();
 }
 
@@ -242,6 +242,14 @@ int ScriptBuiltin::Playground::Folder::errSize() {
     return errs.size();
 }
 
+std::string ScriptBuiltin::Playground::Folder::getPath() {
+    return path;
+}
+
+std::string ScriptBuiltin::Playground::Folder::getName() {
+    return std::filesystem::path(path).filename().string();
+}
+
 sol::table ScriptBuiltin::Playground::entry(sol::state_view state) {
     auto table = state.create_table();
 
@@ -277,7 +285,14 @@ sol::table ScriptBuiltin::Playground::entry(sol::state_view state) {
         "errSize", &File::errSize,
         "getErr", &File::getErr,
         "getPath", &File::getPath,
-        "getFilename", &File::getFilename
+        "getName", sol::overload(
+            [](File& self, bool withExtension) {
+                return self.getName(withExtension);
+            },
+            [](File& self) {
+                return self.getName(true);
+            }
+        )
     );
 
     sol::table folder_table = state.create_table();
@@ -292,7 +307,9 @@ sol::table ScriptBuiltin::Playground::entry(sol::state_view state) {
         "hasErrs", &Folder::hasErrs, // it looks like a staircase again!
         "getErr", &Folder::getErr,
         "errSize", &Folder::errSize,
-        "erase", &Folder::erase
+        "erase", &Folder::erase,
+        "getPath", &Folder::getPath,
+        "getName", &Folder::getName
     );
 
     return table;

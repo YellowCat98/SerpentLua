@@ -11,7 +11,7 @@ local SL = require("serpentlua.std")
 SL.playground:init()
 local pg = SL.playground
 
-SL.log.info("==== BASIC USAGE ====")
+--==== BASIC USAGE ====--
 
 local file = pg.File.create("script://HelloWorld.txt", false)
 --[[
@@ -25,26 +25,23 @@ File: Represents a file in the playground. Will be created if it doesn't exist.
         readOnly: (bool)
             Determines if the file can be written to.
 ]]
-SL.log.debug(string.format("File of path %s has been created with name: %s", file:getPath(), file:getFilename(true)))
+SL.log.debug(string.format("File of path %s has been created with name: %s", file:getPath(), file:getName(true)))
 --[[
     getPath: (string)
         Returns the absolute path of the file.
-    getFileName: (string)
+    getName: (string)
         Returns the filename of the file.
         Args:
             withExtension: (bool)
                 Whether to include the extension or not.
+                If not provided, this variable will default to true.
 ]]
 
-SL.log.info("==== ERROR HANDLING ====")
+--==== ERROR HANDLING ====--
 
 function hasErrs(myFile)
     for i = 1, myFile:errSize() do
-        if type(myFile.getFilename) == "function" then
-            SL.log.error(string.format("%s: %s", myFile:getFilename(true), myFile:getErr(i)))
-        else
-            SL.log.error(string.format("Folder said: %s", myFile:getErr(i)))
-        end
+        SL.log.error(string.format("%s: %s", myFile:getName(true), myFile:getErr(i)))
     end
     return myFile:hasErrs()
 end
@@ -66,7 +63,7 @@ if hasErrs(file) then return end
                 Where the error is located
 ]]
 
-SL.log.info("==== FILE OPERATIONS ====")
+--==== FILE OPERATIONS ====--
 
 local contents = file:read()
 --[[
@@ -113,7 +110,7 @@ end
         Deletes a file. Returns 0 if successful, returns 1 if it wasn't successful.
 ]]
 
-SL.log.info("==== ERROR SCENARIOS ====")
+--==== ERROR SCENARIOS ====--
 
 --Certain error scenarios:
 local function check(file)
@@ -140,7 +137,7 @@ notReallyAnError:append("Hello")
 notReallyAnError:write("NO")
 --Both of these lines silently fail because notReallyAnError is read-only.
 
-SL.log.info("==== FOLDER OPERATIONS ====")
+--==== FOLDER OPERATIONS ====--
 
 local folder = pg.Folder.create("script://HelloFolder") --Represents a folder on the system
 --The folder is created if it doesn't exist already.
@@ -149,7 +146,7 @@ local folder = pg.Folder.create("script://HelloFolder") --Represents a folder on
     All of the error handling functions (hasErrs, getErr, errSize) and the erase function.
     (These functions function the exact same as in File.)
 ]]
-if hasErrs(folder) then return end --Only getFilename doesn't exist on Folder.
+if hasErrs(folder) then return end
 
 
 if folder:exists("CoolFile.txt") then

@@ -22,7 +22,7 @@ namespace SerpentLua::internal::ScriptBuiltin::Playground {
         int errSize();
 
         std::string getPath();
-        std::string getFilename(bool withExtension);
+        std::string getName(bool withExtension);
     private:
         std::vector<std::string> errs;
         std::string path; // i really dont want to wrap sol2 around std::filesystem::path
@@ -45,6 +45,9 @@ namespace SerpentLua::internal::ScriptBuiltin::Playground {
         bool hasErrs();
         std::string getErr(int index);
         int errSize();
+
+        std::string getPath();
+        std::string getName();
 
     private:
         std::vector<std::string> errs;
