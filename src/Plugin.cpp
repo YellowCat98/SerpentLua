@@ -25,8 +25,6 @@ void Plugin::setPlugin() {
     return internal::RuntimeManager::get()->setPlugin(this->metadata->id, this);
 }
 
-#ifdef YELLOWCAT98_SERPENTLUA_EXPORTING
-
 void Plugin::SerpentLuaAPIImpl::log(__metadata m, const char* msg, const char* type) {
     if (std::strcmp(type, "info") == 0) log::info("[PLUGIN] [{}]: {}", m.name, msg);
     else if (strcmp(type, "warn") == 0) log::warn("[PLUGIN] [{}]: {}", m.name, msg);
@@ -167,7 +165,6 @@ geode::Result<Plugin*, std::string> Plugin::createNative(const std::filesystem::
     unwrapped->hDll = hDll;
     return Ok(unwrapped);
 }
-#endif
 
 Result<Plugin*, std::string> Plugin::create(PluginMetadata* metadata, std::function<void(lua_State*)> entry) {
     log::info("Plugin {} creation: initialized.", metadata->id);
