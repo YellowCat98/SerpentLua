@@ -36,6 +36,11 @@ __declspec(dllexport) void entry(lua_State* L) {
 
 	lua_pushcfunction(L, [](lua_State* L) -> int {
 		api.log(api.metadata, "WELCOME TO MY TEST PLUGIN!.", "info");
+		api.log(api.metadata, "LETS WARN!", "warn");
+		api.log(api.metadata, "LETS ERROR!", "error");
+		api.log(api.metadata, "LETS DEBUG!", "debug");
+		api.log(api.metadata, "LETS TRACE!", "trace");
+
 		return 0;
 	});
 	lua_setfield(L, -2, "the_Function");

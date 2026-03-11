@@ -23,12 +23,13 @@ SL.log.debug(string.format("IN UPPERCASE: %s", string.upper(stringToPlayAroundWi
 
 SL.log.warn("There's nothing to warn for...? but this could be useful too.")
 SL.log.error("There is no error, yet. This function will be useful in the future.")
+SL.log.trace("This function is very useful.")
 
 --[[
 SL.log: A table containing 4 logging functions.
 	info: Typical info log, pretty much.
-	debug: Debug logs do not show up when your log level is not set to Debug or Trace in Geode Settings, these are used for more verbose logs.
+	debug: Verbose debugging logs. Can only be seen if log level is set to Debug/Trace in Geode settings.
 	warn: A warning message, self explanatory.
 	error: An error message, self explanatory.
-	
+	trace: Highly verbose messages. Can only be seen if log level is set to Trace in Geode settings.
 ]]

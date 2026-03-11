@@ -28,8 +28,9 @@ void Plugin::setPlugin() {
 void Plugin::SerpentLuaAPIImpl::log(__metadata m, const char* msg, const char* type) {
 	if (std::strcmp(type, "info") == 0) log::info("[PLUGIN] [{}]: {}", m.name, msg);
 	else if (strcmp(type, "warn") == 0) log::warn("[PLUGIN] [{}]: {}", m.name, msg);
-	else if (strcmp(type, "error")) log::error("[PLUGIN] [{}]: {}", m.name, msg);
-	else log::debug("[PLUGIN] [{}]: {}", m.name, msg); // always default to debug if type isnt those things
+	else if (strcmp(type, "error") == 0) log::error("[PLUGIN] [{}]: {}", m.name, msg);
+	else if (strcmp(type, "debug") == 0) log::debug("[PLUGIN] [{}]: {}", m.name, msg);
+	else log::trace("[PLUGIN] [{}]: {}", m.name, msg); // always default to trace if type isnt those things
 }
 
 geode::Result<Plugin*, std::string> Plugin::createNative(const std::filesystem::path& path) {

@@ -127,6 +127,21 @@ sol::table ScriptBuiltin::logging(sol::state_view state) {
 		log::debug("[SCRIPT] [{}]: {}", get.as<SerpentLua::ScriptMetadata*>()->name, msg);
 	};
 
+	logging["trace"] = [](sol::this_state ts, const std::string& msg) -> void {
+		sol::state_view state(ts);
+
+		auto getprotected = ScriptBuiltin::mainModule["ScriptMetadata"]["get"]();
+
+		sol::object get = getprotected;
+
+		if (get == sol::nil) {
+			log::error("Script has failed to print! ScriptMetadata.get returned nil.");
+			return;
+		}
+
+		log::trace("[SCRIPT] [{}]: {}", get.as<SerpentLua::ScriptMetadata*>()->name, msg);
+	};
+
 	logging["warn"] = [](sol::this_state ts, const std::string& msg) -> void {
 		sol::state_view state(ts);
 
