@@ -28,7 +28,7 @@ add_subdirectory($ENV{GEODE_SDK} ${CMAKE_CURRENT_BINARY_DIR}/geode)
 CPMAddPackage(
     NAME sol2
     GITHUB_REPOSITORY ThePhD/sol2
-    VERSION 3.5.0 # wonder who taught it was a good idea to not make the actual latest version the latest version!
+    VERSION 3.5.0 # wonder who thought it was a good idea to not make the actual latest version the latest version!
 )
 
 #set(TULIP_LINK_SOURCE ON)
