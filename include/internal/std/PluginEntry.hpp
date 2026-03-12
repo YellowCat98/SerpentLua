@@ -6,13 +6,20 @@ namespace SerpentLua::internal::ScriptBuiltin { // builtin plugin, can be includ
 	void entry(lua_State* L);
 
 	inline SerpentLua::Plugin* plugin = nullptr;
-	inline sol::table mainModule;
-	inline lua_State* L;
-	inline ScriptMetadata* metadata;
+
+	// things for each specific script
+	struct ScriptContext {
+		sol::table mainModule;
+		lua_State* L;
+		ScriptMetadata* metadata;
+		ScriptContext() {}
+	};
+
+	inline std::unordered_map<lua_State*, ScriptContext> contexts;
 
 	geode::Result<> initPlugin();
 
 	sol::table logging(sol::state_view state);
 
-	ScriptMetadata* getMetadata();
+	ScriptMetadata* getMetadata(lua_State* L);
 };

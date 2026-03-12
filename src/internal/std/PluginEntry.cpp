@@ -5,24 +5,29 @@
 using namespace SerpentLua::internal;
 using namespace geode::prelude;
 
-SerpentLua::ScriptMetadata* ScriptBuiltin::getMetadata() {
-	auto getprotected = ScriptBuiltin::mainModule["ScriptMetadata"]["get"]();
+SerpentLua::ScriptMetadata* ScriptBuiltin::getMetadata(lua_State* L) {
+	auto it = ScriptBuiltin::contexts.find(L);
+	if (it == ScriptBuiltin::contexts.end()) return nullptr;
 
-	sol::object get = getprotected;
-
-	if (get == sol::nil) return nullptr;
-
-	return get.as<SerpentLua::ScriptMetadata*>();
+	return ScriptBuiltin::contexts.at(L).metadata;
 }
 
 void ScriptBuiltin::entry(lua_State* L) {
 	sol::state_view state(L);
 
-	ScriptBuiltin::L = L;
+	auto& ctx = ScriptBuiltin::contexts[L];
 
-	ScriptBuiltin::mainModule = state.create_table();
+	ctx.L = L;
 
-	auto _ScriptMetadata = ScriptBuiltin::mainModule.new_usertype<SerpentLua::ScriptMetadata>("ScriptMetadata", sol::no_constructor);
+	ctx.mainModule = state.create_table();
+
+	for (const auto [k, v] : RuntimeManager::get()->getAllLoadedScripts()) {
+		if (v->getLuaState() != L) ctx.metadata = nullptr;
+
+		ctx.metadata = v->getMetadata();
+	}
+
+	auto _ScriptMetadata = ctx.mainModule.new_usertype<SerpentLua::ScriptMetadata>("ScriptMetadata", sol::no_constructor);
 
 	_ScriptMetadata["getByID"] = [](sol::this_state ts, const std::string& id) -> sol::object {
 		sol::state_view lua(ts); // ts so tuff!
@@ -36,11 +41,8 @@ void ScriptBuiltin::entry(lua_State* L) {
 
 	_ScriptMetadata["get"] = [](sol::this_state ts) -> sol::object {
 		lua_State* L = ts;
-	
-		for (auto& pair : RuntimeManager::get()->getAllLoadedScripts()) {
-			if (pair.second->getLuaState() == L) return sol::make_object(L, pair.second->getMetadata());
-		}
-		return sol::nil;
+		sol::state_view state(ts);
+		return sol::make_object(ts, ScriptBuiltin::getMetadata(L));
 	};
 
 	_ScriptMetadata["name"] = sol::property(
@@ -79,97 +81,47 @@ void ScriptBuiltin::entry(lua_State* L) {
 		}
 	);
 
-	ScriptBuiltin::mainModule["log"] = logging(state);
-	ScriptBuiltin::mainModule["playground"] = ScriptBuiltin::Playground::entry(state);
+	ctx.mainModule["log"] = logging(state);
+	ctx.mainModule["playground"] = ScriptBuiltin::Playground::entry(state);
 
-	state["serpentlua_modules"]["serpentlua.std"] = []() {
-		return ScriptBuiltin::mainModule;
-	};
-
-	auto metadata = ScriptBuiltin::getMetadata();
-	if (!metadata) 
-		log::error("Failed to get metadata.");
-	else
-		ScriptBuiltin::metadata = metadata;
+	state["serpentlua_modules"]["serpentlua.std"] = ctx.mainModule;
 }
 
 sol::table ScriptBuiltin::logging(sol::state_view state) {
 
 	auto logging = state.create_table();
 
-	logging["info"] = [](sol::this_state ts, const std::string& msg) -> void {
-		sol::state_view state(ts);
+	std::function<void(sol::this_state, const std::string&, const std::string&)> logFn = [](sol::this_state ts, const std::string& msg, const std::string& type) {
+		lua_State* L = ts;
 
-		auto getprotected = ScriptBuiltin::mainModule["ScriptMetadata"]["get"]();
+		auto name = ScriptBuiltin::contexts.at(L).metadata->name;
 
-		sol::object get = getprotected;
-
-		if (get == sol::nil) {
-			log::error("Script has failed to print! ScriptMetadata.get returned nil.");
-			return;
-		}
-
-		log::info("[SCRIPT] [{}]: {}", get.as<SerpentLua::ScriptMetadata*>()->name, msg);
+		if (type == "info") log::info("[SCRIPT] [{}]: {}", name, msg);
+		else if (type == "debug") log::debug("[SCRIPT] [{}]: {}", name, msg);
+		else if (type == "warn") log::warn("[SCRIPT] [{}]: {}", name, msg);
+		else if (type == "error") log::error("[SCRIPT] [{}]: {}", name, msg);
+		else if (type == "trace") log::trace("[SCRIPT] [{}]: {}", name, msg);
 	};
 
-	logging["debug"] = [](sol::this_state ts, const std::string& msg) -> void {
-		sol::state_view state(ts);
 
-		auto getprotected = ScriptBuiltin::mainModule["ScriptMetadata"]["get"]();
-
-		sol::object get = getprotected;
-
-		if (get == sol::nil) {
-			log::error("Script has failed to print! ScriptMetadata.get returned nil.");
-			return;
-		}
-
-		log::debug("[SCRIPT] [{}]: {}", get.as<SerpentLua::ScriptMetadata*>()->name, msg);
+	logging["info"] = [logFn](sol::this_state ts, const std::string& msg) -> void {
+		logFn(ts, msg, "info");
 	};
 
-	logging["trace"] = [](sol::this_state ts, const std::string& msg) -> void {
-		sol::state_view state(ts);
-
-		auto getprotected = ScriptBuiltin::mainModule["ScriptMetadata"]["get"]();
-
-		sol::object get = getprotected;
-
-		if (get == sol::nil) {
-			log::error("Script has failed to print! ScriptMetadata.get returned nil.");
-			return;
-		}
-
-		log::trace("[SCRIPT] [{}]: {}", get.as<SerpentLua::ScriptMetadata*>()->name, msg);
+	logging["debug"] = [logFn](sol::this_state ts, const std::string& msg) -> void {
+		logFn(ts, msg, "debug");
 	};
 
-	logging["warn"] = [](sol::this_state ts, const std::string& msg) -> void {
-		sol::state_view state(ts);
-
-		auto getprotected = ScriptBuiltin::mainModule["ScriptMetadata"]["get"]();
-
-		sol::object get = getprotected;
-
-		if (get == sol::nil) {
-			log::error("Script has failed to print! ScriptMetadata.get returned nil.");
-			return;
-		}
-
-		log::warn("[SCRIPT] [{}]: {}", get.as<SerpentLua::ScriptMetadata*>()->name, msg);
+	logging["trace"] = [logFn](sol::this_state ts, const std::string& msg) -> void {
+		logFn(ts, msg, "trace");
 	};
 
-	logging["error"] = [](sol::this_state ts, const std::string& msg) -> void {
-		sol::state_view state(ts);
+	logging["warn"] = [logFn](sol::this_state ts, const std::string& msg) -> void {
+		logFn(ts, msg, "warn");
+	};
 
-		auto getprotected = ScriptBuiltin::mainModule["ScriptMetadata"]["get"]();
-
-		sol::object get = getprotected;
-
-		if (get == sol::nil) {
-			log::error("Script has failed to print! ScriptMetadata.get returned nil.");
-			return;
-		}
-
-		log::error("[SCRIPT] [{}]: {}", get.as<SerpentLua::ScriptMetadata*>()->name, msg);
+	logging["error"] = [logFn](sol::this_state ts, const std::string& msg) -> void {
+		logFn(ts, msg, "error");
 	};
 
 	return logging;

@@ -36,7 +36,7 @@ namespace SerpentLua::internal::ScriptBuiltin::Playground {
 	public:
 		static Folder create(const std::string& path);
 
-		sol::table items();
+		sol::table items(sol::this_state ts);
 
 		bool exists(const std::string& item);
 

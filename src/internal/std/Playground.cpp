@@ -199,8 +199,9 @@ int ScriptBuiltin::Playground::Folder::erase() {
 	return 0;
 }
 
-sol::table ScriptBuiltin::Playground::Folder::items() {
-	sol::state_view state(ScriptBuiltin::L);
+// this function passes this_state so we can get the state from it
+sol::table ScriptBuiltin::Playground::Folder::items(sol::this_state ts) {
+	sol::state_view state(ts);
 
 
 	auto list = state.create_table();
@@ -255,13 +256,14 @@ sol::table ScriptBuiltin::Playground::entry(sol::state_view state) {
 
 	table["init"] = [](sol::this_state ts) {
 		sol::state_view state(ts);
+		lua_State* L = ts;
 
 		sol::table table = sol::stack::get<sol::table>(ts, 1);
 
-		auto scriptDir = Mod::get()->getConfigDir() / "playground" / ScriptBuiltin::metadata->id;
+		auto scriptDir = Mod::get()->getConfigDir() / "playground" / ScriptBuiltin::getMetadata(L)->id;
 		if (!std::filesystem::exists(scriptDir)) utils::file::createDirectoryAll(scriptDir).unwrap();
 
-		auto saveDir = Mod::get()->getSaveDir() / "playground" / ScriptBuiltin::metadata->id;
+		auto saveDir = Mod::get()->getSaveDir() / "playground" / ScriptBuiltin::getMetadata(L)->id;
 		if (!std::filesystem::exists(saveDir)) utils::file::createDirectoryAll(saveDir).unwrap(); // shut up compiler
 
 		ScriptBuiltin::Playground::schemes = {
