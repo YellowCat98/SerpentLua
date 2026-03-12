@@ -97,17 +97,21 @@ __declspec(dllexport) void entry(lua_State* L) {
 	};
 */
 
-	table["registerHook"] = [](sol::this_state ts, sol::function function) {
+	table["hook"] = [](sol::this_state ts, std::string fn, sol::function function) {
 		
-		globals::hookDetours.insert({"MenuLayer_onMoreGames", function}); // yes youre not supposed to call registerHook more than once otherwise this will get called twice and do problemos
+		
+		if (globals::hookDetours.contains(fn)) {
+			api.log(api.metadata, "registerHook must not be called more than once.", "warn");
+			return;
+		}
+		globals::hookDetours.insert({fn, function}); // yes youre not supposed to call registerHook more than once otherwise this will get called twice and do problemos
 
 		geode::Mod::get()->hook(
-			reinterpret_cast<void*>(geode::base::get() + 0x320880),
-			+[](void* self, void* sender) {
+			reinterpret_cast<void*>(geode::base::get() + 0x335740), // i should probably add another map that holds what the functions correspond to
+			+[](MenuLayer* self, cocos2d::CCObject* sender) {
 				sol::state_view state(globals::rawState);
 
 				auto func = globals::hookDetours["MenuLayer_onMoreGames"];
-
 				func(self, sender);
 			},
 			"Boi",
