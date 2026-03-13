@@ -11,5 +11,7 @@ local SL = require("serpentlua.std")
 local Modify = require("yellowcat98.modify")
 
 Modify.hook("MenuLayer_onMoreGames", function(self, sender)
-    SL.log.info("Wooooo")
+    SL.log.info("BEFORE")
+    original(self, sender)
+    SL.log.info("AFTER")
 end)

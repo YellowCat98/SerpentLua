@@ -61,42 +61,6 @@ __declspec(dllexport) void entry(lua_State* L) {
 		api.log(api.metadata, "hello World, this is the Sol2 LIBrare.", "info");
 	};
 
-/*
-	table["registerHook"] = [](sol::this_state ts) {
-		print("Register hook called", "info");
-		static uintptr_t base = reinterpret_cast<uintptr_t>(GetModuleHandle(0));
-		print("Base retrieved!", "info");
-		auto targetFn = reinterpret_cast<void*>(base + 0x3207e0);
-		if (!targetFn) {
-			print("BAD target fn", "info");
-			return;
-		}
-		print("Target FN retrieved!", "info");
-		tulip::hook::HandlerMetadata handlerMeta;
-		
-		auto handlerRes = tulip::hook::createHandler(targetFn, handlerMeta);
-		if (handlerRes.isErr()) {
-			api.log(api.metadata, handlerRes.err().value().c_str(), "error");
-			return;
-		} else {
-			print("Handler is fine", "info");
-		}
-
-		auto handler = handlerRes.unwrap();
-		print("Created handler!", "info");
-
-		tulip::hook::HookMetadata hookMeta;
-		hookMeta.m_priority = 0;
-		print("Created metadata!", "info");
-		auto hook = tulip::hook::createHook(handler, &onMoreJames, hookMeta);
-		print("created hook", "info");
-		if (!hook) {
-			api.log(api.metadata, "failed to create hook", "error");
-		}
-		print("hook created", "info");
-	};
-*/
-
 	table["hook"] = [](sol::this_state ts, std::string fn, sol::function function) {
 		
 		
@@ -112,6 +76,13 @@ __declspec(dllexport) void entry(lua_State* L) {
 				sol::state_view state(globals::rawState);
 
 				auto func = globals::hookDetours["MenuLayer_onMoreGames"];
+
+				sol::environment env(state, sol::create, state.globals());
+				env["original"] = [](MenuLayer* self, cocos2d::CCObject* sender) {
+					return self->onMoreGames(sender);
+				};
+
+				sol::set_environment(env, func);
 				func(self, sender);
 			},
 			"Boi",
