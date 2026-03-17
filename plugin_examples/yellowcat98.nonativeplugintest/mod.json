@@ -7,7 +7,7 @@
 		"ios": "2.2081"
 	},
 	"id": "yellowcat98.nonative_plugintest",
-	"name": "Non-Native plugin example",
+	"name": "Non-Native PluginTest",
 	"version": "v1.0.0",
 	"developer": "YellowCat98",
 	"description": "Basic example using the SerpentLua API.",
