@@ -63,4 +63,13 @@ add_library(lua SHARED ${LUA_SRC})
 target_include_directories(lua PRIVATE include)
 target_compile_definitions(lua PRIVATE LUA_BUILD_AS_DLL)
 
+set(LUA_OUTPUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/.lua_output")
+
+file(MAKE_DIRECTORY ${LUA_OUTPUT_DIR})
+
+add_custom_command(TARGET lua POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:lua> ${LUA_OUTPUT_DIR}/$<TARGET_FILE_NAME:lua>
+    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_LINKER_FILE:lua> ${LUA_OUTPUT_DIR}/$<TARGET_LINKER_FILE_NAME:lua>
+)
+
 setup_geode_mod(${PROJECT_NAME})
