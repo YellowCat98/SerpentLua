@@ -56,7 +56,12 @@ jobs:
           name: Build Output
           path: ${{ steps.build.outputs.build-output }}
       
+      - name: ls
+        run: |
+          ls .
+          ls ${{ env.GITHUB_WORKSPACE }}
+      
       - uses: actions/upload-artifact@v4
         with:
-          name: Lua Binaries for plugins
-          path: .lua_output
+          name: Lua Binaries
+          path: ${{ env.GITHUB_WORKSPACE }}.lua_output/**/*
