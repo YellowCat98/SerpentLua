@@ -42,6 +42,13 @@ jobs:
           combine: true
           target: ${{ matrix.config.target }}
 
+      - name: Upload lua binaries
+        uses: actions/upload-artifact@v4
+        with:
+          name: Lua Binaries
+          path: ./.lua_output/*
+          if-no-files-found: error
+
   package:
     name: Package builds
     runs-on: ubuntu-latest
@@ -55,13 +62,3 @@ jobs:
         with:
           name: Build Output
           path: ${{ steps.build.outputs.build-output }}
-      
-      - name: ls
-        run: |
-          ls .
-          ls ${{ env.GITHUB_WORKSPACE }}
-      
-      - uses: actions/upload-artifact@v4
-        with:
-          name: Lua Binaries
-          path: ${{ env.GITHUB_WORKSPACE }}.lua_output/**/*
