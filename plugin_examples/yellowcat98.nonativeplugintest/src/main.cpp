@@ -33,14 +33,7 @@ void pluginEntry(lua_State* L) {
 }
 
 Result<> initPlugin() {
-    std::map<std::string, std::string> metadataMap = {
-        {"name", Mod::get()->getName()},
-        {"developer", Mod::get()->getDevelopers()[0]}, // Mod::getDeveloper doesn't exist, because this mod only has one developer
-        {"id", Mod::get()->getID()},
-        {"version", Mod::get()->getVersion().toNonVString()},
-        {"serpent-version", "1.0.0-alpha.12"}
-    };
-    globals::metadata = SerpentLua::PluginMetadata::create(metadataMap);
+    globals::metadata = SerpentLua::PluginMetadata::createFromMod(Mod::get());
     if (!globals::metadata) return Err("globals::metadata == nullptr");
 
     auto pluginRes = SerpentLua::Plugin::create(globals::metadata, pluginEntry);
