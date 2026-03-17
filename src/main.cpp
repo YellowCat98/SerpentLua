@@ -137,9 +137,10 @@ $on_mod(Loaded) {
 
 	std::vector<std::string> theUnfortunates;
 
+	log::debug("Terminating unused plugins...");
 	for (const auto& [key, value] : RuntimeManager::get()->getAllLoadedPlugins()) {
 		if (value->loadCount == 0) {
-			log::debug("THE UNFORTUNATE: {}", key);
+			log::trace("{}", key);
 			theUnfortunates.push_back(key);
 		}
 	}
