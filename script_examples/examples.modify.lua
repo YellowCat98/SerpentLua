@@ -1,7 +1,7 @@
 --@name SL Example 03
 --@id examples.modify
 --@version 1.0.0
---@serpent-version 1.0.0
+--@serpent-version 1.0.0-alpha.1
 --@developer YellowCat98
 --@plugins serpentlua.std yellowcat98.modify
 

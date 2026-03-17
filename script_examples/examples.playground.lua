@@ -1,7 +1,7 @@
 --@name SL Example 02
 --@id examples.playground
 --@version 1.0.0
---@serpent-version 1.0.0
+--@serpent-version 1.0.0-alpha.1
 --@developer YellowCat98
 --@plugins serpentlua.std
 

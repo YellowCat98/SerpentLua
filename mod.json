@@ -8,10 +8,11 @@
 	},
 	"id": "yellowcat98.serpentlua",
 	"name": "SerpentLua",
-	"version": "v1.0.0",
+	"version": "v1.0.0-alpha.1",
 	"developer": "YellowCat98",
 	"description": "Make your own mods in Lua.",
 	"early-load": true,
+	"tags": ["developer", "api", "universal", "offline", "utility"],
 	"api": {
 		"include": [
 			"include/SerpentLua.hpp"
@@ -23,6 +24,10 @@
 		]
 	},
 	"settings": {
+		"open-scripts-btn": {
+			"type": "custom:open-scripts-btn",
+			"name": "Open scripts buttons"
+		},
 		"dev-mode": {
 			"name": "Dev Mode",
 			"description": "Allows loading plugins that aren't imported through the plugin importer.",
@@ -36,10 +41,6 @@
 			"type": "bool",
 			"default": false,
 			"requires-restart": false
-		},
-		"open-scripts-btn": {
-			"type": "custom:open-scripts-btn",
-			"name": "Open scripts buttons"
 		}
 	}
 }

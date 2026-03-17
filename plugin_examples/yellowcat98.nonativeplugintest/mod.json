@@ -1,0 +1,19 @@
+{
+	"geode": "5.1.0",
+	"gd": {
+		"win": "2.2081",
+		"android": "2.2081",
+		"mac": "2.2081",
+		"ios": "2.2081"
+	},
+	"id": "yellowcat98.nonative_plugintest",
+	"name": "Non-Native plugin example",
+	"version": "v1.0.0",
+	"developer": "YellowCat98",
+	"description": "Basic example using the SerpentLua API.",
+	"early-load": true,
+	"dependencies": {
+		"geode.node-ids": ">=v1.20.0",
+		"yellowcat98.serpentlua": "v1.0.0-alpha.1"
+	}
+}
