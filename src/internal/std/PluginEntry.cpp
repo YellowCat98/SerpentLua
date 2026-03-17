@@ -129,15 +129,8 @@ sol::table ScriptBuiltin::logging(sol::state_view state) {
 
 Result<> ScriptBuiltin::initPlugin() {
 	if (ScriptBuiltin::plugin) return Err("Builtin plugin was already initialized.");
-	std::map<std::string, std::string> map = {
-		{"name", "SerpentLua"},
-		{"developer", "YellowCat98"},
-		{"id", "serpentlua.std"},
-		{"version", Mod::get()->getVersion().toVString()},
-		{"serpent-version", Mod::get()->getVersion().toVString()}
-	};
-	auto metadata = SerpentLua::PluginMetadata::create(map);
-
+	auto metadata = SerpentLua::PluginMetadata::createFromMod(Mod::get());
+	metadata->id = "serpentlua.std"; // i do not want to use create(std::map<std::string, std::string>) when this is very much simpler
 	auto res = SerpentLua::Plugin::create(metadata, ScriptBuiltin::entry);
 	if (res.isErr()) return Err("{}", res.err().value());
 

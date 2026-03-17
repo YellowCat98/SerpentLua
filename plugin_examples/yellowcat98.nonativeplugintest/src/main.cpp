@@ -38,7 +38,7 @@ Result<> initPlugin() {
         {"developer", Mod::get()->getDevelopers()[0]}, // Mod::getDeveloper doesn't exist, because this mod only has one developer
         {"id", Mod::get()->getID()},
         {"version", Mod::get()->getVersion().toNonVString()},
-        {"serpent-version", "1.0.0-alpha.1"}
+        {"serpent-version", "1.0.0-alpha.12"}
     };
     globals::metadata = SerpentLua::PluginMetadata::create(metadataMap);
     if (!globals::metadata) return Err("globals::metadata == nullptr");

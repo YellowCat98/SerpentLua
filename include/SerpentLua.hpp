@@ -29,6 +29,7 @@ namespace SerpentLua {
 
 	struct SERPENTLUA_DLL PluginMetadata final {
 		static PluginMetadata* create(std::map<std::string, std::string>& metadata);
+		static PluginMetadata* createFromMod(geode::Mod* mod);
 		std::string name;
 		std::string developer;
 		std::string id;
