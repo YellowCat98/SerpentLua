@@ -6,5 +6,5 @@
 - ~~SerpentLua Standard: Set Version in metadata with NonVString.~~ ✓
 - ~~SerpentLua Script/Plugin Loading: Make the mod wait until every plugin has finished loading.~~ ✓
 - ~~README: Finish the README~~ ✓
-- README: Document dynamic plugin dependencies.
+- ~~README: Document dynamic plugin dependencies.~~ ✓
 - ~~SerpentLua: Remove useless includes in `main.cpp`~~ ✓

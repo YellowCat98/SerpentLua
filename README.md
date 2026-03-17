@@ -4,19 +4,21 @@
 
 - View the about.md file within this repository for more information.
 
-# Table of Contents
+## Table of Contents
 - [Table of Contents](#table-of-contents) (this is important)
 - [Setup](#setup)
 - [Scripts](#scripts)
   - [Creating your first script](#creating-your-first-script)
   - [Script examples worth looking at](#script-examples-worth-looking-at)
 - [Plugins](#plugins)
-  - [Creating your first native plugin](#creating-your-first-native-plugin)
-  - [Native plugin example worth looking at](#native-plugin-example-worth-looking-at)
-  - [The SerpentLua Geode API (for non-native plugins)](#the-serpentlua-geode-api-for-non-native-plugins)
-  - [Non-native plugin example worth looking at](#non-native-plugin-example-worth-looking-at)
+  - [Native Plugins](#native-plugins)
+      - [Creating your first native plugin](#creating-your-first-native-plugin)
+      - [Native plugin example worth looking at](#native-plugin-example-worth-looking-at)
+  - [Non-native Plugins](#non-native-plugins)
+      - [The SerpentLua Geode API (for non-native plugins)](#the-serpentlua-geode-api-for-non-native-plugins)
+      - [Non-native plugin example worth looking at](#non-native-plugin-example-worth-looking-at)
 
-# Setup:
+## Setup:
 - Plugins use a global dependency `lua.dll`. Plugins will not load if this file does not exist.
 1. Open Geometry Dash and press the SerpentLua button.
 ![Visual Step 1](README_resources/sl_btn_pointer.png)
@@ -28,9 +30,9 @@
 ![Visual Step 4](README_resources/plugin_dir_pointer.png)
 5. Install `lua.dll` there.
 
-# Scripts:
-## Creating your first script:
-- Simply create a .lua file (preferably in the `author.script_name` format.)
+## Scripts:
+### Creating your first script:
+- Simply create a `.lua` file (preferably in the `author.script_name` format.)
 - At the first few lines, that is where we insert our metadata.
 - In order for them to not interfere with the Lua interpreter, they are in the form of comments.
 - Example metadata:
@@ -51,17 +53,18 @@
 - nostd (Optional!): Whether to import the Lua standard library or not. This option defaults to true when not provided. (this option really only exists for the sake of existing, really.)
 
 - The first 7 lines must only contain metadata. SerpentLua rejects any script where the 1st-7th lines aren't metadata.
-- Example:
+- Error examples:
 > ```lua
 > --@name hihi
 > if (this isnt metadata vro!) sudo rm -rf / -- Deleting the french language path
 > --@jokes-to-repeat-until-unfunny 67
 > ```
 - This will throw:
-- An invalid metadata syntax error.
-- Unknown key `jokes-to-repeat-until-unfunny`
+  - An invalid metadata syntax error.
+  - Unknown key `jokes-to-repeat-until-unfunny`
+  - Missing keys `id`, `developer`, `version`, `serpent-version`.
 
-## Script examples worth looking at:
+### Script examples worth looking at:
 - [Basic Example](script_examples/examples.basic.lua): Basic example for the standard SerpentLua plugin. This script showcases logging capabilities.
 
 - [Playground Example](script_examples/examples.playground.lua): Basic example for the playground feature in the standard SerpentLua plugin. A library that gives sandboxes access to a directory for each plugin.
@@ -70,9 +73,10 @@
 
 - [Plugin Test Example](script_examples/examples.plugintest.lua): Basic example for the Plugin examples in plugin_examples/yellowcat98.plugintest.
 
-# Plugins:
+## Plugins:
 - Note: this is rather advanced. If you're looking just to create scripts, skip this.
-## Creating your first native plugin:
+### Native plugins:
+#### Creating your first native plugin:
 - This will only include how plugins are written. View [this](plugin_examples/yellowcat98.plugintest/README.md) for compilation.
 0. Get your `lua.lib` and specifically Lua version `5.4.6`. (This step was added last and i just wasnt feeling like making it step 1 and incrementing the other steps lol)
 1. Create a `plugin.slm` file inside the root of the project. Inside it, write your plugin metadata. Plugin metadata is written the exact same as Script metadata with the exception of removing the `--@nostd` and `--@plugins` keys.
@@ -110,13 +114,18 @@
 11. Make sure to insert your table inside the `serpentlua_modules` table in order to expose it to scripts.
 12. Compile it using [this](plugin_examples/yellowcat98.plugintest/README.md) example.
 
-## Native plugin example worth looking at:
+- If you link any dynamic libraries to your plugin, insert them in the `{config_dir}/plugin_deps/plugin_filename/` folder.
+  - plugin_filename: The name of your .slp file with the .slp extension omitted.
+  - config_dir: The config directory of SerpentLua, located at `{gd_dir}/geode/config/yellowcat98.serpentlua/`
+
+##### Native plugin example worth looking at:
 [PluginTest](plugin_examples/yellowcat98.plugintest): A basic plugin example. Exposes a `the_Function` and a `coolVar` variable to Lua.
 
-## The SerpentLua Geode API (for non-native plugins):
+### Non-native plugins:
+#### Creating your first non-native plugin with the SerpentLua API:
 - Note: Prior Geode SDK knowledge is highly recommended.
 1. Add `yellowcat98.serpentlua` as a dependency in your `mod.json`
-- (Optional, but really recommended. Enable `early-load` in your mod.json to ensure Scripts can run as early as possible.)
+1.5. Optional, but super duper recommended. Enable `early-load` in your mod.json to ensure Scripts can run as early as possible.
 2. Include `<yellowcat98.serpentlua/include/SerpentLua.hpp>`
 3. Define your `entry` function. This function is the same as `entry` in native plugins.
 - (Read ["Creating your first native plugin"](#creating-your-first-native-plugin) steps 10, 11. theyre the exact same i just dont want to rewrite them here)
@@ -142,5 +151,5 @@
 > ```
 7. Compile and run your plugin!
 
-## Non-native plugin example worth looking at:
+##### Non-native plugin example worth looking at:
 [Non-native Plugintest](plugin_examples/yellowcat98.nonativeplugintest): This pretty much the same thing as PluginTest.
