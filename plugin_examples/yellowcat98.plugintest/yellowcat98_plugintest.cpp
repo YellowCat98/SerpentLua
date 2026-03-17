@@ -8,17 +8,17 @@ extern "C" {
 }
 
 struct __metadata {
-    const char* name;
-    const char* developer;
-    const char* id;
-    const char* version;
-    const char* serpentVersion;
+	const char* name;
+	const char* developer;
+	const char* id;
+	const char* version;
+	const char* serpentVersion;
 };
 
 struct SerpentLuaAPI {
-    void (*log)(__metadata, const char*, const char*); // Basic logging function for plugins.
-    __metadata metadata; // Allows access to your plugin's metadata.
-    HMODULE handle; // Your Plugin's HMODULE.
+	void (*log)(__metadata, const char*, const char*); // Basic logging function for plugins.
+	__metadata metadata; // Allows access to your plugin's metadata.
+	HMODULE handle; // Your Plugin's HMODULE.
 };
 
 static SerpentLuaAPI api;

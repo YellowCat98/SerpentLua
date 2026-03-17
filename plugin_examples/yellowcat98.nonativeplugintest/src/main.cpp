@@ -4,8 +4,8 @@
 using namespace geode::prelude;
 
 struct globals {
-    inline static SerpentLua::PluginMetadata* metadata = nullptr;
-    inline static SerpentLua::Plugin* plugin = nullptr;
+	inline static SerpentLua::PluginMetadata* metadata = nullptr;
+	inline static SerpentLua::Plugin* plugin = nullptr;
 };
 
 // This function is just copy pasted from the yellowcat98.plugintest example but with the necessary changes
@@ -33,18 +33,22 @@ void pluginEntry(lua_State* L) {
 }
 
 Result<> initPlugin() {
-    globals::metadata = SerpentLua::PluginMetadata::createFromMod(Mod::get());
-    if (!globals::metadata) return Err("globals::metadata == nullptr");
+	globals::metadata = SerpentLua::PluginMetadata::createFromMod(Mod::get());
+	if (!globals::metadata) return Err("globals::metadata == nullptr");
 
-    auto pluginRes = SerpentLua::Plugin::create(globals::metadata, pluginEntry);
-    if (pluginRes.isErr()) return Err("{}", *(pluginRes.err()));
-    globals::plugin = pluginRes.unwrap();
+	auto pluginRes = SerpentLua::Plugin::create(globals::metadata, pluginEntry);
+	if (pluginRes.isErr()) return Err("{}", *(pluginRes.err()));
+	globals::plugin = pluginRes.unwrap();
 
-    globals::plugin->setPlugin();
-    return Ok();
+    log::info("{}", SerpentLua::globals::pluginsYetToLoad);
+
+	globals::plugin->setPlugin();
+    
+	return Ok();
 }
 
 $on_mod(Loaded) {
-    auto res = initPlugin();
-    if (res.isErr()) log::error("Failed to load plugin: {}", *(res.err()));
+	auto res = initPlugin();
+	if (res.isErr()) log::error("Failed to load plugin: {}", *(res.err()));
+    SerpentLua::globals::pluginsYetToLoad.erase(std::remove(SerpentLua::globals::pluginsYetToLoad.begin(), SerpentLua::globals::pluginsYetToLoad.end(), Mod::get()->getID()), SerpentLua::globals::pluginsYetToLoad.end());
 }

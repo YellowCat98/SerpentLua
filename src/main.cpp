@@ -1,11 +1,11 @@
 #include <Geode/Geode.hpp>
 #include <SerpentLua.hpp>
 #include <Geode/modify/MenuLayer.hpp>
-#include <filesystem>
 #include <internal/SerpentLua.hpp>
 #include <internal/ui/ScriptsLayer.hpp>
 #include <internal/std/PluginEntry.hpp>
-#include <tulip/TulipHook.hpp>
+#include <Geode/utils/async.hpp>
+#include <arc/prelude.hpp>
 
 using namespace geode::prelude;
 using namespace SerpentLua::internal;
@@ -24,6 +24,15 @@ Result<void, std::vector<std::pair<std::string, std::string>>> createDirs(const 
 	if (errs.empty()) return Ok();
 
 	return Err(errs);
+}
+
+std::vector<Mod*> getDependants() {
+	std::vector<Mod*> ret;
+	for (const auto mod : Loader::get()->getAllMods()) {
+		if (mod->depends(Mod::get()->getID())) ret.push_back(mod);
+	}
+
+	return ret;
 }
 
 $on_mod(Loaded) {
@@ -57,99 +66,40 @@ $on_mod(Loaded) {
 
 	// initialize all the native plugins! (mod plugins are initialized by the mods themselves)
 
-	for (const auto& file : std::filesystem::directory_iterator(configDir/"plugins")) {
+	// No need to add native plugins and serpentlua.std to SerpentLua::globals::pluginsYetToLoad.
+	SerpentLua::internal::StartupOperations::loadNativePlugins();
 
-		if (file.path().extension().string() == ".dll") {
-			log::error("All plugins must have the .slp extension, DLLs will not load.");
-		}
-
-		if (file.path().extension().string() != ".slp") {
-			log::warn("Found non-slp file in plugins directory, will be ignored.");
-			continue;
-		}
-
-		auto pluginRes = SerpentLua::Plugin::createNative(file.path());
-		if (pluginRes.isErr()) {
-			log::error("{}", pluginRes.err().value());
-			continue;
-		}
-
-		auto unwrapped = pluginRes.unwrap();
-		if (unwrapped->metadata->serpentVersion != Mod::get()->getVersion().toNonVString()) {
-			log::error("Plugin {} was made for serpent version {} but you are on {}", unwrapped->metadata->id, unwrapped->metadata->serpentVersion, Mod::get()->getVersion().toNonVString());
-			continue;
-		}
-
-		pluginRes.unwrap()->setPlugin();
+	// Assume every dependant of SerpentLua is a native plugin.
+	log::info("Populating list of plugins that are yet to load...");
+	for (const auto mod : getDependants()) {
+		log::trace("Adding {} to SerpentLua::globals::pluginsYetToLoad", mod->getID());
+		SerpentLua::globals::pluginsYetToLoad.push_back(mod->getID());
 	}
+
+	log::info("Waiting for non-native plugins to load...");
+
+	async::spawn([]() -> arc::Future<> {
+		while (!SerpentLua::globals::pluginsYetToLoad.empty()) {
+			co_await arc::sleep(asp::Duration::fromMillis(50));
+		}
+
+		log::info("boo");
+		geode::queueInMainThread([]() {
+			log::info("All plugins loaded!");
+			
+			log::info("Loading scripts...");
+			SerpentLua::internal::StartupOperations::loadScripts();
+
+			log::info("Loading unused plugins...");
+			SerpentLua::internal::StartupOperations::unfortunatelyDeleteTheUnfortunates();
+		});
+	});
 
 	// and now for the scripts!
+	//SerpentLua::internal::StartupOperations::loadScripts();
 
-	// setup metadata first
-	for (const auto& file : std::filesystem::directory_iterator(configDir/"scripts")) {
-		if (file.path().extension().string() != ".lua") {
-			log::warn("Non-lua file was found in scripts directory, will be ignored.");
-			continue;
-		}
-
-		auto res = ScriptMetadata::createFromScript(file);
-		if (res.isErr()) {
-			log::error("{}", res.err().value());
-			continue;
-		}
-		RuntimeManager::get()->setScript(res.unwrap());
-	}
-
-	for (auto& pair : RuntimeManager::get()->getAllScripts()) {
-		if (Mod::get()->getSavedValue<bool>(fmt::format("enabled-{}", pair.first))) {
-			if (pair.second->serpentVersion != Mod::get()->getVersion().toNonVString()) {
-				auto err = fmt::format("Script {} was made for serpent version {} but you are on {}", pair.first, pair.second->serpentVersion, Mod::get()->getVersion().toNonVString());
-				pair.second->errors.push_back(err);
-				log::warn("{}", err);
-				continue; // why didnt i do this before
-			}
-			auto res = script::create(pair.second);
-			if (res.isErr()) {
-				pair.second->errors.push_back(res.err().value());
-				log::error("{}", res.err().value());
-				continue;
-			}
-			auto script = res.unwrap();
-			
-			RuntimeManager::get()->setLoadedScript(script);
-
-			auto loadres = script->loadPlugins();
-
-			if (loadres.isErr()) {
-				pair.second->errors.push_back(loadres.err().value());
-				log::error("{}", loadres.err().value());
-				continue;
-			}
-
-			auto execres = script->execute();
-			if (execres.isErr()) {
-				pair.second->errors.push_back(execres.err().value());
-				log::error("{}", execres.err().value());
-				continue;
-			}
-		}
-	}
-
-	std::vector<std::string> theUnfortunates;
-
-	log::debug("Terminating unused plugins...");
-	for (const auto& [key, value] : RuntimeManager::get()->getAllLoadedPlugins()) {
-		if (value->loadCount == 0) {
-			log::trace("{}", key);
-			theUnfortunates.push_back(key);
-		}
-	}
-	// the fate has been determined
-
-	for (auto& theUnfortunate : theUnfortunates) {
-		RuntimeManager::get()->getLoadedPluginByID(theUnfortunate).unwrap()->terminate();
-		// imagine this plugin wantign to be used and then getting TERMINATED
-	}
+	//log::info("Terminating unused plugins...");
+	//SerpentLua::internal::StartupOperations::unfortunatelyDeleteTheUnfortunates();
 }
 
 

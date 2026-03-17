@@ -26,6 +26,9 @@ extern "C" {
 
 namespace SerpentLua {
 
+	struct globals {
+		inline static std::vector<std::string> SERPENTLUA_DLL pluginsYetToLoad;
+	};
 
 	struct SERPENTLUA_DLL PluginMetadata final {
 		static PluginMetadata* create(std::map<std::string, std::string>& metadata);

@@ -5,6 +5,14 @@
 #include <SerpentLua.hpp>
 
 namespace SerpentLua::internal {
+
+	// an amazing struct that exists for stuff that happens when the mod is loading!
+	struct StartupOperations {
+		static void loadScripts();
+		static void loadNativePlugins();
+		static void unfortunatelyDeleteTheUnfortunates();
+	};
+
 	class script {
 	public:
 		static geode::Result<script*, std::string> create(ScriptMetadata* metadata);

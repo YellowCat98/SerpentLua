@@ -61,19 +61,19 @@
 5. Declare the struct `__metadata`:
 > ```c++
 > struct __metadata {
->     const char* name;
->     const char* developer;
->     const char* id;
->     const char* version;
->     const char* serpentVersion;
+>	 const char* name;
+>	 const char* developer;
+>	 const char* id;
+>	 const char* version;
+>	 const char* serpentVersion;
 > };
 > ```
 4. Declare the struct `SerpentLuaAPI`:
 > ```cpp
 > struct SerpentLuaAPI {
->     void (*log)(__metadata, const char*, const char*); // Basic logging function for plugins.
->     __metadata metadata; // Allows access to your plugin's metadata.
->     HMODULE handle; // Your Plugin's HMODULE.
+>	 void (*log)(__metadata, const char*, const char*); // Basic logging function for plugins.
+>	 __metadata metadata; // Allows access to your plugin's metadata.
+>	 HMODULE handle; // Your Plugin's HMODULE.
 > };
 > ```
 5. Declare the a static variable of type `SerpentLuaAPI` (must be of any name, example: `static SerpentLuaAPI api;`)
@@ -81,7 +81,7 @@
 > ```c++
 > // Important! must be exported with `extern "C"` as SerpentLua will call it!
 > extern "C" __declspec(dllexport) void initNativeAPI(SerpentLuaAPI TheCoolAPI) {
->     api = TheCoolAPI; // `api` being the static variable you declared the previous step.
+>	 api = TheCoolAPI; // `api` being the static variable you declared the previous step.
 > }
 6. Declare your `entry` function with the signature `extern "C" __declspec(dllexport) void entry(lua_State* L);`. lua_State* L being the lua interpreter of whatever script is using your plugin.
 7. Inside your entry function, create a table, this table is where you store everything about your plugin.
