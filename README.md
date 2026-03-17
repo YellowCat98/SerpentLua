@@ -56,7 +56,7 @@
 - Error examples:
 > ```lua
 > --@name hihi
-> if (this isnt metadata vro!) sudo rm -rf / -- Deleting the french language path
+> if (this isnt metadata vro!) sudo rm -rf / -- Deleting the french language pack
 > --@jokes-to-repeat-until-unfunny 67
 > ```
 - This will throw:
