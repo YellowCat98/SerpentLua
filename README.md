@@ -118,7 +118,7 @@
   - plugin_filename: The name of your .slp file with the .slp extension omitted.
   - config_dir: The config directory of SerpentLua, located at `{gd_dir}/geode/config/yellowcat98.serpentlua/`
 
-##### Native plugin example worth looking at:
+#### Native plugin example worth looking at:
 [PluginTest](plugin_examples/yellowcat98.plugintest): A basic plugin example. Exposes a `the_Function` and a `coolVar` variable to Lua.
 
 ### Non-native plugins:
@@ -151,5 +151,5 @@
 > ```
 7. Compile and run your plugin!
 
-##### Non-native plugin example worth looking at:
+#### Non-native plugin example worth looking at:
 [Non-native Plugintest](plugin_examples/yellowcat98.nonativeplugintest): This pretty much the same thing as PluginTest.
