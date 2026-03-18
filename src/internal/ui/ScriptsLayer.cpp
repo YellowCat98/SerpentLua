@@ -78,8 +78,8 @@ void ScriptsLayer::setupScriptsList() {
 			scripts[k] = static_cast<void*>(v);
 		}
 	} else {
-		for (const auto [k, v] : RuntimeManager::get()->getAllLoadedPlugins()) {
-			scripts[k] = static_cast<void*>(v->metadata);
+		for (const auto [k, v] : RuntimeManager::get()->getAllPlugins()) {
+			scripts[k] = static_cast<void*>(v);
 		}
 	}
 

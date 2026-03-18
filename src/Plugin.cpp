@@ -22,7 +22,7 @@ std::function<void(lua_State*)> Plugin::getEntry() {
 }
 
 void Plugin::setPlugin() {
-	return internal::RuntimeManager::get()->setPlugin(this->metadata->id, this);
+	return internal::RuntimeManager::get()->setPlugin(this);
 }
 
 void Plugin::SerpentLuaAPIImpl::log(__metadata m, const char* msg, const char* type) {
