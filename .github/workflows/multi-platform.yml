@@ -79,7 +79,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Lua Binaries
-          path: .lua_output
+          path: .lua_output/
           if-no-files-found: warn
 
       - name: Upload lua binaries 6
