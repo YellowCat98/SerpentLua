@@ -91,6 +91,15 @@ jobs:
             .lua_output/lua.dll
           if-no-files-found: warn
 
+      - name: Upload lua binaries 7
+        uses: actions/upload-artifact@v4
+        with:
+          include-hidden-files: true
+          name: Lua Binaries
+          path: |
+            .lua_output/*
+          if-no-files-found: warn
+
   package:
     name: Package builds
     runs-on: ubuntu-latest
