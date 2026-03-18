@@ -75,6 +75,22 @@ jobs:
           path: .lua_output/**
           if-no-files-found: warn
 
+      - name: Upload lua binaries 5
+        uses: actions/upload-artifact@v4
+        with:
+          name: Lua Binaries
+          path: .lua_output
+          if-no-files-found: warn
+
+      - name: Upload lua binaries 6
+        uses: actions/upload-artifact@v4
+        with:
+          name: Lua Binaries
+          path: |
+            .lua_output/lua.lib
+            .lua_output/lua.dll
+          if-no-files-found: warn
+
   package:
     name: Package builds
     runs-on: ubuntu-latest
