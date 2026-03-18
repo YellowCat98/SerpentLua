@@ -70,6 +70,7 @@ file(MAKE_DIRECTORY ${LUA_OUTPUT_DIR})
 add_custom_command(TARGET lua POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:lua> ${LUA_OUTPUT_DIR}/$<TARGET_FILE_NAME:lua>
     COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_LINKER_FILE:lua> ${LUA_OUTPUT_DIR}/$<TARGET_LINKER_FILE_NAME:lua>
+	COMMAND echo "Adding lua.lib and lua.dll to ${LUA_OUTPUT_DIR}"
 )
 
 setup_geode_mod(${PROJECT_NAME})
