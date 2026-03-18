@@ -42,56 +42,7 @@ jobs:
           combine: true
           target: ${{ matrix.config.target }}
 
-      - name: Run ls
-        shell: bash
-        run: |
-          ls -R .lua_output || echo "nothing inside"
-
       - name: Upload lua binaries
-        uses: actions/upload-artifact@v4
-        with:
-          name: Lua Binaries
-          path: .lua_output/
-          if-no-files-found: warn
-
-      - name: Upload lua binaries 2
-        uses: actions/upload-artifact@v4
-        with:
-          name: Lua Binaries
-          path: .lua_output/**/*
-          if-no-files-found: warn
-
-      - name: Upload lua binaries 3
-        uses: actions/upload-artifact@v4
-        with:
-          name: Lua Binaries
-          path: .lua_output/*
-          if-no-files-found: warn
-
-      - name: Upload lua binaries 4
-        uses: actions/upload-artifact@v4
-        with:
-          name: Lua Binaries
-          path: .lua_output/**
-          if-no-files-found: warn
-
-      - name: Upload lua binaries 5
-        uses: actions/upload-artifact@v4
-        with:
-          name: Lua Binaries
-          path: .lua_output/
-          if-no-files-found: warn
-
-      - name: Upload lua binaries 6
-        uses: actions/upload-artifact@v4
-        with:
-          name: Lua Binaries
-          path: |
-            .lua_output/lua.lib
-            .lua_output/lua.dll
-          if-no-files-found: warn
-
-      - name: Upload lua binaries 7
         uses: actions/upload-artifact@v4
         with:
           include-hidden-files: true
