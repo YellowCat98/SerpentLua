@@ -139,7 +139,7 @@ geode::Result<script*, std::string> script::getLoadedScript(const std::string& i
 
 geode::Result<script*, std::string> script::create(ScriptMetadata* metadata) {
 
-	auto ret = new script();
+	auto ret = new (std::nothrow) script();
 	if (!ret) return Err("Script `{}` creation: Couldn't create.", metadata->id);
 	ret->metadata = metadata;
 

@@ -4,7 +4,8 @@ using namespace geode::prelude;
 using namespace SerpentLua;
 
 PluginMetadata* PluginMetadata::createFromMod(Mod* mod) {
-	auto ret = new PluginMetadata();
+	auto ret = new (std::nothrow) PluginMetadata();
+	if (!ret) return nullptr;
 	ret->name = mod->getName();
 	ret->developer = mod->getDevelopers()[0];
 	ret->id = mod->getID();
@@ -15,7 +16,8 @@ PluginMetadata* PluginMetadata::createFromMod(Mod* mod) {
 }
 
 PluginMetadata* PluginMetadata::create(std::map<std::string, std::string>& metadata) {
-	auto ret = new PluginMetadata();
+	auto ret = new (std::nothrow) PluginMetadata();
+	if (!ret) return nullptr;
 	ret->name = metadata["name"];
 	ret->developer = metadata["developer"];
 	ret->id = metadata["id"];
