@@ -106,13 +106,15 @@ class $modify(MenuLayerHook, MenuLayer) {
 	bool init() {
 		if (!MenuLayer::init()) return false;
 
-		if (!std::filesystem::exists(Mod::get()->getConfigDir()/"plugin_global_deps"/"lua.dll")) {
-			auto alert = FLAlertLayer::create(nullptr, "Missing DLL",
+		static bool shownMissingWarning = std::filesystem::exists(Mod::get()->getConfigDir()/"plugin_global_deps"/"lua.dll");
+		// assume the user has seen the warning beforehand if the file exists, so instead of checking for both std::filesystem::exists and if the user saw the warning, we only check one variable!
+		if (!shownMissingWarning) {
+			auto alert = FLAlertLayer::create(nullptr, "SerpentLua: Missing DLL",
 				fmt::format(
 					"<cb>lua.dll</c> was not found in the <cj>SerpentLua</c> config <cd>directory</c>.\n"
 					"<cb>lua.dll</c> is <ca>essential</c> for <cp>plugins</c> to <cy>work</c>.\n"
 					"<cp>Scripts</c> will load <cf>fine</c>, however they will <cr>not</c> be able to <cy>use</c> <cp>plugins</c>.\n"
-					"Please install <cb>lua.dll</c> at the following <cd>path</c>:\n\n<cg>{}</c>",
+					"Please install <cb>lua.dll</c> at the following <cd>path</c>:\n<cg>{}</c>",
 					(Mod::get()->getConfigDir()/"plugin_global_deps"/"lua.dll").string()
 				).c_str(),
 				"OK", nullptr, 400, true, 0, 1
@@ -132,6 +134,8 @@ class $modify(MenuLayerHook, MenuLayer) {
 
 			alert->m_scene = this;
 			alert->show();
+
+			shownMissingWarning = true;
 		}
 
 		if (Mod::get()->setSavedValue<bool>("should-show-warning", false)) {
