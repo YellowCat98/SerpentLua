@@ -107,16 +107,28 @@ class $modify(MenuLayerHook, MenuLayer) {
 		if (!MenuLayer::init()) return false;
 
 		if (!std::filesystem::exists(Mod::get()->getConfigDir()/"plugin_global_deps"/"lua.dll")) {
-			auto alert = FLAlertLayer::create("Missing DLL.",
+			auto alert = FLAlertLayer::create(nullptr, "Missing DLL",
 				fmt::format(
-					"lua.dll was not found in the mod's config directory.\n"
-					"lua.dll is essential for plugins to work.\n"
-					"Scripts will load fine, however they will not be able to use plugins.\n"
-					"Please install lua.dll in the following directory:\n{}",
+					"<cb>lua.dll</c> was not found in the <cj>SerpentLua</c> config <cd>directory</c>.\n"
+					"<cb>lua.dll</c> is <ca>essential</c> for <cp>plugins</c> to <cy>work</c>.\n"
+					"<cp>Scripts</c> will load <cf>fine</c>, however they will <cr>not</c> be able to <cy>use</c> <cp>plugins</c>.\n"
+					"Please install <cb>lua.dll</c> at the following <cd>path</c>:\n\n<cg>{}</c>",
 					(Mod::get()->getConfigDir()/"plugin_global_deps"/"lua.dll").string()
 				).c_str(),
-				"OK"
+				"OK", nullptr, 400, true, 0, 1
 			);
+
+			auto tooManyColors = CCLabelBMFont::create("Did I color too many words? I think I colored too many words.", "chatFont.fnt");
+			tooManyColors->setID("too-many-color"_spr);
+			tooManyColors->setOpacity(51);
+			tooManyColors->setScale(0.7f);
+
+			auto alertSize = alert->m_mainLayer->getContentSize();
+
+			tooManyColors->setAnchorPoint({0.5f, 0.0f});
+			tooManyColors->setPosition({ alertSize.width / 2, 7.0f });
+
+			alert->m_mainLayer->addChild(tooManyColors);
 
 			alert->m_scene = this;
 			alert->show();
