@@ -83,7 +83,6 @@ $on_mod(Loaded) {
 			co_await arc::sleep(asp::Duration::fromMillis(50));
 		}
 
-		log::info("boo");
 		geode::queueInMainThread([]() {
 			log::info("All plugins loaded!");
 			
