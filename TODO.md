@@ -14,4 +14,3 @@
 - ~~Plugins UI (1.0.0-alpha.2): Keep Unloaded plugins' PluginMetadata in order to display them in Plugins UI.~~
 - ~~UI (1.0.0-alpha.2): Make missing lua.dll popup #Better.~~ ✓
 - Dev mode (1.0.0-alpha.2): Make warning appear directly above the dev mode option in settings.
-- Dev mode (1.0.0-alpha.2): Scripts default to enable when their .lua file was placed directly inside the scripts folder (without script importer)
