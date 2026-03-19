@@ -10,7 +10,10 @@
 local SL = require("serpentlua.std")
 
 local metadata = SL.ScriptMetadata.get()
-
+--[[
+	SL.ScriptMetadata: Represents the metadata of a script.
+	keys (self explanatory): name, id, developer, serpent-version, version, nostd, plugins
+]]
 SL.log.info("Hello, World!")
 
 SL.log.debug(string.format("Beep Boop! Script %s (ID: %s) is running on version %s <insert more robot noises>", metadata.name, metadata.id, metadata.version))
@@ -33,3 +36,17 @@ SL.log: A table containing 4 logging functions.
 	error: An error message, self explanatory.
 	trace: Highly verbose messages. Can only be seen if log level is set to Trace in Geode settings.
 ]]
+
+local plugin = SL.PluginMetadata.getByID("serpentlua.std")
+--[[
+	SL.PluginMetadata: represents a plugin.
+	keys: name, developer, id, version, serpent-version
+]]
+
+SL.log.info(string.format("The plugin responsible for logging this message is of ID \"%s\".", plugin.id))
+
+-- SL.ScriptMetadata.plugins returns an array of strings, not PluginMetadata object, you must get the PluginMetadata yourself through the id.
+for k, v in pairs(metadata.plugins) do
+	local p = SL.PluginMetadata.getByID(v)
+	-- Do whatever...
+end

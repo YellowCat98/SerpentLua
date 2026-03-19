@@ -34,7 +34,7 @@ void ScriptBuiltin::entry(lua_State* L) {
 
 		auto result = SerpentLua::ScriptMetadata::getScript(id);
 
-		if (result.isErr()) return sol::make_object(lua, result.err().value());
+		if (result.isErr()) return sol::nil;
 
 		return sol::make_object(lua, result.unwrap());
 	};
@@ -78,6 +78,50 @@ void ScriptBuiltin::entry(lua_State* L) {
 	_ScriptMetadata["path"] = sol::property(
 		[](ScriptMetadata& self) -> std::string& {
 			return self.path;
+		}
+	);
+	_ScriptMetadata["plugins"] = sol::property(
+		[](ScriptMetadata& self) -> std::vector<std::string>& {
+			return self.plugins;
+		}
+	);
+
+	auto _PluginMetadata = ctx.mainModule.new_usertype<SerpentLua::PluginMetadata>("PluginMetadata", sol::no_constructor);
+
+	_PluginMetadata["getByID"] = [](sol::this_state ts, const std::string& id) -> sol::object {
+		sol::state_view lua(ts);
+
+		auto res = RuntimeManager::get()->getPluginByID(id);
+
+		if (res.isErr()) return sol::nil;
+
+		return sol::make_object(lua, res.unwrap());
+	};
+
+	_PluginMetadata["name"] = sol::property(
+		[](PluginMetadata& self) -> std::string& {
+			return self.name;
+		}
+	);
+	_PluginMetadata["id"] = sol::property(
+		[](PluginMetadata& self) -> std::string& {
+			return self.id;
+		}
+	);
+	_PluginMetadata["version"] = sol::property(
+		[](PluginMetadata& self) -> std::string& {
+			return self.version;
+		}
+	);
+	_PluginMetadata["serpentVersion"] = sol::property(
+		[](PluginMetadata& self) -> std::string& {
+			return self.serpentVersion;
+		}
+	);
+
+	_PluginMetadata["developer"] = sol::property(
+		[](PluginMetadata& self) -> std::string& {
+			return self.developer;
 		}
 	);
 

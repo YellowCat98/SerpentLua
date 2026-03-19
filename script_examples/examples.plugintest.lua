@@ -16,3 +16,8 @@ SL.log.info(string.format("TestPlugin threw a cool Variable: \"%s\"", TestPlugin
 
 NoNativeTestPlugin.the_Function()
 SL.log.info(string.format("NoNativeTestPlugin threw a cool Variable: \"%s\"", NoNativeTestPlugin.coolVar))
+
+SL.log.info("The plugins we rely on™️:")
+for k, v in SL.ScriptMetadata.get().plugins do
+    SL.log.info(v)
+end
