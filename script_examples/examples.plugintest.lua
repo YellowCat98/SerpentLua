@@ -1,4 +1,4 @@
---@name Example 04
+--@name SL Example 04
 --@developer YellowCat98
 --@version 1.0.0
 --@serpent-version 1.0.0-alpha.1
