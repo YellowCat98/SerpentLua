@@ -124,13 +124,49 @@ bool ScriptItem::init(void* theMetadata, std::function<void(CCMenuItemToggler*)>
 	);
 	if (plugin) viewBtn->setVisible(false);
 
+	
+	CCSize indicatorSize = {30, 30};
+
+	auto indicatorContainer = CCMenu::create();
+	//indicatorContainer->setContentSize(indicatorSize);
+	indicatorContainer->setID("indicator-container");
+	indicatorContainer->setPosition({
+		m_obContentSize.width - 5, m_obContentSize.height - 3
+	});
+	indicatorContainer->ignoreAnchorPointForPosition(false);
+	indicatorContainer->setAnchorPoint({1.0f, 1.0f});
+	indicatorContainer->setScale(0.4f);
+	indicatorContainer->setLayout(RowLayout::create()
+		->setAxisAlignment(AxisAlignment::End)
+		->setAxisReverse(true)
+		->setGap(5)
+	);
+
+	//bool native = std::get<PluginMetadata*>(this->metadata)->native;
+
+	// @geode-ignore(unknown-resource)
+	auto indicatorSpr = CCSprite::createWithSpriteFrameName("geode.loader/updates-available.png");
+	indicatorSpr->setScale(0.7f);
+	indicatorSpr->setOpacity(100);
+	auto indicator = CCMenuItemExt::createSpriteExtra(indicatorSpr, [](CCMenuItemSpriteExtra*) {
+		FLAlertLayer::create("Plugin Indicator", "This is a <cf>non-native plugin</c>.", "OK")->show();
+	});
+
+	indicator->setID("native-indicator");
+	indicator->setAnchorPoint({1.0f, 0.5f});
+	indicatorContainer->addChild(indicator);
+	if (plugin) indicator->setVisible(!std::get<PluginMetadata*>(this->metadata)->native);
+	else indicator->setVisible(false);
+
 	this->addChild(bg);
 	this->addChild(mainContainer);
 	this->addChildAtPosition(viewMenu, Anchor::Right, ccp(-10, 0));
+	this->addChild(indicatorContainer);
 	mainContainer->updateLayout();
 	title->updateLayout();
 	devContainer->updateLayout();
 	viewMenu->updateLayout();
+	indicatorContainer->updateLayout();
 	this->updateLayout();
 	this->schedule(schedule_selector(ScriptItem::listener));
 	return true;

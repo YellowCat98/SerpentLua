@@ -162,6 +162,7 @@ geode::Result<Plugin*, std::string> Plugin::createNative(const std::filesystem::
 	auto unwrapped = plugin.unwrap();
 
 	unwrapped->native = true;
+	metadata->native = true;
 
 	unwrapped->hDll = hDll;
 	return Ok(unwrapped);
