@@ -96,6 +96,7 @@ void SerpentLua::internal::StartupOperations::unfortunatelyDeleteTheUnfortunates
 	// the fate has been determined
 
 	for (auto& theUnfortunate : theUnfortunates) {
+		RuntimeManager::get()->getPluginByID(theUnfortunate).unwrap()->loaded = false;
 		RuntimeManager::get()->getLoadedPluginByID(theUnfortunate).unwrap()->terminate();
 		// imagine this plugin wantign to be used and then getting TERMINATED
 	}

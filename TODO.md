@@ -7,7 +7,7 @@
 - ~~README: Finish the README~~ ✓
 - ~~README: Document dynamic plugin dependencies.~~ ✓
 - ~~SerpentLua: Remove useless includes in `main.cpp`~~ ✓
-- Scripts UI (1.0.0-alpha.2): Delete script button
+- ~~Scripts UI (1.0.0-alpha.2): Delete script button~~ ✓
 - ~~Plugins UI (1.0.0-alpha.2): Visual Indicator between native plugins and non-native plugins.~~ ✓
 - ~~Plugins UI (1.0.0-alpha.2): Keep Unloaded plugins' PluginMetadata in order to display them in Plugins UI.~~
 - ~~UI (1.0.0-alpha.2): Make missing lua.dll popup #Better.~~ ✓

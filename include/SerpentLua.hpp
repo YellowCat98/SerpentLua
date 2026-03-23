@@ -38,7 +38,9 @@ namespace SerpentLua {
 		std::string id;
 		std::string version;
 		std::string serpentVersion;
+		std::string path;
 		bool native;
+		bool loaded;
 	};
 	class SERPENTLUA_DLL Plugin final {
 	public:

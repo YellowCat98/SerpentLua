@@ -112,6 +112,7 @@ geode::Result<Plugin*, std::string> Plugin::createNative(const std::filesystem::
 	}
 
 	auto metadata = PluginMetadata::create(metadataMap);
+	metadata->path = path.string();
 
 	FreeLibrary(temphDll);
 
@@ -163,6 +164,7 @@ geode::Result<Plugin*, std::string> Plugin::createNative(const std::filesystem::
 
 	unwrapped->native = true;
 	metadata->native = true;
+	metadata->loaded = true;
 
 	unwrapped->hDll = hDll;
 	return Ok(unwrapped);

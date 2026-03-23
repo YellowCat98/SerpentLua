@@ -101,14 +101,46 @@ bool ScriptItem::init(void* theMetadata, std::function<void(CCMenuItemToggler*)>
 
 	viewBtn = CCMenuItemExt::createTogglerWithFrameName("GJ_checkOn_001.png", "GJ_checkOff_001.png", 1.5f, onButton);
 	viewBtn->setID("toggle");
+	viewMenu->addChild(viewBtn);
+
+	auto deleteBtn = CCMenuItemExt::createSpriteExtra(
+		ButtonSprite::create(
+			CCSprite::createWithSpriteFrameName("edit_delBtn_001.png"),
+			42, true, 40, "GJ_button_04.png", 1),
+		[=, this](CCMenuItemSpriteExtra*) {
+			if (this->plugin) if (!std::get<PluginMetadata*>(this->metadata)->native) return;
+
+			geode::createQuickPopup("Confirm",
+				fmt::format("Are you sure you would like to <cr>delete</c> \"{}\"?\nThis action is <cr>irreversible</c>!", METADATA_GET(name), METADATA_GET(id)),
+				"Cancel", "Delete",
+				[=, this](FLAlertLayer*, bool btn2) {
+					if (btn2) {
+						std::error_code ec;
+						bool removed = std::filesystem::remove(METADATA_GET(path), ec);
+						if (ec) {
+							std::string message;
+							if (ec.value() == 5) message = "<cr>This usually means a script is using this plugin.</c>";
+							FLAlertLayer::create("Error", fmt::format("Error: \"{}\" (Code: {})\n{}", ec.message(), ec.value(), message).c_str(), "OK")->show();
+						} else if (removed) {
+							FLAlertLayer::create("Success", fmt::format("\"{}\" was removed <cg>successfully</c>!", METADATA_GET(name)).c_str(), "OK")->show();
+						}
+					}
+				}
+			);
+		});
+	deleteBtn->setID("delete-button");
+
+	if (plugin) deleteBtn->setVisible(std::get<PluginMetadata*>(this->metadata)->native);
+	else deleteBtn->setVisible(true);
+
+	viewMenu->addChild(deleteBtn);
+
 	// @geode-ignore(unknown-resource)
 	auto errorBtn = CCMenuItemExt::createSpriteExtraWithFrameName("geode.loader/info-alert.png", 1.5f, [this](CCMenuItemSpriteExtra*) {
 		std::string errorString = fmt::format("{}", fmt::join(std::get<ScriptMetadata*>(metadata)->errors, "\n"));
 		MDPopup::create("Errors", errorString, "OK")->show();
 	});
 	errorBtn->setID("error-button");
-
-	viewMenu->addChild(viewBtn);
 
 	if (plugin) {
 		errorBtn->setVisible(false);
