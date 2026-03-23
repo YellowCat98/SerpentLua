@@ -1,6 +1,5 @@
 # TODO
 
-- Script (1.0.0-alpha.2): Version specification for plugins in Script Metadata.
 - ~~SerpentLua Standard (1.0.0-alpha.2): Make plugin metadata accessible for scripts.~~ ✓
 - ~~SerpentLua Geode API: Add a createFromMod(Mod* mod) function to PluginMetadata.~~ ✓
 - ~~SerpentLua Standard: Set Version in metadata with NonVString.~~ ✓
