@@ -58,11 +58,11 @@ $on_mod(Loaded) {
 		return;
 	}
 
-	geode::listenForSettingChanges<bool>("dev-mode", +[](bool change) {
-		if (change) {
-			Mod::get()->setSavedValue<bool>("should-show-warning", true); // basically, since this function gets called after the setting was set, it makes it a little wonky to add a warning here
-		}
-	});
+	//geode::listenForSettingChanges<bool>("dev-mode", +[](bool change) {
+	//	if (change) {
+	//		Mod::get()->setSavedValue<bool>("should-show-warning", true); // basically, since this function gets called after the setting was set, it makes it a little wonky to add a warning here
+	//	}
+	//});
 
 	// initialize all the native plugins! (mod plugins are initialized by the mods themselves)
 
@@ -137,7 +137,7 @@ class $modify(MenuLayerHook, MenuLayer) {
 
 			shownMissingWarning = true;
 		}
-
+/*
 		if (Mod::get()->setSavedValue<bool>("should-show-warning", false)) {
 			auto popup = geode::createQuickPopup("SerpentLua: Dev mode enabled!",
 				"It appears that you have enabled dev mode.\n"
@@ -164,6 +164,7 @@ class $modify(MenuLayerHook, MenuLayer) {
 			popup->m_scene = this;
 			popup->show();
 		}
+*/
 
 		auto bottomMenu = static_cast<CCMenu*>(this->getChildByID("bottom-menu"));
 		bottomMenu->addChild(CCMenuItemExt::createSpriteExtra(CircleButtonSprite::create(CCSprite::create("serpentluaButton.png"_spr), CircleBaseColor::Green, CircleBaseSize::MediumAlt), [](CCObject*) {
