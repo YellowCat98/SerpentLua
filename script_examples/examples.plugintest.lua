@@ -5,7 +5,7 @@
 --@id examples.plugintest
 --@plugins serpentlua.std yellowcat98.plugintest yellowcat98.nonative_plugintest
 
--- Basic example for the yellowcat98.plugintest.
+-- Basic example for importing other plugins.
 
 local TestPlugin = require("yellowcat98.plugintest")
 local NoNativeTestPlugin = require("yellowcat98.nonative_plugintest")
