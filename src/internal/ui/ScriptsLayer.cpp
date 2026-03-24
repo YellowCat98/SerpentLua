@@ -230,9 +230,9 @@ bool ScriptsLayer::init(bool plugin) {
 	rightActionsMenu->setID("right-actions-menu");
 
 	// @geode-ignore(unknown-resource)
-	auto restartSpr = CCSprite::createWithSpriteFrameName("geode.loader/reload.png");
-	restartSpr->setColor({255, 215, 65});
-	auto restartBtn = CCMenuItemExt::createSpriteExtra(CircleButtonSprite::create(restartSpr, CircleBaseColor::Green, CircleBaseSize::Small), [](CCObject* sender) {
+	auto restartSpr = CircleButtonSprite::createWithSpriteFrameName("geode.loader/reload-gold.png", 1.0f, CircleBaseColor::Green, CircleBaseSize::Small);
+	restartSpr->setTopOffset({1.0f, -0.5f});
+	auto restartBtn = CCMenuItemExt::createSpriteExtra(restartSpr, [](CCObject* sender) {
 		geode::createQuickPopup(
 			"Restart Game",
 			"Would you like to restart?",
@@ -247,8 +247,20 @@ bool ScriptsLayer::init(bool plugin) {
 
 	restartBtn->setID("restart-btn");
 
+	auto restartSize = restartBtn->getContentSize();
 	// @geode-ignore(unknown-resource)
-	auto sextingsBtn = CCMenuItemExt::createSpriteExtra(CircleButtonSprite::createWithSpriteFrameName("geode.loader/settings.png", 1.0f, CircleBaseColor::Green, CircleBaseSize::Small), [](CCObject*) {
+	pendingRestartIndicator = CCSprite::createWithSpriteFrameName("geode.loader/exclamation-red.png");
+	pendingRestartIndicator->setScale(0.75f);
+
+	pendingRestartIndicator->setAnchorPoint({1.0f, 1.0f});
+	pendingRestartIndicator->setPosition({restartSize.width, restartSize.height});
+	pendingRestartIndicator->setVisible(false);
+	restartBtn->addChild(pendingRestartIndicator);
+
+	// @geode-ignore(unknown-resource)
+	auto sextingsSpr = CircleButtonSprite::createWithSpriteFrameName("geode.loader/settings.png", 1.0f, CircleBaseColor::Green, CircleBaseSize::Small);
+	sextingsSpr->setTopOffset({-0.25f, 0.5f});
+	auto sextingsBtn = CCMenuItemExt::createSpriteExtra(sextingsSpr, [](CCObject*) {
 		openSettingsPopup(Mod::get(), true);
 	});
 	sextingsBtn->setID("settings-btn");
@@ -266,8 +278,18 @@ bool ScriptsLayer::init(bool plugin) {
 	actionsMenu->updateLayout();
 	rightActionsMenu->updateLayout();
 	backMenu->updateLayout();
-
+	this->schedule(schedule_selector(ScriptsLayer::pendingRestartListener), 0.5f); // not necessary to call every frame
 	return true;
+}
+
+void ScriptsLayer::pendingRestartListener(float dt) {
+	this->pendingRestartIndicator->setVisible(ScriptsLayer::pendingRestart);
+}
+
+void ScriptsLayer::changesMade() {
+	if (ScriptsLayer::pendingRestart) return;
+	Notification::create("Changes have been made. Restart to apply.", NotificationIcon::Info)->show();
+	ScriptsLayer::pendingRestart = true;
 }
 
 void ScriptsLayer::startImport(std::filesystem::path path, std::filesystem::path dest, std::filesystem::copy_options options) {
@@ -281,6 +303,7 @@ void ScriptsLayer::startImport(std::filesystem::path path, std::filesystem::path
 			"OK"
 		)->show();
 	} else {
+		ScriptsLayer::changesMade();
 		if (this->plugin) Mod::get()->setSavedValue<bool>(fmt::format("safe-{}", path.stem()), true);
 		else if (!Mod::get()->hasSavedValue(fmt::format("enabled-{}", path.stem()))) Mod::get()->setSavedValue<bool>(fmt::format("enabled-{}", path.stem()), true); // auto enable script on import
 		geode::createQuickPopup(

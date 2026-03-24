@@ -7,11 +7,15 @@ bool ScriptItem::init(void* theMetadata, std::function<void(CCMenuItemToggler*)>
 	if (!CCNode::init()) return false;
 	this->plugin = plugin;
 
-	if (plugin)
-		this->metadata = static_cast<PluginMetadata*>(theMetadata);
-	else
-		this->metadata = static_cast<ScriptMetadata*>(theMetadata);
+	std::optional<bool> current;
 
+	if (plugin) {
+		this->metadata = static_cast<PluginMetadata*>(theMetadata);
+	} else {
+		this->metadata = static_cast<ScriptMetadata*>(theMetadata);
+		current = Mod::get()->getSavedValue<bool>(fmt::format("enabled-{}", std::get<ScriptMetadata*>(metadata)->id));
+		this->lastState = *current; // guranteed to have a value
+	}
 
 	this->setID(fmt::format("script-item/{}", METADATA_GET(id)));
 
@@ -100,6 +104,7 @@ bool ScriptItem::init(void* theMetadata, std::function<void(CCMenuItemToggler*)>
 
 
 	viewBtn = CCMenuItemExt::createTogglerWithFrameName("GJ_checkOn_001.png", "GJ_checkOff_001.png", 1.5f, onButton);
+	viewBtn->toggle(current.has_value() ? *current : false);
 	viewBtn->setID("toggle");
 	viewMenu->addChild(viewBtn);
 
@@ -123,6 +128,7 @@ bool ScriptItem::init(void* theMetadata, std::function<void(CCMenuItemToggler*)>
 							FLAlertLayer::create("Error", fmt::format("Error: \"{}\" (Code: {})\n{}", ec.message(), ec.value(), message).c_str(), "OK")->show();
 						} else if (removed) {
 							FLAlertLayer::create("Success", fmt::format("\"{}\" was removed <cg>successfully</c>!", METADATA_GET(name)).c_str(), "OK")->show();
+							ScriptsLayer::changesMade();
 						}
 					}
 				}
@@ -200,15 +206,24 @@ bool ScriptItem::init(void* theMetadata, std::function<void(CCMenuItemToggler*)>
 	viewMenu->updateLayout();
 	indicatorContainer->updateLayout();
 	this->updateLayout();
-	this->schedule(schedule_selector(ScriptItem::listener));
+	this->schedule(schedule_selector(ScriptItem::listener), 0.2f);
 	return true;
 }
 
 // listens for changes and applies them
 void ScriptItem::listener(float) {
-	if (!plugin)
-		this->viewBtn->toggle(Mod::get()->getSavedValue<bool>(fmt::format("enabled-{}", std::get<ScriptMetadata*>(metadata)->id)));
+	if (plugin) return;
+
+	bool current = Mod::get()->getSavedValue<bool>(fmt::format("enabled-{}", std::get<ScriptMetadata*>(metadata)->id));
+
+	if (lastState != current) {
+		log::info("hi");
+		this->viewBtn->toggle(current);
+		lastState = current;
+		ScriptsLayer::changesMade();
+	}
 }
+
 ScriptItem* ScriptItem::create(void* metadata, std::function<void(CCMenuItemToggler*)> onButton, const cocos2d::CCSize& size, bool plugin) {
 	auto ret = new ScriptItem();
 	if (ret && ret->init(metadata, onButton, size, plugin)) {

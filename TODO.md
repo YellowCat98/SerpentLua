@@ -11,4 +11,4 @@
 - ~~Plugins UI (1.0.0-alpha.2): Visual Indicator between native plugins and non-native plugins.~~ ✓
 - ~~Plugins UI (1.0.0-alpha.2): Keep Unloaded plugins' PluginMetadata in order to display them in Plugins UI.~~
 - ~~UI (1.0.0-alpha.2): Make missing lua.dll popup #Better.~~ ✓
-- UI (1.0.0-alpha.2): Add an indicator when changes have been made
+- ~~UI (1.0.0-alpha.2): Add an indicator when changes have been made~~ ✓

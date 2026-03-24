@@ -19,6 +19,7 @@ namespace SerpentLua::internal::ui {
 		bool init(void* theMetadata, std::function<void(CCMenuItemToggler*)> onButton, const cocos2d::CCSize& size, bool plugin);
 		void listener(float dt);
 		bool plugin;
+		bool lastState;
 	public:
 		static ScriptItem* create(void* metadata, std::function<void(CCMenuItemToggler*)> onButton, const cocos2d::CCSize& size, bool plugin);
 		CCMenuItemToggler* viewBtn;

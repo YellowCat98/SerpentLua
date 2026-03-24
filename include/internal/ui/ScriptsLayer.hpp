@@ -8,6 +8,8 @@ namespace SerpentLua::internal::ui {
 	public:
 		static ScriptsLayer* create(bool plugin); // whether to make it show plugins or show scripts
 		static cocos2d::CCScene* scene(bool plugin);
+		inline static bool pendingRestart = false; // making it static allows for when you enter the plugins ui the indicator is still there
+		static void changesMade();
 	private:
 
 		void keyBackClicked() override;
@@ -40,5 +42,8 @@ namespace SerpentLua::internal::ui {
 		std::map<std::string, void*> scripts; // it appears that it was a pain in the ass to use templates here, so im using a raw pointer and then converting it to either pluginmetadata or scriptmetadata! all of this just to avoid copying
 
 		bool plugin;
+
+		void pendingRestartListener(float dt);
+		cocos2d::CCSprite* pendingRestartIndicator;
 	};
 }
