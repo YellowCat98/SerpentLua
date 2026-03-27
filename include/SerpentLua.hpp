@@ -77,12 +77,14 @@ namespace SerpentLua {
 
 		struct SerpentLuaAPI {
 			void (*log)(__metadata, const char*, const char*);
+			__metadata (*get_script)(lua_State*);
 			__metadata metadata;
 			HMODULE handle;
 		};
 
 		struct SerpentLuaAPIImpl {
 			static void log(__metadata, const char* msg, const char* type);
+			static __metadata get_script(lua_State* L);
 		};
 		#endif
 	};

@@ -13,10 +13,12 @@ struct __metadata {
 	const char* id;
 	const char* version;
 	const char* serpentVersion;
+	const char** plugins;
 };
 
 struct SerpentLuaAPI {
 	void (*log)(__metadata, const char*, const char*); // Basic logging function for plugins.
+	__metadata (*get_script)(lua_State*); // A simple function that returns the metadata of scripts through their state.
 	__metadata metadata; // Allows access to your plugin's metadata.
 	HMODULE handle; // Your Plugin's HMODULE.
 };
@@ -41,6 +43,9 @@ extern "C" __declspec(dllexport) void entry(lua_State* L) {
 		api.log(api.metadata, "LETS ERROR!", "error");
 		api.log(api.metadata, "LETS DEBUG!", "debug");
 		api.log(api.metadata, "LETS TRACE!", "trace");
+
+		api.log(api.metadata, "THE ID IS: ", "info");
+		api.log(api.metadata, api.get_script(L).id, "info");
 
 		return 0;
 	});

@@ -33,6 +33,27 @@ void Plugin::SerpentLuaAPIImpl::log(__metadata m, const char* msg, const char* t
 	else log::trace("[PLUGIN] [{}]: {}", m.name, msg); // always default to trace if type isnt those things
 }
 
+Plugin::__metadata Plugin::SerpentLuaAPIImpl::get_script(lua_State* L) {
+	auto script = SerpentLua::internal::RuntimeManager::get()->getScriptByState(L).unwrap();
+
+	Plugin::__metadata ret;
+	ret.name = script->name.c_str();
+	ret.developer = script->developer.c_str();
+	ret.id = script->id.c_str();
+	ret.version = script->version.c_str();
+	ret.serpentVersion = script->serpentVersion.c_str();
+
+	std::vector<const char*> plugins;
+	plugins.reserve(script->plugins.size());
+	for (const auto& buttplug : script->plugins) {
+		plugins.push_back(buttplug.c_str());
+	}
+	
+	ret.plugins = plugins.data();
+
+	return ret;
+}
+
 geode::Result<Plugin*, std::string> Plugin::createNative(const std::filesystem::path& path) {
 	log::info("Loading Native Plugin {}: initialized", path.filename());
 	if (!Mod::get()->getSavedValue<bool>(fmt::format("safe-{}", path.stem())) && !Mod::get()->getSettingValue<bool>("dev-mode") && !Mod::get()->getSavedValue<bool>("should-show-warning")) return Err("Native Plugin {} was imported manually.\nThis plugin will not load unless it's imported through the plugin importer in-game.", path.stem());
@@ -148,6 +169,7 @@ geode::Result<Plugin*, std::string> Plugin::createNative(const std::filesystem::
 	API.handle = hDll;
 	API.metadata = __md;
 	API.log = &Plugin::SerpentLuaAPIImpl::log;
+	API.get_script = &Plugin::SerpentLuaAPIImpl::get_script;
 
 	INITFUCKINGAPI(API);
 
