@@ -21,12 +21,7 @@ void ScriptBuiltin::entry(lua_State* L) {
 
 	ctx.mainModule = state.create_table();
 
-	for (const auto [k, v] : RuntimeManager::get()->getAllLoadedScripts()) {
-		if (v->getLuaState() != L) continue;
-
-		ctx.metadata = v->getMetadata();
-		break;
-	}
+	ctx.metadata = RuntimeManager::get()->getScriptByState(L).unwrap(); // its guaranteed to be true if the script was able to call ScriptBuiltin::entry
 
 	auto _ScriptMetadata = ctx.mainModule.new_usertype<SerpentLua::ScriptMetadata>("ScriptMetadata", sol::no_constructor);
 
