@@ -65,12 +65,14 @@ namespace SerpentLua {
 		std::optional<HMODULE> hDll;
 		// meant for native plugins.
 		#ifdef YELLOWCAT98_SERPENTLUA_EXPORTING
+		// __metadata is used for both plugins and scripts
 		struct __metadata {
 			const char* name;
 			const char* developer;
 			const char* id;
 			const char* version;
 			const char* serpentVersion;
+			const char** plugins;
 		};
 
 		struct SerpentLuaAPI {

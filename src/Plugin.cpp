@@ -142,6 +142,7 @@ geode::Result<Plugin*, std::string> Plugin::createNative(const std::filesystem::
 	__md.id = metadata->id.c_str();
 	__md.version = metadata->version.c_str();
 	__md.serpentVersion = metadata->serpentVersion.c_str();
+	__md.plugins = {}; // just initializing it to empty to be safe
 
 	Plugin::SerpentLuaAPI API;
 	API.handle = hDll;

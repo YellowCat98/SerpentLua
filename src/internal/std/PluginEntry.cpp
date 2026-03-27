@@ -22,9 +22,10 @@ void ScriptBuiltin::entry(lua_State* L) {
 	ctx.mainModule = state.create_table();
 
 	for (const auto [k, v] : RuntimeManager::get()->getAllLoadedScripts()) {
-		if (v->getLuaState() != L) ctx.metadata = nullptr;
+		if (v->getLuaState() != L) continue;
 
 		ctx.metadata = v->getMetadata();
+		break;
 	}
 
 	auto _ScriptMetadata = ctx.mainModule.new_usertype<SerpentLua::ScriptMetadata>("ScriptMetadata", sol::no_constructor);
@@ -138,7 +139,12 @@ sol::table ScriptBuiltin::logging(sol::state_view state) {
 	std::function<void(sol::this_state, const std::string&, const std::string&)> logFn = [](sol::this_state ts, const std::string& msg, const std::string& type) {
 		lua_State* L = ts;
 
-		auto name = ScriptBuiltin::contexts.at(L).metadata->name;
+		auto metadata = ScriptBuiltin::getMetadata(L);
+		if (!metadata) {
+			log::error("Metadata is null.");
+			return;
+		}
+		auto name = metadata->name;
 
 		if (type == "info") log::info("[SCRIPT] [{}]: {}", name, msg);
 		else if (type == "debug") log::debug("[SCRIPT] [{}]: {}", name, msg);

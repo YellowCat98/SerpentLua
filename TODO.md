@@ -14,3 +14,4 @@
 - ~~UI (1.0.0-alpha.2): Add an indicator when changes have been made~~ ✓
 
 - Native Plugin API (1.0.0): Access script metadata through ID and state
+- RuntimeManager (1.0.0): Add RuntimeManager::getFromState to retrieve metadata through lua_State* alone.

@@ -47,6 +47,10 @@ Result<SerpentLua::ScriptMetadata*, std::string> RuntimeManager::getScriptByID(c
 	return Ok(scripts[id]);
 }
 
+Result<script*, std::string> RuntimeManager::getLoadedScriptByState(lua_State* L) {
+	
+}
+
 std::map<std::string, script*> RuntimeManager::getAllLoadedScripts() {
 	return loadedScripts;
 }
