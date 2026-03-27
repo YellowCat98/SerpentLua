@@ -14,6 +14,6 @@
 	"early-load": true,
 	"dependencies": {
 		"geode.node-ids": ">=v1.20.0",
-		"yellowcat98.serpentlua": "v1.0.0-alpha.2"
+		"yellowcat98.serpentlua": "v1.0.0"
 	}
 }
