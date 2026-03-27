@@ -15,14 +15,3 @@ Modify.hook("MenuLayer", "onMoreGames", function(self, sender)
 	original(self, sender)
 	SL.log.info("AFTER")
 end)
-
-Modify.hook("MenuLayer", "init", function(self)
-	if not original(self) then return false end
-	SL.log.info("HELLO")
-	return true
-end)
-
-Modify.hook("MenuLayer", "onTwitch", function(self, sender)
-	SL.log.info("HELLO")
-	SL.log.info("AFTER")
-end)

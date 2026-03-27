@@ -12,3 +12,5 @@
 - ~~Plugins UI (1.0.0-alpha.2): Keep Unloaded plugins' PluginMetadata in order to display them in Plugins UI.~~
 - ~~UI (1.0.0-alpha.2): Make missing lua.dll popup #Better.~~ ✓
 - ~~UI (1.0.0-alpha.2): Add an indicator when changes have been made~~ ✓
+
+- Native Plugin API (1.0.0): Access script metadata through ID and state
