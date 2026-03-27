@@ -217,7 +217,6 @@ void ScriptItem::listener(float) {
 	bool current = Mod::get()->getSavedValue<bool>(fmt::format("enabled-{}", std::get<ScriptMetadata*>(metadata)->id));
 
 	if (lastState != current) {
-		log::info("hi");
 		this->viewBtn->toggle(current);
 		lastState = current;
 		ScriptsLayer::changesMade();
