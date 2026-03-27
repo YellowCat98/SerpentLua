@@ -73,6 +73,7 @@ namespace SerpentLua {
 			const char* version;
 			const char* serpentVersion;
 			const char** plugins;
+			int pluginsSize;
 		};
 
 		struct SerpentLuaAPI {

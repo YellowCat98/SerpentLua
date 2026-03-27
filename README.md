@@ -94,12 +94,14 @@
 >	 const char* id;
 >	 const char* version;
 >	 const char* serpentVersion;
+>  const char** plugins; // note! `plugins` is intended for scripts.
 > };
 > ```
 6. Declare the struct `SerpentLuaAPI`:
 > ```cpp
 > struct SerpentLuaAPI {
 >	 void (*log)(__metadata, const char*, const char*); // Basic logging function for plugins.
+>  __metadata (*get_script)(lua_State*); // Basic function for retrieving scripts through state.
 >	 __metadata metadata; // Allows access to your plugin's metadata.
 >	 HMODULE handle; // Your Plugin's HMODULE.
 > };

@@ -48,7 +48,7 @@ Plugin::__metadata Plugin::SerpentLuaAPIImpl::get_script(lua_State* L) {
 	for (const auto& buttplug : script->plugins) {
 		plugins.push_back(buttplug.c_str());
 	}
-	
+	ret.pluginsSize = plugins.size();
 	ret.plugins = plugins.data();
 
 	return ret;

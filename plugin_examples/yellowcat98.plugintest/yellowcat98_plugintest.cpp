@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <Windows.h>
+#include <vector>
 extern "C" {
 	#include <lua.h>
 	#include <lualib.h>
@@ -14,6 +15,7 @@ struct __metadata {
 	const char* version;
 	const char* serpentVersion;
 	const char** plugins;
+	int pluginsSize;
 };
 
 struct SerpentLuaAPI {
@@ -44,8 +46,17 @@ extern "C" __declspec(dllexport) void entry(lua_State* L) {
 		api.log(api.metadata, "LETS DEBUG!", "debug");
 		api.log(api.metadata, "LETS TRACE!", "trace");
 
+		auto scriptmeta = api.get_script(L);
+
 		api.log(api.metadata, "THE ID IS: ", "info");
-		api.log(api.metadata, api.get_script(L).id, "info");
+		api.log(api.metadata, scriptmeta.id, "info");
+
+		api.log(api.metadata, "WE #RELY ON:", "info");
+		auto plugins = std::vector<std::string>(scriptmeta.plugins, scriptmeta.plugins + scriptmeta.pluginsSize);
+
+		for (const auto& plugin : plugins) {
+			api.log(api.metadata, plugin.c_str(), "info");
+		}
 
 		return 0;
 	});
