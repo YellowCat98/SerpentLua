@@ -89,7 +89,7 @@ $on_mod(Loaded) {
 			log::info("Loading scripts...");
 			SerpentLua::internal::StartupOperations::loadScripts();
 
-			log::info("Loading unused plugins...");
+			log::info("Unloading unused plugins...");
 			SerpentLua::internal::StartupOperations::unfortunatelyDeleteTheUnfortunates();
 		});
 	});
