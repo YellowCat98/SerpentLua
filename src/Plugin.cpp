@@ -58,18 +58,16 @@ geode::Result<Plugin*, std::string> Plugin::createNative(const std::filesystem::
 	log::info("Loading Native Plugin {}: initialized", path.filename());
 	if (!Mod::get()->getSavedValue<bool>(fmt::format("safe-{}", path.stem())) && !Mod::get()->getSettingValue<bool>("dev-mode") && !Mod::get()->getSavedValue<bool>("should-show-warning")) return Err("Native Plugin {} was imported manually.\nThis plugin will not load unless it's imported through the plugin importer in-game.", path.stem());
 	auto configDir = Mod::get()->getConfigDir();
-	bool depsDir = std::filesystem::exists(configDir/"plugin_deps"/path.filename().string());
+	bool depsDir = std::filesystem::exists(configDir/"plugin_deps"/path.filename());
 	if (!depsDir) {
 		log::warn("Plugin {}: No dependencies directory found, will continue loading regardless.", path.filename());
 	}
 	DLL_DIRECTORY_COOKIE cookie1;
-	if (depsDir) cookie1 = AddDllDirectory((configDir/"plugin_deps"/path.filename().string()).wstring().c_str());
+	if (depsDir) cookie1 = AddDllDirectory((configDir/"plugin_deps"/path.filename()).c_str());
 	
-	DLL_DIRECTORY_COOKIE cookie2 = AddDllDirectory((configDir/"plugin_global_deps").wstring().c_str());
+	DLL_DIRECTORY_COOKIE cookie2 = AddDllDirectory((configDir/"plugin_global_deps").c_str());
 
-	//auto hDll = LoadLibraryExA(path.string().c_str(), NULL, LOAD_LIBRARY_SEARCH_USER_DIRS);
-
-	auto temphDll = LoadLibraryExA(path.string().c_str(), NULL, LOAD_LIBRARY_AS_DATAFILE);
+	auto temphDll = LoadLibraryExW(path.c_str(), NULL, LOAD_LIBRARY_AS_DATAFILE);
 	if (!temphDll) {
 		return Err("Plugin {}: Failed to load SLP.", path.filename());
 	}
@@ -133,14 +131,14 @@ geode::Result<Plugin*, std::string> Plugin::createNative(const std::filesystem::
 	}
 
 	auto metadata = PluginMetadata::create(metadataMap);
-	metadata->path = path.string();
+	metadata->path = utils::string::pathToString(path);
 
 	FreeLibrary(temphDll);
 
 	log::debug("Plugin {}: Metadata gathered, executing...", path.filename());
 
 
-	auto hDll = LoadLibraryExA(path.string().c_str(), NULL, LOAD_LIBRARY_SEARCH_USER_DIRS);
+	auto hDll = LoadLibraryExW(path.c_str(), NULL, LOAD_LIBRARY_SEARCH_USER_DIRS);
 
 	if (depsDir) RemoveDllDirectory(cookie1);
 	RemoveDllDirectory(cookie2);

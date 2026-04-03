@@ -6,11 +6,11 @@ void SerpentLua::internal::StartupOperations::loadNativePlugins() {
 	auto configDir = Mod::get()->getConfigDir();
 	for (const auto& file : std::filesystem::directory_iterator(configDir/"plugins")) {
 
-		if (file.path().extension().string() == ".dll") {
+		if (file.path().extension() == ".dll") {
 			log::error("All plugins must have the .slp extension, DLLs will not load.");
 		}
 
-		if (file.path().extension().string() != ".slp") {
+		if (file.path().extension() != ".slp") {
 			log::warn("Found non-slp file in plugins directory, will be ignored.");
 			continue;
 		}
@@ -35,7 +35,7 @@ void SerpentLua::internal::StartupOperations::loadScripts() {
 	auto configDir = Mod::get()->getConfigDir();
 	// setup metadata first
 	for (const auto& file : std::filesystem::directory_iterator(configDir/"scripts")) {
-		if (file.path().extension().string() != ".lua") {
+		if (file.path().extension() != ".lua") {
 			log::warn("Non-lua file was found in scripts directory, will be ignored.");
 			continue;
 		}

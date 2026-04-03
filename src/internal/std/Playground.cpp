@@ -46,7 +46,7 @@ geode::Result<std::string> ScriptBuiltin::Playground::reverseResolvePath(const s
 			remainder /= *coolerIt;
 		}
 
-		return Ok(fmt::format("{}://{}", k, remainder.string()));
+		return Ok(fmt::format("{}://{}", k, remainder));
 	}
 
 	return Err("Cannot reverse resolve path.");
@@ -59,7 +59,7 @@ geode::Result<void, std::string> ScriptBuiltin::Playground::DidHeSayThatHisLastN
 
 	for (const auto& part : path) {
 		if (part == ".." || part == ".") {
-			return Err("playground does not allow `{}`.", part.string());
+			return Err("playground does not allow `{}`.", part);
 		}
 	}
 
@@ -80,7 +80,7 @@ ScriptBuiltin::Playground::File ScriptBuiltin::Playground::File::create(const st
 	}
 
 	std::filesystem::path thePath = result.unwrap();
-	file.path = thePath.string();
+	file.path = utils::string::pathToString(thePath);
 
 	auto check = ScriptBuiltin::Playground::DidHeSayThatHisLastNameIsBurger(thePath);
 	if (check.isErr()) {
@@ -156,7 +156,7 @@ std::string ScriptBuiltin::Playground::File::getPath() {
 }
 
 std::string ScriptBuiltin::Playground::File::getName(bool withExtension) {
-	return withExtension ? std::filesystem::path(path).filename().string() : std::filesystem::path(path).stem().string();
+	return withExtension ? utils::string::pathToString(std::filesystem::path(path).filename()) : utils::string::pathToString(std::filesystem::path(path).stem());
 }
 
 ScriptBuiltin::Playground::Folder ScriptBuiltin::Playground::Folder::create(const std::string& path) {
@@ -171,7 +171,7 @@ ScriptBuiltin::Playground::Folder ScriptBuiltin::Playground::Folder::create(cons
 	}
 
 	auto thePath = result.unwrap();
-	folder.path = thePath.string();
+	folder.path = utils::string::pathToString(thePath);
 
 	auto check = ScriptBuiltin::Playground::DidHeSayThatHisLastNameIsBurger(thePath);
 	if (check.isErr()) {
@@ -212,7 +212,7 @@ sol::table ScriptBuiltin::Playground::Folder::items(sol::this_state ts) {
 
 		std::string type = std::filesystem::is_directory(item) ? "folder" : "file";
 
-		auto result = ScriptBuiltin::Playground::reverseResolvePath(item.string());
+		auto result = ScriptBuiltin::Playground::reverseResolvePath(utils::string::pathToString(item));
 		if (result.isErr()) {
 			log::error("Failed to reverse resolve path: {}", *(result.err()));
 			return state.create_table();
@@ -248,7 +248,7 @@ std::string ScriptBuiltin::Playground::Folder::getPath() {
 }
 
 std::string ScriptBuiltin::Playground::Folder::getName() {
-	return std::filesystem::path(path).filename().string();
+	return utils::string::pathToString(std::filesystem::path(path).filename());
 }
 
 sol::table ScriptBuiltin::Playground::entry(sol::state_view state) {

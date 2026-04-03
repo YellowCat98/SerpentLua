@@ -115,7 +115,7 @@ class $modify(MenuLayerHook, MenuLayer) {
 					"<cb>lua.dll</c> is <ca>essential</c> for <cp>plugins</c> to <cy>work</c>.\n"
 					"<cp>Scripts</c> will load <cf>fine</c>, however they will <cr>not</c> be able to <cy>use</c> <cp>plugins</c>.\n"
 					"Please install <cb>lua.dll</c> at the following <cd>path</c>:\n<cg>{}</c>",
-					(Mod::get()->getConfigDir()/"plugin_global_deps"/"lua.dll").string()
+					Mod::get()->getConfigDir()/"plugin_global_deps"/"lua.dll"
 				).c_str(),
 				"OK", nullptr, 400, true, 0, 1
 			);

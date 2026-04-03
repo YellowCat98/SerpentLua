@@ -94,7 +94,7 @@ geode::Result<SerpentLua::ScriptMetadata*, std::string> SerpentLua::ScriptMetada
 	}
 	
 	// HOW the fuck did i forget this holy fucking SHIT.
-	metadata.insert({"path", scriptPath.string()});
+	metadata.insert({"path", utils::string::pathToString(scriptPath)});
 
 	if (scriptPath.stem() != metadata.at("id")) return Err("Script `{}` metadata: Script filename with the extension omitted must match Script ID. ({} != {})", scriptPath.filename(), scriptPath.stem(), metadata.at("id"));
 
