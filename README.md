@@ -71,7 +71,7 @@
 
 - [Playground Example](script_examples/examples.playground.lua): Basic example for the playground feature in the standard SerpentLua plugin. A library that gives sandboxes access to a directory for each plugin.
 
-- [Modify example](script_examples/examples.modify.lua): Basic example for the Modify plugin. A plugin that allows modifying Geometry Dash. This plugin is yet to be finished.
+- [Modify example](script_examples/examples.modify.lua): Basic example for the Modify plugin.
 
 - [Plugin Test Example](script_examples/examples.plugintest.lua): Basic example for the Plugin examples in plugin_examples/yellowcat98.plugintest.
 

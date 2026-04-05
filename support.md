@@ -1,1 +1,1 @@
-Edit this file to change your mod's support info, or delete it if you don't need it.
+If you like SerpentLua and would like to donate, my ko-fi is https://ko-fi.com/yellowcat98!!

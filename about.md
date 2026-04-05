@@ -48,14 +48,18 @@ See the next sections for more information.
 Do not install unless you trust the source.
 
 ## Documentation
-- Check out the README at the [GitHub Repository](https://github.com/yellowcat98/SerpentLua) for setting up Serpentlua and documentation.
+- Check out the README at the [GitHub Repository](https://github.com/yellowcat98/SerpentLua) for setting up SerpentLua and documentation.
 
 ## Possible questions:
-- Q: Why is the plugins list empty even though I have a plugin installed?
+- Q: Why is the plugins list not showing a plugin that I have installed?
 - A: SerpentLua doesn't show plugins that have failed to load, check your platform console. (enable in Geode settings.)
+- If you have any more questions, join the [Discord](https://discord.com/invite/qnPgmUVZsV).
 
 ## Notes:
 - Enabling the platform console in the Geode settings is encouraged for better error handling.
+
+## Plugins of interest:
+- [YellowCat98 Modify plugin](https://github.com/yellowcat98/serpentlua-modify): Allows for hooking GD functions.
 
 ## By installing this mod, you acknowledge:
 - The disclaimer above.
