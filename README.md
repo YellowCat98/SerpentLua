@@ -30,7 +30,7 @@
 ![Visual Step 4](README_resources/plugin_dir_pointer.png)
 5. Install `lua.dll` there.
 6. `lua.dll` can be found [here](https://github.com/YellowCat98/SerpentLua/releases/tag/v1.0.0)
--# (or just the release of whatever version of SerpentLua you have.)
+- (or just the release of whatever version of SerpentLua you have.)
 
 ## Scripts:
 ### Creating your first script:
