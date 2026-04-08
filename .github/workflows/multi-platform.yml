@@ -80,11 +80,11 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v1.0.0
-          name: SerpentLua v1.0.0
+          tag_name: v1.0.1
+          name: SerpentLua v1.0.1
           prerelease: false
           body: |
-            SerpentLua initial public release.
+            Better error handling
 
           files: artifacts/**/*
         env:

@@ -1,6 +1,8 @@
+# 1.0.1
+- Internal: Properly handle error for `createDirectory` functions.
+
 # 1.0.0
 - Internal: use Geode's `pathToString` utility and remove useless `.string()` calls.
-- Add about.mod
 
 # 1.0.0-alpha.2
 - UI: Make missing lua.dll popup better.

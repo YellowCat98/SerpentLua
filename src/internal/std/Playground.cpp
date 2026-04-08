@@ -90,7 +90,10 @@ ScriptBuiltin::Playground::File ScriptBuiltin::Playground::File::create(const st
 	}
 
 	if (!std::filesystem::exists(thePath)) {
-		utils::file::createDirectoryAll(thePath.parent_path()).unwrap();
+		auto result = utils::file::createDirectoryAll(thePath.parent_path());
+		if (result.isErr()) {
+			file.push_back(*(result.err()));
+		}
 		std::ofstream the(thePath); // this auto creates it
 		if (!the.is_open()) {
 			file.failed = true;
@@ -181,7 +184,11 @@ ScriptBuiltin::Playground::Folder ScriptBuiltin::Playground::Folder::create(cons
 	}
 
 	if (!std::filesystem::exists(thePath)) {
-		utils::file::createDirectoryAll(thePath).unwrap();
+		auto result = utils::file::createDirectoryAll(thePath);
+		if (result.isErr()) {
+			folders.errs.push_back(*(result.err()));
+			return folder;
+		}
 	}
 
 	return folder;
@@ -214,7 +221,7 @@ sol::table ScriptBuiltin::Playground::Folder::items(sol::this_state ts) {
 
 		auto result = ScriptBuiltin::Playground::reverseResolvePath(utils::string::pathToString(item));
 		if (result.isErr()) {
-			log::error("Failed to reverse resolve path: {}", *(result.err()));
+			log::error("[PLAYGROUND] Failed to reverse resolve path: {}", *(result.err()));
 			return state.create_table();
 		}
 
@@ -261,10 +268,20 @@ sol::table ScriptBuiltin::Playground::entry(sol::state_view state) {
 		sol::table table = sol::stack::get<sol::table>(ts, 1);
 
 		auto scriptDir = Mod::get()->getConfigDir() / "playground" / ScriptBuiltin::getMetadata(L)->id;
-		if (!std::filesystem::exists(scriptDir)) utils::file::createDirectoryAll(scriptDir).unwrap();
+		if (!std::filesystem::exists(scriptDir)) {
+			auto result = utils::file::createDirectoryAll(scriptDir);
+			if (result.isErr()) {
+				log::error("[PLAYGROUND]: Couldn't create script directory for {}.\nErr: {}", ScriptBuiltin::getMetadata(L)->name, *(result.err()));
+			}
+		}
 
 		auto saveDir = Mod::get()->getSaveDir() / "playground" / ScriptBuiltin::getMetadata(L)->id;
-		if (!std::filesystem::exists(saveDir)) utils::file::createDirectoryAll(saveDir).unwrap(); // shut up compiler
+		if (!std::filesystem::exists(saveDir)) {
+			auto result = utils::file::createDirectoryAll(saveDir);
+			if (result.isErr()) {
+				log::error("[PLAYGROUND]: Couldn't create script directory for {}.\nErr: {}", ScriptBuiltin::getMetadata(L)->name, *(result.err()));
+			}
+		}
 
 		ScriptBuiltin::Playground::schemes = {
 			{"script", scriptDir},
