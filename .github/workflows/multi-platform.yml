@@ -67,7 +67,7 @@ jobs:
 
   # Uncomment out in non-release commits
   upload:
-    name: Upload Release (1.0.0)
+    name: Upload Release (1.0.1)
     runs-on: ubuntu-latest
     needs: ['package']
 
