@@ -92,7 +92,7 @@ ScriptBuiltin::Playground::File ScriptBuiltin::Playground::File::create(const st
 	if (!std::filesystem::exists(thePath)) {
 		auto result = utils::file::createDirectoryAll(thePath.parent_path());
 		if (result.isErr()) {
-			file.push_back(*(result.err()));
+			file.errs.push_back(*(result.err()));
 		}
 		std::ofstream the(thePath); // this auto creates it
 		if (!the.is_open()) {
@@ -186,7 +186,7 @@ ScriptBuiltin::Playground::Folder ScriptBuiltin::Playground::Folder::create(cons
 	if (!std::filesystem::exists(thePath)) {
 		auto result = utils::file::createDirectoryAll(thePath);
 		if (result.isErr()) {
-			folders.errs.push_back(*(result.err()));
+			folder.errs.push_back(*(result.err()));
 			return folder;
 		}
 	}
