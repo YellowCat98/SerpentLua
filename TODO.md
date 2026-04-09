@@ -18,3 +18,4 @@
 
 - ~~version stuff idk (1.0.2): Follow semver.~~ ✓
 - ScriptMetadata (1.1.0): Add a `getFromState` function to ScriptMetadata.
+- UI (1.0.0): Alphabetically list scripts/plugins by name.
