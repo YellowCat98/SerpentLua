@@ -98,13 +98,24 @@ geode::Result<SerpentLua::ScriptMetadata*, std::string> SerpentLua::ScriptMetada
 
 	if (scriptPath.stem() != metadata.at("id")) return Err("Script `{}` metadata: Script filename with the extension omitted must match Script ID. ({} != {})", scriptPath.filename(), scriptPath.stem(), metadata.at("id"));
 
+	auto res = utility::handleVersion(metadata.at("version"));
+	if (res.isErr()) return Err("Script `{}` metadata: Version cannot be parsed: {}", metadata.at("id"), *(res.err()));
+
+	metadata["version"] = res.unwrap();
+
+	auto serpVerRes = utility::handleVersion(metadata.at("serpent-version"));
+	if (serpVerRes.isErr()) return Err("Plugin {}: Serpent version cannot be parsed: {}", metadata.at("id"), *(serpVerRes.err()));
+
+	metadata["serpent-version"] = serpVerRes.unwrap();
+
 	log::debug("Script `{}` metadata: Metadata gathered.", scriptPath.filename());
 
 	return Ok(ScriptMetadata::create(metadata));
 }
 
 SerpentLua::ScriptMetadata* SerpentLua::ScriptMetadata::create(std::map<std::string, std::string>& metadata) {
-	auto ret = new SerpentLua::ScriptMetadata();
+	auto ret = new (std::nothrow) SerpentLua::ScriptMetadata();
+	if (!ret) return nullptr;
 
 	ret->name = metadata["name"];
 	ret->id = metadata["id"];

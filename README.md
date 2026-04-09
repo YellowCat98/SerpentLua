@@ -29,7 +29,7 @@
 4. Enter the `plugin_global_deps` folder.
 ![Visual Step 4](README_resources/plugin_dir_pointer.png)
 5. Install `lua.dll` there.
-6. `lua.dll` can be found [here](https://github.com/YellowCat98/SerpentLua/releases/tag/v1.0.0)
+6. `lua.dll` can be found [here](https://github.com/YellowCat98/SerpentLua/releases/latest)
 - (or just the release of whatever version of SerpentLua you have.)
 
 ## Scripts:
@@ -43,7 +43,7 @@
 > --@developer Author
 > --@id author.script_name
 > --@version 1.0.0
-> --@serpent-version 1.0.0-alpha.1
+> --@serpent-version 1.0.2
 > --@plugins yellowcat98.plugintest serpentlua.std
 > ```
 - name: The name of the script.
@@ -138,7 +138,9 @@
 >     auto metadata = SerpentLua::PluginMetadata::createFromMod(Mod::get());
 >     // You can use PluginMetadata::create, which instead of taking a `Mod*` argument, it takes a `std::map<std::string, std::string>` that contains your metadata keys. Though there are no advantages over `PluginMetadata::createFromMod`.
 >     // PluginMetadata::createFromMod also makes your Plugin automatically use whatever SerpentLua version you have installed.
->     if (!metadata) /* Handle Error. */; // Highly optional, `metadata` is most likely not nullptr.
+>     if (!metadata) /* Handle Error. */; // Optional, `metadata` is most unlikely to be nullptr.
+>     // The metadata keys aren't constant, you can modify them.
+>    // Though if you're modifying the version (for example, separating the plugin's version from your mod's version.), It is recommended to make it have a leading V. (Doesn't make any difference, though it looks weird in the plugins list.)
 > ```
 5. Create your `Plugin*`.
 > ```c++

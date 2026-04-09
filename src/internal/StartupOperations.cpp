@@ -8,6 +8,7 @@ void SerpentLua::internal::StartupOperations::loadNativePlugins() {
 
 		if (file.path().extension() == ".dll") {
 			log::error("All plugins must have the .slp extension, DLLs will not load.");
+			continue;
 		}
 
 		if (file.path().extension() != ".slp") {
@@ -22,7 +23,12 @@ void SerpentLua::internal::StartupOperations::loadNativePlugins() {
 		}
 
 		auto unwrapped = pluginRes.unwrap();
-		if (unwrapped->metadata->serpentVersion != Mod::get()->getVersion().toNonVString()) {
+		auto version = VersionInfo::parse(unwrapped->metadata->serpentVersion);
+		if (version.isErr()) {
+			log::error("Plugin {} could not parse serpent-version: {}", unwrapped->metadata->id, *(version.err()));
+			continue;
+		}
+		if (!SerpentLua::utility::versionInfoCompare(version.unwrap(), Mod::get()->getVersion())) {
 			log::error("Plugin {} was made for serpent version {} but you are on {}", unwrapped->metadata->id, unwrapped->metadata->serpentVersion, Mod::get()->getVersion().toNonVString());
 			continue;
 		}
@@ -50,10 +56,17 @@ void SerpentLua::internal::StartupOperations::loadScripts() {
 
 	for (auto& pair : RuntimeManager::get()->getAllScripts()) {
 		if (Mod::get()->getSavedValue<bool>(fmt::format("enabled-{}", pair.first))) {
-			if (pair.second->serpentVersion != Mod::get()->getVersion().toNonVString()) {
+			auto version = VersionInfo::parse(pair.second->serpentVersion);
+			if (version.isErr()) {
+				auto err = fmt::format("Script {} could not parse serpent-version: {}", pair.first, *(version.err()));
+				pair.second->errors.push_back(err);
+				log::error("{}", err);
+				continue;
+			}
+			if (!SerpentLua::utility::versionInfoCompare(version.unwrap(), Mod::get()->getVersion())) {
 				auto err = fmt::format("Script {} was made for serpent version {} but you are on {}", pair.first, pair.second->serpentVersion, Mod::get()->getVersion().toNonVString());
 				pair.second->errors.push_back(err);
-				log::warn("{}", err);
+				log::error("{}", err);
 				continue; // why didnt i do this before
 			}
 			auto res = script::create(pair.second);

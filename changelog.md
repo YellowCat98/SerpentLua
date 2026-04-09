@@ -1,3 +1,9 @@
+# 1.0.2
+- Internal: Compare versions while taking Semantic Versioning into account.
+- Script/Plugin metadata: Allow leading `v` in version.
+- Script/Plugin metadata: Error check version.
+- UI: Always have a leading `v` in version regardless of whether the version has one or not.
+
 # 1.0.1
 - Internal: Properly handle error for `createDirectory` functions.
 

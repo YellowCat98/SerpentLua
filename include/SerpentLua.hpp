@@ -114,4 +114,9 @@ namespace SerpentLua {
 		std::vector<std::string> errors;
 	};
 
+	namespace utility {
+		bool versionInfoCompare(const geode::VersionInfo& first, const geode::VersionInfo& second);
+		geode::Result<std::string, std::string> handleVersion(const std::string& version);
+	};
+
 }

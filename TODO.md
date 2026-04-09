@@ -15,3 +15,6 @@
 
 - ~~Native Plugin API (1.0.0): Access script metadata through ID and state~~ ✓
 - ~~RuntimeManager (1.0.0): Add RuntimeManager::getFromState to retrieve metadata through lua_State* alone.~~ ✓
+
+- ~~version stuff idk (1.0.2): Follow semver.~~ ✓
+- ScriptMetadata (1.1.0): Add a `getFromState` function to ScriptMetadata.

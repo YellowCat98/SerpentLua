@@ -4,6 +4,8 @@ A rewrite of [Serpent](mod:yellowcat98.serpent) that uses Lua instead of Python 
 
 A mod that allows you to create your own Lua scripts and run them within the game.
 
+Uses Lua Version: 5.4
+
 See the next sections for more information.
 
 ## Scripts
@@ -51,15 +53,26 @@ Do not install unless you trust the source.
 - Check out the README at the [GitHub Repository](https://github.com/yellowcat98/SerpentLua) for setting up SerpentLua and documentation.
 
 ## Possible questions:
-- Q: Why is the plugins list not showing a plugin that I have installed?
-- A: SerpentLua doesn't show plugins that have failed to load, check your platform console. (enable in Geode settings.)
-- If you have any more questions, join the [Discord](https://discord.com/invite/qnPgmUVZsV).
+- **Q: Why is the plugins list not showing a plugin that I have installed?**  
+  A: SerpentLua doesn't show plugins that have failed to load. Check for errors in the platform console.
+
+- **Q: Why do scripts say a plugin doesn't exist when it does?**  
+  A: Scripts cannot recognize plugins that have failed to load. Check for errors in the platform console.
+
+- **Q: What is the platform console?**  
+  A: The platform console is an additional window that opens alongside GD that shows logs. It is recommended to have it on as SerpentLua logs errors.
+
+- **Q: What is Error 126?**  
+  A: Error 126 corresponds to the "module not found" error in Windows. Please make sure you have `lua.dll` in `plugin_global_deps`. (If so, try reinstalling it from whatever release of SerpentLua you have.)
 
 ## Notes:
 - Enabling the platform console in the Geode settings is encouraged for better error handling.
 
 ## Plugins of interest:
-- [YellowCat98 Modify plugin](https://github.com/yellowcat98/serpentlua-modify): Allows for hooking GD functions.
+- [YellowCat98 Modify plugin](https://github.com/yellowcat98/serpentlua-modify): Modify GD functions to extend what a script can do.
+
+## Discord
+- If you have any questions or would like to share a script/plugin you created, join the [Discord](https://discord.gg/qnPgmUVZsV)!
 
 ## By installing this mod, you acknowledge:
 - The disclaimer above.

@@ -9,7 +9,7 @@ PluginMetadata* PluginMetadata::createFromMod(Mod* mod) {
 	ret->name = mod->getName();
 	ret->developer = mod->getDevelopers()[0];
 	ret->id = mod->getID();
-	ret->version = mod->getVersion().toNonVString();
+	ret->version = mod->getVersion().toVString();
 	ret->serpentVersion = Mod::get()->getVersion().toNonVString();
 
 	return ret;

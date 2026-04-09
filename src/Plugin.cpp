@@ -130,6 +130,16 @@ geode::Result<Plugin*, std::string> Plugin::createNative(const std::filesystem::
 		if (it == requiredKeys.end()) return Err("Plugin {}: Unknown Metadata key: {}", path.filename(), key);
 	}
 
+	auto verRes = utility::handleVersion(metadataMap.at("version"));
+	if (verRes.isErr()) return Err("Plugin {}: Version cannot be parsed: {}", metadataMap.at("id"), *(verRes.err()));
+
+	metadataMap["version"] = verRes.unwrap();
+
+	auto serpVerRes = utility::handleVersion(metadataMap.at("serpent-version"));
+	if (serpVerRes.isErr()) return Err("Plugin {}: Serpent version cannot be parsed: {}", metadataMap.at("id"), *(serpVerRes.err()));
+
+	metadataMap["serpent-version"] = serpVerRes.unwrap();
+
 	auto metadata = PluginMetadata::create(metadataMap);
 	metadata->path = utils::string::pathToString(path);
 
