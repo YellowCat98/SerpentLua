@@ -20,8 +20,12 @@ void SerpentLua::ScriptMetadata::setPlugins() {
 	this->plugins = pluginIDs; // would be better to use metadata->plugins as pluginIDs from the start but i already wrote everything i do not want to replace the stuff
 }
 
-geode::Result<SerpentLua::ScriptMetadata*, std::string> SerpentLua::ScriptMetadata::getScript(const std::string& id) {
+geode::Result<SerpentLua::ScriptMetadata*, std::string> SerpentLua::ScriptMetadata::getScriptByID(const std::string& id) {
 	return SerpentLua::internal::RuntimeManager::get()->getScriptByID(id);
+}
+
+SerpentLua::ScriptMetadata* SerpentLua::ScriptMetadata::getScriptByState(lua_State* L) {
+	return SerpentLua::internal::RuntimeManager::get()->getScriptByState(L);
 }
 
 // all this does is convert a `--@key value` into a `{"key", "value"}`

@@ -21,14 +21,14 @@ void ScriptBuiltin::entry(lua_State* L) {
 
 	ctx.mainModule = state.create_table();
 
-	ctx.metadata = RuntimeManager::get()->getScriptByState(L).unwrap(); // its guaranteed to be true if the script was able to call ScriptBuiltin::entry
+	ctx.metadata = RuntimeManager::get()->getScriptByState(L); // its guaranteed to be non-nullptr if the script was able to call ScriptBuiltin::entry
 
 	auto _ScriptMetadata = ctx.mainModule.new_usertype<SerpentLua::ScriptMetadata>("ScriptMetadata", sol::no_constructor);
 
 	_ScriptMetadata["getByID"] = [](sol::this_state ts, const std::string& id) -> sol::object {
 		sol::state_view lua(ts); // ts so tuff!
 
-		auto result = SerpentLua::ScriptMetadata::getScript(id);
+		auto result = SerpentLua::ScriptMetadata::getScriptByID(id);
 
 		if (result.isErr()) return sol::nil;
 

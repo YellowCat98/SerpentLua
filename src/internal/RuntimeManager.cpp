@@ -47,26 +47,24 @@ Result<SerpentLua::ScriptMetadata*, std::string> RuntimeManager::getScriptByID(c
 	return Ok(scripts[id]);
 }
 
-Result<script*, std::string> RuntimeManager::getLoadedScriptByState(lua_State* L) {
+script* RuntimeManager::getLoadedScriptByState(lua_State* L) {
 	for (const auto [k, v] : RuntimeManager::get()->getAllLoadedScripts()) {
 		if (v->getLuaState() != L) continue;
 
-		return Ok(v);
-		break;
+		return v;
 	}
 
-	return Err("Loaded Script Getter (by state): Couldn't find script.");
+	return nullptr;
 }
 
-Result<SerpentLua::ScriptMetadata*, std::string> RuntimeManager::getScriptByState(lua_State* L) {
+SerpentLua::ScriptMetadata* RuntimeManager::getScriptByState(lua_State* L) {
 	for (const auto [k, v] : RuntimeManager::get()->getAllLoadedScripts()) {
 		if (v->getLuaState() != L) continue;
 
-		return Ok(v->getMetadata());
-		break;
+		return v->getMetadata();
 	}
 
-	return Err("Script Getter (by state): Couldn't find script.");
+	return nullptr;
 }
 
 std::map<std::string, script*> RuntimeManager::getAllLoadedScripts() {

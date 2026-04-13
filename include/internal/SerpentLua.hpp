@@ -35,10 +35,10 @@ namespace SerpentLua::internal {
 	class RuntimeManager {
 	public:
 		static RuntimeManager* get();
-		geode::Result<script*, std::string> getLoadedScriptByID(const std::string& id); // script::getLoadedScriptByID;
+		geode::Result<script*, std::string> getLoadedScriptByID(const std::string& id); // script::getLoadedScriptByID();
 		geode::Result<ScriptMetadata*, std::string> getScriptByID(const std::string& id); // ScriptMetadata::getScriptByID();
-		geode::Result<ScriptMetadata*, std::string> getScriptByState(lua_State* L);
-		geode::Result<script*, std::string> getLoadedScriptByState(lua_State* L);
+		ScriptMetadata* getScriptByState(lua_State* L); // ScriptMetadata::getScriptByState();
+		script* getLoadedScriptByState(lua_State* L);
 
 		geode::Result<Plugin*, std::string> getLoadedPluginByID(const std::string& id);
 		geode::Result<PluginMetadata*, std::string> getPluginByID(const std::string& id);

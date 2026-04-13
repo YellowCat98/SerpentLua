@@ -1,5 +1,18 @@
 # TODO
 
+
+## 1.1.0
+- ~~ScriptMetadata (1.1.0): Add a `getFromState` function to ScriptMetadata.~~ ✓
+- UI (1.0.0): Alphabetically list scripts/plugins by name.
+
+## 1.0.2
+- ~~version stuff idk (1.0.2): Follow semver.~~ ✓
+
+## 1.0.0
+- ~~Native Plugin API (1.0.0): Access script metadata through ID and state~~ ✓
+- ~~RuntimeManager (1.0.0): Add RuntimeManager::getFromState to retrieve metadata through lua_State* alone.~~ ✓
+
+## 1.0.0-alpha.2
 - ~~SerpentLua Standard (1.0.0-alpha.2): Make plugin metadata accessible for scripts.~~ ✓
 - ~~SerpentLua Geode API: Add a createFromMod(Mod* mod) function to PluginMetadata.~~ ✓
 - ~~SerpentLua Standard: Set Version in metadata with NonVString.~~ ✓
@@ -13,9 +26,5 @@
 - ~~UI (1.0.0-alpha.2): Make missing lua.dll popup #Better.~~ ✓
 - ~~UI (1.0.0-alpha.2): Add an indicator when changes have been made~~ ✓
 
-- ~~Native Plugin API (1.0.0): Access script metadata through ID and state~~ ✓
-- ~~RuntimeManager (1.0.0): Add RuntimeManager::getFromState to retrieve metadata through lua_State* alone.~~ ✓
-
-- ~~version stuff idk (1.0.2): Follow semver.~~ ✓
-- ScriptMetadata (1.1.0): Add a `getFromState` function to ScriptMetadata.
-- UI (1.0.0): Alphabetically list scripts/plugins by name.
+## Uncategorized
+- Plugins: Create plugin repository.

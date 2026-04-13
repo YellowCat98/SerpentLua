@@ -1,3 +1,7 @@
+# 1.0.0
+- API: Expose `ScriptMetadata::getScriptByState`.
+- API: Expose `ScriptMetadata::getScriptByID`.
+
 # 1.0.2
 - Internal: Compare versions while taking Semantic Versioning into account.
 - Script/Plugin metadata: Allow leading `v` in version.

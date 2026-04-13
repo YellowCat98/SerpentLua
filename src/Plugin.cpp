@@ -34,7 +34,7 @@ void Plugin::SerpentLuaAPIImpl::log(__metadata m, const char* msg, const char* t
 }
 
 Plugin::__metadata Plugin::SerpentLuaAPIImpl::get_script(lua_State* L) {
-	auto script = SerpentLua::internal::RuntimeManager::get()->getScriptByState(L).unwrap();
+	auto script = SerpentLua::internal::RuntimeManager::get()->getScriptByState(L);
 
 	Plugin::__metadata ret;
 	ret.name = script->name.c_str();

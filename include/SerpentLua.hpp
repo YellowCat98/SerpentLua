@@ -95,11 +95,12 @@ namespace SerpentLua {
 		#ifdef YELLOWCAT98_SERPENTLUA_EXPORTING
 			static ScriptMetadata* create(std::map<std::string, std::string>& metadata);
 			static geode::Result<ScriptMetadata*, std::string> createFromScript(const std::filesystem::path& scriptPath);
-			static geode::Result<ScriptMetadata*, std::string> getScript(const std::string& id);
 			static std::pair<std::string, std::string> createPair(std::string& lines);
 			void setPlugins();
 			ScriptMetadata(){}
 		#endif
+		static geode::Result<ScriptMetadata*, std::string> getScriptByID(const std::string& id);
+		static ScriptMetadata* getScriptByState(lua_State* L); // doesnt need to return a result because if the scriptmetadata doesnt exist then neither should the state (unless it was created manually)
 		std::string name;
 		std::string id;
 		std::string version;
@@ -116,7 +117,7 @@ namespace SerpentLua {
 
 	namespace utility {
 		bool versionInfoCompare(const geode::VersionInfo& first, const geode::VersionInfo& second);
-		geode::Result<std::string, std::string> handleVersion(const std::string& version);
+		geode::Result<std::string, std::string> handleVersion(const std::string& version); // parses version and adds a leading V
 	};
 
 }
