@@ -1,6 +1,7 @@
-# 1.0.0
+# 1.1.0
 - API: Expose `ScriptMetadata::getScriptByState`.
 - API: Expose `ScriptMetadata::getScriptByID`.
+- UI: Alphabetically sort scripts and plugins by name. (serpentlua std is always on top btw)
 
 # 1.0.2
 - Internal: Compare versions while taking Semantic Versioning into account.

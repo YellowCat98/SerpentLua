@@ -3,7 +3,7 @@
 
 ## 1.1.0
 - ~~ScriptMetadata (1.1.0): Add a `getFromState` function to ScriptMetadata.~~ ✓
-- UI (1.0.0): Alphabetically list scripts/plugins by name.
+- ~~UI (1.0.0): Alphabetically list scripts/plugins by name.~~ ✓
 
 ## 1.0.2
 - ~~version stuff idk (1.0.2): Follow semver.~~ ✓
