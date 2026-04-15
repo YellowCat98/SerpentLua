@@ -1,5 +1,6 @@
 #include <internal/std/PluginEntry.hpp>
 #include <internal/std/Playground.hpp>
+#include <internal/std/UI.hpp>
 #include <sol/sol.hpp>
 
 using namespace SerpentLua::internal;
@@ -123,6 +124,7 @@ void ScriptBuiltin::entry(lua_State* L) {
 
 	ctx.mainModule["log"] = logging(state);
 	ctx.mainModule["playground"] = ScriptBuiltin::Playground::entry(state);
+	ctx.mainModule["ui"] = ScriptBuiltin::ui::entry(state);
 
 	state["serpentlua_modules"]["serpentlua.std"] = ctx.mainModule;
 }
@@ -176,7 +178,7 @@ Result<> ScriptBuiltin::initPlugin() {
 	if (ScriptBuiltin::plugin) return Err("Builtin plugin was already initialized.");
 	auto metadata = SerpentLua::PluginMetadata::createFromMod(Mod::get());
 	metadata->id = "serpentlua.std"; // i do not want to use create(std::map<std::string, std::string>) when this is very much simpler
-	metadata->version = "v1.0.0"; // the serpentlua std is already finished while the mod itself isnt
+	metadata->version = "v1.1.0";
 	auto res = SerpentLua::Plugin::create(metadata, ScriptBuiltin::entry);
 	if (res.isErr()) return Err("{}", res.err().value());
 

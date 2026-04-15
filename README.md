@@ -1,5 +1,10 @@
 # SerpentLua
 
+![Mod Version](https://api.geode-sdk.org/v1/mods/yellowcat98.serpentlua/status_badge?stat=version)
+![Downloads](https://api.geode-sdk.org/v1/mods/yellowcat98.serpentlua/status_badge?stat=downloads)
+![GD Version](https://api.geode-sdk.org/v1/mods/yellowcat98.serpentlua/status_badge?stat=gd_version)
+![Geode Version](https://api.geode-sdk.org/v1/mods/yellowcat98.serpentlua/status_badge?stat=geode_version)
+
 - A Geode mod for creating scripts in the Lua language.
 
 - View the about.md file within this repository for more information.
