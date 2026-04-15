@@ -8,7 +8,7 @@
 	},
 	"id": "yellowcat98.serpentlua",
 	"name": "SerpentLua",
-	"version": "v1.1.0",
+	"version": "v1.2.0",
 	"developer": "YellowCat98",
 	"description": "Make your own mods in Lua.",
 	"early-load": true,

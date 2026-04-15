@@ -2,7 +2,7 @@
 
 # 1.2.0
 - SL Plugin (1.1.0): Basic UI utilities.
-- UI: Add ID to SerpentLua button.
+- ~~UI: Add ID to SerpentLua button.~~ ✓
 
 ## 1.1.0
 - ~~ScriptMetadata (1.1.0): Add a `getFromState` function to ScriptMetadata.~~ ✓
