@@ -6,8 +6,6 @@
 #include <string>
 #include <vector>
 #include <filesystem>
-#include <fstream>
-#include <sstream>
 extern "C" {
 	#include <lua.h>
 	#include <lualib.h>

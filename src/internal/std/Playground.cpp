@@ -258,36 +258,38 @@ std::string ScriptBuiltin::Playground::Folder::getName() {
 	return utils::string::pathToString(std::filesystem::path(path).filename());
 }
 
-sol::table ScriptBuiltin::Playground::entry(sol::state_view state) {
-	auto table = state.create_table();
-
-	table["init"] = [](sol::this_state ts) {
-		sol::state_view state(ts);
-		lua_State* L = ts;
+void ScriptBuiltin::Playground::exposedFunctions::init(sol::this_state ts) {
+	sol::state_view state(ts);
+	lua_State* L = ts;
 
 		sol::table table = sol::stack::get<sol::table>(ts, 1);
 
-		auto scriptDir = Mod::get()->getConfigDir() / "playground" / ScriptBuiltin::getMetadata(L)->id;
-		if (!std::filesystem::exists(scriptDir)) {
-			auto result = utils::file::createDirectoryAll(scriptDir);
-			if (result.isErr()) {
-				log::error("[PLAYGROUND]: Couldn't create script directory for {}.\nErr: {}", ScriptBuiltin::getMetadata(L)->name, *(result.err()));
-			}
+	auto scriptDir = Mod::get()->getConfigDir() / "playground" / ScriptBuiltin::getMetadata(L)->id;
+	if (!std::filesystem::exists(scriptDir)) {
+		auto result = utils::file::createDirectoryAll(scriptDir);
+		if (result.isErr()) {
+			log::error("[PLAYGROUND]: Couldn't create script directory for {}.\nErr: {}", ScriptBuiltin::getMetadata(L)->name, *(result.err()));
 		}
+	}
 
-		auto saveDir = Mod::get()->getSaveDir() / "playground" / ScriptBuiltin::getMetadata(L)->id;
-		if (!std::filesystem::exists(saveDir)) {
-			auto result = utils::file::createDirectoryAll(saveDir);
-			if (result.isErr()) {
-				log::error("[PLAYGROUND]: Couldn't create script directory for {}.\nErr: {}", ScriptBuiltin::getMetadata(L)->name, *(result.err()));
-			}
+	auto saveDir = Mod::get()->getSaveDir() / "playground" / ScriptBuiltin::getMetadata(L)->id;
+	if (!std::filesystem::exists(saveDir)) {
+		auto result = utils::file::createDirectoryAll(saveDir);
+		if (result.isErr()) {
+			log::error("[PLAYGROUND]: Couldn't create script directory for {}.\nErr: {}", ScriptBuiltin::getMetadata(L)->name, *(result.err()));
 		}
+	}
 
-		ScriptBuiltin::Playground::schemes = {
-			{"script", scriptDir},
-			{"user", saveDir}
-		};
-	}; // creates the stuff if they dont exist and initialize variables
+	ScriptBuiltin::Playground::schemes = {
+		{"script", scriptDir},
+		{"user", saveDir}
+	};
+} // creates the stuff if they dont exist and initialize variables
+
+sol::table ScriptBuiltin::Playground::entry(sol::state_view state) {
+	auto table = state.create_table();
+
+	table["init"] = ScriptBuiltin::Playground::exposedFunctions::init; 
 
 	sol::table file_table = state.create_table();
 

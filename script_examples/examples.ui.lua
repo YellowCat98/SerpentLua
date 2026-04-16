@@ -6,9 +6,21 @@
 --@plugins serpentlua.std yellowcat98.modify
 
 -- Note! This example uses the Modify plugin by YellowCat98.
--- Get the Modify plugin at: https://github.com/YellowCat98/serpentlua-modify/releases/tag/v1.0.0 to use this example.
+-- Get the Modify plugin at: https://github.com/YellowCat98/serpentlua-modify/releases/latest to use this example.
 
 local SL = require("serpentlua.std")
 local Modify = require("yellowcat98.modify")
 
-SL.ui.helloUI()
+Modify.createHook("hello-hook", "MenuLayer", "init", function(self)
+	if not original(self) then return false end
+
+	local node = SL.ui.Node.create(SL.Enums.ui.NodeType.Node, {})
+local selfNode = SL.ui.Node.createFromCCNode(self, SL.Enums.ui.NodeType.Node)
+
+
+
+	selfNode:addChild(node)
+	return true
+end)
+
+Modify.applyHook("hello-hook")

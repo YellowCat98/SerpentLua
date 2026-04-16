@@ -72,6 +72,7 @@ lua_State* script::createState() {
 
 	lua_atpanic(state, [](lua_State* L) -> int {
 		log::error("LUA PANIC: {}", lua_tostring(L, -1));
+		MessageBoxA(nullptr, fmt::format("{}", lua_tostring(L, -1)).c_str(), "LUA PANIC!", MB_OK);
 		return 0;
 	});
 

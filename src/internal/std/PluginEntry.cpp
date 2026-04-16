@@ -1,6 +1,7 @@
 #include <internal/std/PluginEntry.hpp>
 #include <internal/std/Playground.hpp>
 #include <internal/std/UI.hpp>
+#include <internal/std/Enums.hpp>
 #include <sol/sol.hpp>
 
 using namespace SerpentLua::internal;
@@ -125,6 +126,7 @@ void ScriptBuiltin::entry(lua_State* L) {
 	ctx.mainModule["log"] = logging(state);
 	ctx.mainModule["playground"] = ScriptBuiltin::Playground::entry(state);
 	ctx.mainModule["ui"] = ScriptBuiltin::ui::entry(state);
+	ctx.mainModule["enums"] = ScriptBuiltin::Enums::entry(state);
 
 	state["serpentlua_modules"]["serpentlua.std"] = ctx.mainModule;
 }

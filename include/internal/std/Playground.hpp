@@ -1,3 +1,5 @@
+#pragma once
+
 #include <internal/SerpentLua.hpp>
 #include <sol/sol.hpp>
 
@@ -53,5 +55,9 @@ namespace SerpentLua::internal::ScriptBuiltin::Playground {
 		std::vector<std::string> errs;
 		bool failed;
 		std::string path;
+	};
+
+	struct exposedFunctions {
+		static void init(sol::this_state ts);
 	};
 }

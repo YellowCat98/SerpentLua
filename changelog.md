@@ -1,3 +1,7 @@
+# 1.2.0
+- SL Plugin: Add new `Enums` table.
+- Error handling: Show system-level alert on lua panic (used to previously print error and exit immediately)
+
 # 1.1.0
 - API: Expose `ScriptMetadata::getScriptByState`.
 - API: Expose `ScriptMetadata::getScriptByID`.
