@@ -8,6 +8,7 @@ template <typename T>
 bool typeCheck(std::optional<sol::object> value, const std::string& name) {
 	if (!value.has_value()) {
 		log::warn("[UI PLUGIN] {} has no value.", name);
+		return false;
 	}
 	if (!(*value).is<T>()) {
 		log::warn("[UI PLUGIN] {} type mismatch.", name);
@@ -256,4 +257,91 @@ void ScriptBuiltin::ui::AttributeHandler::populateAttributesNode(sol::state_view
 	add("getID", [state](CCNode* ccnode, std::optional<sol::object>) {
 		return sol::make_object(state, std::string(ccnode->getID()));
 	});
+}
+
+void ScriptBuiltin::ui::AttributeHandler::populateAttributesSprite(sol::state_view state, Node *node) {
+
+	DEFINE_ADD_LAMBDA(add)
+
+	// ccnode inherits ccsprite anyway lolololololo!!!!!!
+	ScriptBuiltin::ui::AttributeHandler::populateAttributesNode(state, node);
+
+	add("setColor", [state](CCNode* ccnode, std::optional<sol::object> value) {
+		if (!typeCheck<sol::table>(value, "setColor")) return sol::make_object(state, sol::nil);
+		auto sprite = static_cast<CCSprite*>(ccnode);
+		auto t = (*value).as<sol::table>();
+		if (!t["r"].is<float>() || !t["g"].is<float>() || !t["b"].is<float>()) {
+			log::warn("[UI PLUGIN] setRotation table missing float r/g/b.");
+			return sol::make_object(state, sol::nil);
+		}
+		sprite->setColor({
+			static_cast<GLubyte>(std::clamp(t["r"].get<float>(), 0.0f, 255.0f)),
+			static_cast<GLubyte>(std::clamp(t["g"].get<float>(), 0.0f, 255.0f)),
+			static_cast<GLubyte>(std::clamp(t["b"].get<float>(), 0.0f, 255.0f))
+		});
+		return sol::make_object(state, sol::nil);
+	});
+
+	add("setOpacity", [state](CCNode* ccnode, std::optional<sol::object> value) {
+		if (!typeCheck<float>(value, "setOpacity")) return sol::make_object(state, sol::nil);
+		auto sprite = static_cast<CCSprite*>(ccnode);
+
+		sprite->setOpacity(static_cast<GLubyte>(std::clamp((*value).as<float>(), 0.0f, 255.0f)));
+		return sol::make_object(state, sol::nil);
+	});
+
+	add("setFlipX", [state](CCNode* ccnode, std::optional<sol::object> value) {
+		if (!typeCheck<bool>(value, "setFlipX")) return sol::make_object(state, sol::nil);
+		auto sprite = static_cast<CCSprite*>(ccnode);
+
+		sprite->setFlipX((*value).as<bool>());
+		return sol::make_object(state, sol::nil);
+	});
+
+	add("setFlipY", [state](CCNode* ccnode, std::optional<sol::object> value) {
+		if (!typeCheck<bool>(value, "setFlipY")) return sol::make_object(state, sol::nil);
+		auto sprite = static_cast<CCSprite*>(ccnode);
+
+		sprite->setFlipY((*value).as<bool>());
+		return sol::make_object(state, sol::nil);
+	});
+
+
+
+	add("getColor", [state](CCNode* ccnode, std::optional<sol::object> value) {
+		auto sprite = static_cast<CCSprite*>(ccnode);
+		auto t = state.create_table_with(state,
+			"r", static_cast<float>(sprite->getColor().r),
+			"g", static_cast<float>(sprite->getColor().g),
+			"b", static_cast<float>(sprite->getColor().b)
+		);
+		return sol::make_object(state, t);
+	});
+
+	add("getOpacity", [state](CCNode* ccnode, std::optional<sol::object> value) {
+		auto sprite = static_cast<CCSprite*>(ccnode);
+		return sol::make_object(state, static_cast<float>(sprite->getOpacity()));
+	});
+
+	add("isFlipX", [state](CCNode* ccnode, std::optional<sol::object> value) {
+		auto sprite = static_cast<CCSprite*>(ccnode);
+		return sol::make_object(state, sprite->isFlipX());
+	});
+
+	add("isFlipY", [state](CCNode* ccnode, std::optional<sol::object> value) {
+		auto sprite = static_cast<CCSprite*>(ccnode);
+		return sol::make_object(state, sprite->isFlipY());
+	});
+}
+
+void ScriptBuiltin::ui::AttributeHandler::populateAttributesButton(sol::state_view state, Node *node) {
+	return ScriptBuiltin::ui::AttributeHandler::populateAttributesNode(state, node);
+}
+
+void ScriptBuiltin::ui::AttributeHandler::populateAttributesLabel(sol::state_view state, Node *node) {
+	return ScriptBuiltin::ui::AttributeHandler::populateAttributesNode(state, node);
+}
+
+void ScriptBuiltin::ui::AttributeHandler::populateAttributesMenu(sol::state_view state, Node *node) {
+	return ScriptBuiltin::ui::AttributeHandler::populateAttributesNode(state, node);
 }

@@ -18,6 +18,7 @@ ScriptBuiltin::ui::Node* ScriptBuiltin::ui::Node::create(sol::this_state state, 
 	switch (type) {
 		case ScriptBuiltin::Enums::ui::NodeType::Node: {
 			ret->node = CCNode::create(); // options are #NotNeeded
+			ScriptBuiltin::ui::AttributeHandler::populateAttributesNode(state, ret);
 			break;
 		}
 
@@ -26,6 +27,7 @@ ScriptBuiltin::ui::Node* ScriptBuiltin::ui::Node::create(sol::this_state state, 
 			bool frameName = options["frameName"];
 
 			ret->node = frameName ? CCSprite::createWithSpriteFrameName(spriteName.c_str()) : CCSprite::create(spriteName.c_str());
+			ScriptBuiltin::ui::AttributeHandler::populateAttributesSprite(state, ret);
 			break;
 		}
 
@@ -38,6 +40,7 @@ ScriptBuiltin::ui::Node* ScriptBuiltin::ui::Node::create(sol::this_state state, 
 			ret->node = CCMenuItemExt::createSpriteExtra(buttonImage, [callback](CCMenuItemSpriteExtra* sender) {
 				return callback(sender);
 			});
+			ScriptBuiltin::ui::AttributeHandler::populateAttributesButton(state, ret);
 			break;
 		}
 
@@ -46,18 +49,18 @@ ScriptBuiltin::ui::Node* ScriptBuiltin::ui::Node::create(sol::this_state state, 
 			std::string font = options["font"];
 
 			ret->node = CCLabelBMFont::create(text.c_str(), font.c_str());
+			ScriptBuiltin::ui::AttributeHandler::populateAttributesLabel(state, ret);
 			break;
 		}
 
 		case ScriptBuiltin::Enums::ui::NodeType::Menu: {
 			ret->node = CCMenu::create();
+			ScriptBuiltin::ui::AttributeHandler::populateAttributesMenu(state, ret);
 			break;
 		}
 	}
 
 	ret->type = type;
-
-	ScriptBuiltin::ui::AttributeHandler::populateAttributesNode(state, ret);
 
 	return ret;
 }
