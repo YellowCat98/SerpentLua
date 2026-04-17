@@ -1,4 +1,4 @@
-#include <internal/std/ui.hpp>
+#include <internal/std/UI.hpp>
 #include <internal/std/PluginEntry.hpp>
 
 using namespace SerpentLua::internal;
@@ -108,6 +108,53 @@ void ScriptBuiltin::ui::Node::addToNode(sol::this_state state, Node* node) {
 	node->getNode(state)->addChild(this->node);
 }
 
+void bindNodeWrappers(sol::state_view state, sol::table table) {
+	table.set_function("createNode", [](sol::this_state ts) {
+		sol::state_view view(ts);
+		return ScriptBuiltin::ui::Node::create(ts, ScriptBuiltin::Enums::ui::NodeType::Node, view.create_table());
+	});
+
+	table.set_function("createSprite", [](sol::this_state ts, const std::string& sprite, bool frameName) {
+		sol::state_view view(ts);
+		return ScriptBuiltin::ui::Node::create(ts, ScriptBuiltin::Enums::ui::NodeType::Sprite, view.create_table_with(
+			"sprite", sprite,
+			"frameName", frameName
+		));
+	});
+
+	table.set_function("createLabel", [](sol::this_state ts, const std::string& text, const std::string& font) {
+		sol::state_view view(ts);
+		return ScriptBuiltin::ui::Node::create(ts, ScriptBuiltin::Enums::ui::NodeType::Label, view.create_table_with(
+			"text", text,
+			"font", font
+		));
+	});
+
+	table.set_function("createButton", [](sol::this_state ts, ScriptBuiltin::ui::Node* node, sol::function callback) {
+		sol::state_view view(ts);
+		return ScriptBuiltin::ui::Node::create(ts, ScriptBuiltin::Enums::ui::NodeType::Button, view.create_table_with(
+			"image", node,
+			"callback", callback
+		));
+	});
+
+	table.set_function("createButtonWithSprite", [](sol::this_state ts, const std::string& sprite, bool frameName, sol::function callback) {
+		sol::state_view view(ts);
+		return ScriptBuiltin::ui::Node::create(ts, ScriptBuiltin::Enums::ui::NodeType::Button, view.create_table_with(
+			"image", ScriptBuiltin::ui::Node::create(ts, ScriptBuiltin::Enums::ui::NodeType::Sprite, view.create_table_with(
+				"sprite", sprite,
+				"frameName", frameName
+			)),
+			"callback", callback
+		));
+	});
+
+	table.set_function("createMenu", [](sol::this_state ts) {
+		sol::state_view view(ts);
+		return ScriptBuiltin::ui::Node::create(ts, ScriptBuiltin::Enums::ui::NodeType::Menu, view.create_table());
+	});
+}
+
 sol::table ScriptBuiltin::ui::entry(sol::state_view state) {
 	auto table = state.create_table();
 
@@ -130,6 +177,8 @@ sol::table ScriptBuiltin::ui::entry(sol::state_view state) {
 			return ScriptBuiltin::ui::Node::createFromCCNode(ts, node, ScriptBuiltin::Enums::ui::NodeType::Node);
 		}
 	));
+
+	bindNodeWrappers(state, table);
 
 	table["Node"] = node_table;
 

@@ -15,15 +15,9 @@ Modify.createHook("hello-hook", "MenuLayer", "init", function(self)
 	if not original(self) then return false end
 	local selfNode = SL.ui.Node.createFromCCNode(self)
 
-	local node = SL.ui.Node.create(SL.enums.ui.NodeType.Button, {
-		image = SL.ui.Node.create(SL.enums.ui.NodeType.Sprite, {
-			sprite = "GJ_arrow_01_001.png",
-			frameName = true
-		}),
-		callback = function(sender)
-			SL.log.info("yoyo")
-		end
-	})
+	local node = SL.ui.createButtonWithSprite("GJ_arrow_01_001.png", true, function(sender)
+		SL.log.info("Hello World")
+	end)
 	node:method("setID")("yo-yo")
 
 	local menu = SL.ui.Node.getByID(selfNode, "bottom-menu")
