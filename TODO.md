@@ -31,3 +31,4 @@
 
 ## Uncategorized
 - Plugins: Create plugin repository.
+- Plugin API (2.x): Don't require metadata as first argument for the logging functions.
