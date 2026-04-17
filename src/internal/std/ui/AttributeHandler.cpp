@@ -25,7 +25,7 @@ static CCNode* getCCNode(sol::state_view state, ScriptBuiltin::ui::Node* node) {
 void ScriptBuiltin::ui::AttributeHandler::populateAttributesNode(sol::state_view state, Node* node) {
 	if (!node) return;
 
-	DEFINE_ADD_LAMBDA(add)
+	DEFINE_ADD_LAMBDA(add);
 
 	add("setPositionX", [state](CCNode* ccnode, std::optional<sol::object> value) {
 		if (!typeCheck<float>(value, "setPositionX")) return sol::make_object(state, sol::nil);
@@ -170,6 +170,12 @@ void ScriptBuiltin::ui::AttributeHandler::populateAttributesNode(sol::state_view
 		return sol::make_object(state, sol::nil);
 	});
 
+	add("setZOrder", [state](CCNode* ccnode, std::optional<sol::object> value) {
+		if (!typeCheck<int>(value, "setZOrder")) return sol::make_object(state, sol::nil);
+		ccnode->setZOrder((*value).as<int>());
+		return sol::make_object(state, sol::nil);
+	});
+
 
 
 	add("getPositionX", [state](CCNode* ccnode, std::optional<sol::object>) {
@@ -257,13 +263,15 @@ void ScriptBuiltin::ui::AttributeHandler::populateAttributesNode(sol::state_view
 	add("getID", [state](CCNode* ccnode, std::optional<sol::object>) {
 		return sol::make_object(state, std::string(ccnode->getID()));
 	});
+
+	add("getZOrder", [state](CCNode* ccnode, std::optional<sol::object>) {
+		return sol::make_object(state, ccnode->getZOrder());
+	});
 }
 
 void ScriptBuiltin::ui::AttributeHandler::populateAttributesSprite(sol::state_view state, Node *node) {
-
-	DEFINE_ADD_LAMBDA(add)
-
-	// ccnode inherits ccsprite anyway lolololololo!!!!!!
+	if (!node) return;
+	DEFINE_ADD_LAMBDA(add);
 	ScriptBuiltin::ui::AttributeHandler::populateAttributesNode(state, node);
 
 	add("setColor", [state](CCNode* ccnode, std::optional<sol::object> value) {
@@ -335,13 +343,80 @@ void ScriptBuiltin::ui::AttributeHandler::populateAttributesSprite(sol::state_vi
 }
 
 void ScriptBuiltin::ui::AttributeHandler::populateAttributesButton(sol::state_view state, Node *node) {
-	return ScriptBuiltin::ui::AttributeHandler::populateAttributesNode(state, node);
+	if (!node) return;
+	DEFINE_ADD_LAMBDA(add);
+
+	ScriptBuiltin::ui::AttributeHandler::populateAttributesNode(state, node);
+
+	add("setNormalImage", [state](CCNode* ccnode, std::optional<sol::object> value) {
+		if (!typeCheck<Node*>(value, "setNormalImage")) return sol::make_object(state, sol::nil);
+		auto btn = static_cast<CCMenuItemSpriteExtra*>(ccnode);
+
+		btn->setNormalImage((*value).as<Node*>()->getNode(state));
+		return sol::make_object(state, sol::nil);
+	});
+
+	add("setSelectedImage", [state](CCNode* ccnode, std::optional<sol::object> value) {
+		if (!typeCheck<Node*>(value, "setSelectedImage")) return sol::make_object(state, sol::nil);
+		auto btn = static_cast<CCMenuItemSpriteExtra*>(ccnode);
+
+		btn->setSelectedImage((*value).as<Node*>()->getNode(state));
+		return sol::make_object(state, sol::nil);
+	});
+
+	add("setDisabledImage", [state](CCNode* ccnode, std::optional<sol::object> value) {
+		if (!typeCheck<Node*>(value, "setDisabledImage")) return sol::make_object(state, sol::nil);
+		auto btn = static_cast<CCMenuItemSpriteExtra*>(ccnode);
+
+		btn->setDisabledImage((*value).as<Node*>()->getNode(state));
+		return sol::make_object(state, sol::nil);
+	});
 }
 
 void ScriptBuiltin::ui::AttributeHandler::populateAttributesLabel(sol::state_view state, Node *node) {
-	return ScriptBuiltin::ui::AttributeHandler::populateAttributesNode(state, node);
+	if (!node) return;
+	DEFINE_ADD_LAMBDA(add);
+	ScriptBuiltin::ui::AttributeHandler::populateAttributesNode(state, node);
+
+	add("setString", [state](CCNode* ccnode, std::optional<sol::object> value) {
+		if (!typeCheck<std::string>(value, "setString")) return sol::make_object(state, sol::nil);
+		auto label = static_cast<CCLabelBMFont*>(ccnode);
+
+		label->setString((*value).as<std::string>().c_str());
+
+		return sol::make_object(state, sol::nil);
+	});
+
+	add("setFntFile", [state](CCNode* ccnode, std::optional<sol::object> value) {
+		if (!typeCheck<std::string>(value, "setFntFile")) return sol::make_object(state, sol::nil);
+		auto label = static_cast<CCLabelBMFont*>(ccnode);
+
+		label->setFntFile((*value).as<std::string>().c_str());
+
+		return sol::make_object(state, sol::nil);
+	});
+
+
+
+	add("getString", [state](CCNode* ccnode, std::optional<sol::object> value) {
+		auto label = static_cast<CCLabelBMFont*>(ccnode);
+		return sol::make_object(state, label->getString());
+	});
+
+	add("getFntFile", [state](CCNode* ccnode, std::optional<sol::object> value) {
+		auto label = static_cast<CCLabelBMFont*>(ccnode);
+		return sol::make_object(state, label->getFntFile());
+	});
 }
 
 void ScriptBuiltin::ui::AttributeHandler::populateAttributesMenu(sol::state_view state, Node *node) {
-	return ScriptBuiltin::ui::AttributeHandler::populateAttributesNode(state, node);
+	if (!node) return;
+	DEFINE_ADD_LAMBDA(add);
+	ScriptBuiltin::ui::AttributeHandler::populateAttributesNode(state, node);
+
+	add("updateLayout", [state](CCNode* ccnode, std::optional<sol::object> value) {
+		auto menu = static_cast<CCMenu*>(ccnode);
+		menu->updateLayout();
+		return sol::make_object(state, sol::nil);
+	});
 }

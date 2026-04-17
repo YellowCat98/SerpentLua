@@ -13,7 +13,7 @@ std::function<void(const std::string&, std::function<sol::object(CCNode*, std::o
 			return fn(ccnode, value); \
 		} \
 	}); \
-}; \
+} \
 
 namespace SerpentLua::internal::ScriptBuiltin::ui {
 	sol::table entry(sol::state_view state);

@@ -182,6 +182,13 @@ sol::table ScriptBuiltin::ui::entry(sol::state_view state) {
 	));
 
 	bindNodeWrappers(state, table);
+	table.set_function("getWinSize", [](sol::this_state ts) {
+		sol::state_view state = ts;
+		return state.create_table_with(
+			"width", CCDirector::get()->getWinSize().width,
+			"height", CCDirector::get()->getWinSize().height
+		);
+	});
 
 	table["Node"] = node_table;
 
