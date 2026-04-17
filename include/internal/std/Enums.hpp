@@ -6,7 +6,7 @@
 namespace SerpentLua::internal::ScriptBuiltin::Enums {
 	sol::table entry(sol::state_view ts);
 
-	struct UI {
+	struct ui {
 		enum class NodeType {
 			Node, // CCNode
 			Sprite, // CCSprite

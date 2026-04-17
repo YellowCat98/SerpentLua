@@ -9,38 +9,32 @@ namespace SerpentLua::internal::ScriptBuiltin::ui {
 
 	struct Node;
 	struct Attribute {
-		sol::object value;
-		std::function<void(Node*)> apply;
+		std::function<sol::object(Node*, sol::object)> apply;
 
-		Attribute(sol::object value, std::function<void(Node*)> apply) : value(value), apply(apply) {}
+		Attribute(std::function<sol::object(Node*, sol::object)> apply) : apply(apply) {}
 	};
 
 	// functions that dont take this_state as their first argument dont get bound
 	struct Node {
 	public:
-		static Node* create(sol::this_state ts, ScriptBuiltin::Enums::UI::NodeType type, sol::table options);
-		static Node* getByID(sol::this_state ts, Node* from, const std::string& id, ScriptBuiltin::Enums::UI::NodeType type);
-		static Node* createFromCCNode(sol::this_state ts, sol::object node, ScriptBuiltin::Enums::UI::NodeType type); // casts a CCNode to a Node so you can interact with it
+		static Node* create(sol::this_state ts, ScriptBuiltin::Enums::ui::NodeType type, sol::table options);
+		static Node* getByID(sol::this_state ts, Node* from, const std::string& id, ScriptBuiltin::Enums::ui::NodeType type);
+		static Node* createFromCCNode(sol::this_state ts, sol::object node, ScriptBuiltin::Enums::ui::NodeType type); // casts a CCNode to a Node so you can interact with it
 
 
-		void setAttribute(sol::this_state ts, const std::string& attr, sol::object value);
-		sol::object getAttribute(sol::this_state ts, const std::string& attr);
+		sol::object method(sol::this_state ts, const std::string& method, sol::object value);
 
-		sol::object callSpecial(sol::this_state ts, const std::string& special); // a special is just a function exclusive to that node! 
 		void addChild(sol::this_state ts, Node* node);
 		void addToNode(sol::this_state ts, Node* node);
 
 		cocos2d::CCNode* getNode(sol::state_view ts);
-		ScriptBuiltin::Enums::UI::NodeType getType(sol::this_state ts);
+		ScriptBuiltin::Enums::ui::NodeType getType(sol::this_state ts);
 
-		// not binding these but i need them in attribute handler
-		std::unordered_map<std::string, Attribute> attributes;
-		std::unordered_map<std::string, sol::object> specials;
+		// not binding this but i need them in attribute handler
+		std::unordered_map<std::string, Attribute> methods;
 	private:
 		cocos2d::CCNode* node; // casted to whatever type it is
-		ScriptBuiltin::Enums::UI::NodeType type;
-
-		void applyAttribute(sol::this_state ts, const std::string& attr, sol::object value);
+		ScriptBuiltin::Enums::ui::NodeType type;
 	};
 
 

@@ -13,13 +13,22 @@ local Modify = require("yellowcat98.modify")
 
 Modify.createHook("hello-hook", "MenuLayer", "init", function(self)
 	if not original(self) then return false end
+	local selfNode = SL.ui.Node.createFromCCNode(self)
 
-	local node = SL.ui.Node.create(SL.Enums.ui.NodeType.Node, {})
-local selfNode = SL.ui.Node.createFromCCNode(self, SL.Enums.ui.NodeType.Node)
+	local node = SL.ui.Node.create(SL.enums.ui.NodeType.Button, {
+		image = SL.ui.Node.create(SL.enums.ui.NodeType.Sprite, {
+			sprite = "GJ_arrow_01_001.png",
+			frameName = true
+		}),
+		callback = function(sender)
+			SL.log.info("yoyo")
+		end
+	})
+	node:method("setID")("yo-yo")
 
+	local menu = SL.ui.Node.getByID(selfNode, "bottom-menu")
+	menu:addChild(node)
 
-
-	selfNode:addChild(node)
 	return true
 end)
 

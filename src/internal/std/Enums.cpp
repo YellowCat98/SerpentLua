@@ -9,11 +9,11 @@ sol::table createUITable(sol::state_view state) {
 
 	// NodeType
 	table.new_enum("NodeType",
-		"Node", ScriptBuiltin::Enums::UI::NodeType::Node,
-		"Sprite", ScriptBuiltin::Enums::UI::NodeType::Sprite,
-		"Button", ScriptBuiltin::Enums::UI::NodeType::Button,
-		"Label", ScriptBuiltin::Enums::UI::NodeType::Label,
-		"Menu", ScriptBuiltin::Enums::UI::NodeType::Menu
+		"Node", ScriptBuiltin::Enums::ui::NodeType::Node,
+		"Sprite", ScriptBuiltin::Enums::ui::NodeType::Sprite,
+		"Button", ScriptBuiltin::Enums::ui::NodeType::Button,
+		"Label", ScriptBuiltin::Enums::ui::NodeType::Label,
+		"Menu", ScriptBuiltin::Enums::ui::NodeType::Menu
 	);
 
 	return table;
