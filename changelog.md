@@ -1,5 +1,6 @@
 # 1.2.0
-- SL Plugin: Add new `Enums` table.
+- SL Plugin v1.1.0: Added new `enums` table.
+- SL Plugin v1.1.0: Added basic UI utilities.
 - Error handling: Show system-level alert on lua panic (used to previously print error and exit immediately)
 
 # 1.1.0

@@ -67,6 +67,7 @@ Do not install unless you trust the source.
 
 ## Notes:
 - Enabling the platform console in the Geode settings is encouraged for better error handling.
+- The SerpentLua plugin uses a separate version from SerpentLua itself.
 
 ## Plugins of interest:
 - [YellowCat98 Modify plugin](https://github.com/yellowcat98/serpentlua-modify): Modify GD functions to extend what a script can do.

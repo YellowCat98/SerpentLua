@@ -8,22 +8,75 @@
 -- Note! This example uses the Modify plugin by YellowCat98.
 -- Get the Modify plugin at: https://github.com/YellowCat98/serpentlua-modify/releases/latest to use this example.
 
+-- Basic example for using the UI system that the SerpentLua plugin provides.
+
+-- Simple counter.
+
 local SL = require("serpentlua.std")
 local Modify = require("yellowcat98.modify")
+
+local counter = 0
+
+-- Node is simply a class that wraps around a type that lua doesn't understand (CCNode and its derivatives).
+--[[
+	Types that Node wraps around:
+	CCNode (NodeType.Node)
+	CCSprite (NodeType.Sprite)
+	CCMenuItemSpriteExtra (NodeType.Button)
+	CCLabelBMFont (NodeType.Label)
+	CCMenu (NodeType.Menu)
+]]
+-- Any other types that aren't bound are registered of type Node.
+-- As long as a type derives from CCNode, it can be registered as Node.
+-- With Node, you can call setters and getters (or any method) of any CCNode derivative easily.
+-- NodeType is an enum (which is internally just a table of strings corresponding to numbers.)
+-- Usage: SL.Enums.ui.NodeType.X
 
 Modify.createHook("hello-hook", "MenuLayer", "init", function(self)
 	if not original(self) then return false end
 	local selfNode = SL.ui.Node.createFromCCNode(self)
+	-- You may use the createFromCCNode function to create a Node instance to be able to call methods of a CCNode.
+	-- `self` is a MenuLayer, which derives from CCNode. (i mean it derives from a bunch of stuff but it ultimately goes down to ccnode anyway)
+	-- You may also provide an argument containing the type of the node (with NodeType)
 
-	local node = SL.ui.createButtonWithSprite("GJ_arrow_01_001.png", true, function(sender)
-		SL.log.info("Hello World")
+	local label = SL.ui.createLabel(string.format("Counter: %d", counter), "bigFont.fnt")
+	-- SL.ui.createLabel is just a wrapper around the SL.ui.Node.create(SL.enums.ui.NodeType.Label, {text="...",font="..."})
+	-- The same goes for other types.
+	label:method("setID")("counter-id")
+	-- `method` is a function that returns another function that simply calls the method you want to call.
+	-- Usage: node:method("<method-name>")(args...)
+	label:method("setPosition")({
+		x=SL.ui.getWinSize().width/2,
+		y=SL.ui.getWinSize().height/2
+	})
+	-- getWinSize is self explanatory. Returns a table containing the width and height of the screen.
+
+	local node = SL.ui.createButtonWithSprite("GJ_button_01.png", false, function(sender)
+		counter = counter+1
+		label:method("setString")(string.format("Counter: %d", counter))
 	end)
-	node:method("setID")("yo-yo")
+	-- The first argument is the sprite's name.
+	-- The second boolean argument is whether the sprite comes from a sprite sheet or not.
+	-- The last argument is the function that gets called when the button is pressed.
+	node:method("setID")("my-counter")
+	-- Most nodes have an ID that is used to distinguish between nodes.
 
 	local menu = SL.ui.Node.getByID(selfNode, "bottom-menu")
 	menu:addChild(node)
+	-- Self explanatory.
 
+	selfNode:addChild(label)
 	return true
 end)
 
 Modify.applyHook("hello-hook")
+
+--[[
+	Creating a Node through the manual way.
+	SL.ui.createNode <=> SL.ui.Node.create(SL.enums.ui.NodeType.Node, {})
+	SL.ui.createSprite <=> SL.ui.Node.create(SL.enums.ui.NodeType.Sprite, {sprite=string, frameName=bool})
+	SL.ui.createButton <=> SL.ui.Node.create(SL.enums.ui.NodeType.Button, {image=Node, callback=function})
+	SL.ui.createLabel <=> SL.ui.Node.create(SL.enums.ui.NodeType.Label, {text=string, font=string})
+	SL.ui.createMenu <=> SL.ui.Node.create(SL.enums.ui.NodeType.Menu, {})
+]]
+-- I personally don't see any use case for these functions, but they're here if you want to use them.
