@@ -291,13 +291,8 @@ sol::table ScriptBuiltin::Playground::entry(sol::state_view state) {
 
 	table["init"] = ScriptBuiltin::Playground::exposedFunctions::init; 
 
-	sol::table file_table = state.create_table();
-
-	file_table.set_function("create", &ScriptBuiltin::Playground::File::create);
-
-	table["File"] = file_table;
-
-	state.new_usertype<ScriptBuiltin::Playground::File>("FileInstance", sol::no_constructor,
+	table.new_usertype<ScriptBuiltin::Playground::File>("File", sol::no_constructor,
+		"create", &File::create,
 		"read", &File::read,
 		"erase", &File::erase,
 		"append", &File::append, // it looks like a staircase!
@@ -316,13 +311,8 @@ sol::table ScriptBuiltin::Playground::entry(sol::state_view state) {
 		)
 	);
 
-	sol::table folder_table = state.create_table();
-
-	folder_table.set_function("create", &ScriptBuiltin::Playground::Folder::create);
-
-	table["Folder"] = folder_table;
-
-	state.new_usertype<ScriptBuiltin::Playground::Folder>("FolderInstance", sol::no_constructor,
+	table.new_usertype<ScriptBuiltin::Playground::Folder>("Folder", sol::no_constructor,
+		"create", &Folder::create,
 		"items", &Folder::items,
 		"exists", &Folder::exists,
 		"hasErrs", &Folder::hasErrs, // it looks like a staircase again!

@@ -161,26 +161,6 @@ void bindNodeWrappers(sol::state_view state, sol::table table) {
 sol::table ScriptBuiltin::ui::entry(sol::state_view state) {
 	auto table = state.create_table();
 
-	sol::table node_table = state.create_table();
-
-	node_table.set_function("create", &ScriptBuiltin::ui::Node::create);
-	node_table.set_function("getByID", sol::overload(
-		[](sol::this_state ts, Node* from, const std::string& id) {
-			return ScriptBuiltin::ui::Node::getByID(ts, from, id, ScriptBuiltin::Enums::ui::NodeType::Node);
-		},
-		[](sol::this_state ts, Node* from, const std::string& id, ScriptBuiltin::Enums::ui::NodeType type) {
-			return ScriptBuiltin::ui::Node::getByID(ts, from, id, type);
-		}
-	));
-	node_table.set_function("createFromCCNode", sol::overload(
-		[](sol::this_state ts, sol::object node, ScriptBuiltin::Enums::ui::NodeType type) {
-			return ScriptBuiltin::ui::Node::createFromCCNode(ts, node, type);
-		},
-		[](sol::this_state ts, sol::object node) {
-			return ScriptBuiltin::ui::Node::createFromCCNode(ts, node, ScriptBuiltin::Enums::ui::NodeType::Node);
-		}
-	));
-
 	bindNodeWrappers(state, table);
 	table.set_function("getWinSize", [](sol::this_state ts) {
 		sol::state_view state = ts;
@@ -190,9 +170,24 @@ sol::table ScriptBuiltin::ui::entry(sol::state_view state) {
 		);
 	});
 
-	table["Node"] = node_table;
-
-	state.new_usertype<ScriptBuiltin::ui::Node>("NodeInstance", sol::no_constructor,
+	table.new_usertype<ScriptBuiltin::ui::Node>("Node", sol::no_constructor,
+		"create", &Node::create,
+		"getByID", sol::overload(
+			[](sol::this_state ts, Node* from, const std::string& id) {
+				return ScriptBuiltin::ui::Node::getByID(ts, from, id, ScriptBuiltin::Enums::ui::NodeType::Node);
+			},
+			[](sol::this_state ts, Node* from, const std::string& id, ScriptBuiltin::Enums::ui::NodeType type) {
+				return ScriptBuiltin::ui::Node::getByID(ts, from, id, type);
+			}
+		),
+		"createFromCCNode", sol::overload(
+			[](sol::this_state ts, sol::object node, ScriptBuiltin::Enums::ui::NodeType type) {
+				return ScriptBuiltin::ui::Node::createFromCCNode(ts, node, type);
+			},
+			[](sol::this_state ts, sol::object node) {
+				return ScriptBuiltin::ui::Node::createFromCCNode(ts, node, ScriptBuiltin::Enums::ui::NodeType::Node);
+			}
+		),
 		"method", &Node::method,
 		"addChild", &Node::addChild,
 		"addToNode", &Node::addToNode,

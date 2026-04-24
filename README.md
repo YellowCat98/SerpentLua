@@ -74,18 +74,20 @@
 ### Script examples worth looking at:
 - [Basic Example](script_examples/examples.basic.lua): Basic example for the standard SerpentLua plugin. This script showcases logging capabilities.
 
-- [Playground Example](script_examples/examples.playground.lua): Basic example for the playground feature in the standard SerpentLua plugin. A library that gives sandboxes access to a directory for each plugin.
+- [Playground Example](script_examples/examples.playground.lua): Basic example for the playground module in the standard SerpentLua plugin. A module that gives sandboxes access to a directory for each plugin.
 
-- [Modify example](script_examples/examples.modify.lua): Basic example for the Modify plugin.
+- [Modify Example](script_examples/examples.modify.lua): Basic example for the Modify plugin.
 
 - [Plugin Test Example](script_examples/examples.plugintest.lua): Basic example for the Plugin examples in plugin_examples/yellowcat98.plugintest.
+
+- [UI Example](script_examples/examples.ui.lua): Basic example for the UI module in the standard SerpentLua plugin. A module which allows writing basic UI code. (Though it requires that you use a Plugin like Modify to execute code at the `init` of any CCLayer.)
 
 ## Plugins:
 - Note: this is rather advanced. If you're looking just to create scripts, skip this.
 ### Native plugins:
 #### Creating your first native plugin:
 - This will only include how plugins are written. View [this](plugin_examples/yellowcat98.plugintest/README.md) for compilation.
-0. Get your `lua.lib` and specifically Lua version `5.4.6`. (This step was added last and i just wasnt feeling like making it step 1 and incrementing the other steps lol)
+0. Get `lua.lib` from whatever release of SerpentLua you have installed. As well as the Lua C API version `5.4.6`. (This step was added last and i just wasnt feeling like making it step 1 and incrementing the other steps lol)
 1. Create a `plugin.slm` file inside the root of the project. Inside it, write your plugin metadata. Plugin metadata is written the exact same as Script metadata with the exception of removing the `--@nostd` and `--@plugins` keys.
 2. Create a `serpentlua.rc` file containing the following:
 `SERPENTLUA_METADATA RCDATA "plugin.slm"`
@@ -126,6 +128,8 @@
 - If you link any dynamic libraries to your plugin, insert them in the `{config_dir}/plugin_deps/plugin_filename/` folder.
   - plugin_filename: The name of your .slp file with the .slp extension omitted.
   - config_dir: The config directory of SerpentLua, located at `{gd_dir}/geode/config/yellowcat98.serpentlua/`
+
+- You can use any Lua wrapper you want, as this is just a DLL that links the Lua C API.
 
 #### Native plugin example worth looking at:
 [PluginTest](plugin_examples/yellowcat98.plugintest): A basic plugin example. Exposes a `the_Function` and a `coolVar` variable to Lua.

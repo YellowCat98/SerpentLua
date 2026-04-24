@@ -67,9 +67,7 @@ namespace SerpentLua::internal::ui {
 		bool plugin;
 
 		cocos2d::CCSize winSize;
-		std::map<std::string, void*, MapOrder> scripts; // it appears that it was a pain in the ass to use templates here, so im using a raw pointer and then converting it to either pluginmetadata or scriptmetadata! all of this just to avoid copying
-
-		
+		std::multimap<std::string, void*, MapOrder> scripts; // it appears that it was a pain in the ass to use templates here, so im using a raw pointer and then converting it to either pluginmetadata or scriptmetadata! all of this just to avoid copying
 
 		void pendingRestartListener(float dt);
 		cocos2d::CCSprite* pendingRestartIndicator;

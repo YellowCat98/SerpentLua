@@ -2,7 +2,6 @@
 #include <internal/ui/ScriptItem.hpp>
 #include <Geode/utils/async.hpp>
 #include <Geode/ui/GeodeUI.hpp>
-#include <type_traits>
 
 using namespace SerpentLua::internal::ui;
 using namespace geode::prelude;
@@ -76,11 +75,11 @@ void ScriptsLayer::setupScriptsList() {
 	
 	if (!plugin) {
 		for (const auto [k, v] : RuntimeManager::get()->getAllScripts()) {
-			scripts[k] = static_cast<void*>(v);
+			scripts.insert({k, static_cast<void*>(v)});
 		}
 	} else {
 		for (const auto [k, v] : RuntimeManager::get()->getAllPlugins()) {
-			scripts[k] = static_cast<void*>(v);
+			scripts.insert({k, static_cast<void*>(v)});
 		}
 	}
 
@@ -162,7 +161,7 @@ bool ScriptsLayer::init(bool plugin) {
 	this->currentPage = 1;
 	this->itemsPerPage = 10;
 	this->plugin = plugin;
-	this->scripts = std::map<std::string, void*, MapOrder>(MapOrder(plugin));
+	this->scripts = std::multimap<std::string, void*, MapOrder>(MapOrder(plugin));
 	this->infoLabel = CCLabelBMFont::create("", "goldFont.fnt");
 
 	this->infoLabel->setScale(0.5f);

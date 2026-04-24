@@ -1,3 +1,7 @@
+# 1.2.1
+- SL Plugin v1.1.1: Basic code improvements.
+- UI: Allow multiple scripts/plugins of the same name to appear in the UI.
+
 # 1.2.0
 - SL Plugin v1.1.0: Added new `enums` table.
 - SL Plugin v1.1.0: Added basic UI utilities.

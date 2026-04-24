@@ -180,7 +180,7 @@ Result<> ScriptBuiltin::initPlugin() {
 	if (ScriptBuiltin::plugin) return Err("Builtin plugin was already initialized.");
 	auto metadata = SerpentLua::PluginMetadata::createFromMod(Mod::get());
 	metadata->id = "serpentlua.std"; // i do not want to use create(std::map<std::string, std::string>) when this is very much simpler
-	metadata->version = "v1.1.0";
+	metadata->version = "v1.1.1";
 	auto res = SerpentLua::Plugin::create(metadata, ScriptBuiltin::entry);
 	if (res.isErr()) return Err("{}", res.err().value());
 
