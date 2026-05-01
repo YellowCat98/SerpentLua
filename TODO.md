@@ -2,9 +2,11 @@
 
 - (the top most unchecked todos are for the next SerpentLua update, the ones at the very bottom (marked Unrecognized) are unplanned for next update but still in mind. It mostly has breaking changes and stuff i dont want to deal with now)
 
-## 1.3.0
-- SL Plugin(1.2.0): Add FLAlertLayer utilities
+## 1.4.0
 - Plugins: Plugin repository.
+
+## 1.3.0
+- ~~SL Plugin (1.2.0): Add FLAlertLayer utilities.~~ ✓
 
 ## 1.2.0
 - ~~SL Plugin (1.1.0): Basic UI utilities.~~ ✓
@@ -36,4 +38,4 @@
 - ~~UI (1.0.0-alpha.2): Add an indicator when changes have been made~~ ✓
 
 ## Uncategorized
-- Plugin API (v2): Don't require metadata as first argument for the logging functions.
+- Native Plugin API (v2): Don't require metadata as first argument for the logging functions.

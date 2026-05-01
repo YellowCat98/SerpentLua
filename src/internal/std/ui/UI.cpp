@@ -58,6 +58,24 @@ ScriptBuiltin::ui::Node* ScriptBuiltin::ui::Node::create(sol::this_state state, 
 			ScriptBuiltin::ui::AttributeHandler::populateAttributesMenu(state, ret);
 			break;
 		}
+
+		case ScriptBuiltin::Enums::ui::NodeType::Alert: {
+			const char* title = options.get<const char*>("title");
+			std::string content = options["content"];
+			const char* btn1 = options.get<const char*>("btn1");
+			sol::object btn2Obj = options["btn2"];
+			const char* btn2 = (btn2Obj.get_type() == sol::type::string) ? btn2Obj.as<const char*>() : nullptr;
+			sol::function callback = options["callback"];
+
+			ret->node = geode::createQuickPopup(title, content, btn1, btn2, [callback](FLAlertLayer* sender, bool btn2) {
+				if (callback.get_type() != sol::type::nil) {
+					callback(sender, btn2);
+				}
+			}, false);
+
+			ScriptBuiltin::ui::AttributeHandler::populateAttributesAlert(state, ret);
+			break;
+		}
 	}
 
 	ret->type = type;
@@ -70,10 +88,10 @@ ScriptBuiltin::ui::Node* ScriptBuiltin::ui::Node::createFromCCNode(sol::this_sta
 
 	ret->type = type;
 
-    lua_State* L = state;
-    node.push(L);
-    CCNode* rawNode = *static_cast<CCNode**>(lua_touserdata(L, -1));
-    lua_pop(L, 1);
+	lua_State* L = state;
+	node.push(L);
+	CCNode* rawNode = *static_cast<CCNode**>(lua_touserdata(L, -1));
+	lua_pop(L, 1);
 
 	ret->node = rawNode;
 
@@ -156,6 +174,19 @@ void bindNodeWrappers(sol::state_view state, sol::table table) {
 		sol::state_view view(ts);
 		return ScriptBuiltin::ui::Node::create(ts, ScriptBuiltin::Enums::ui::NodeType::Menu, view.create_table());
 	});
+
+	table.set_function("createAlert",
+		[](sol::this_state ts, const char* title, const std::string& content, const char* btn1, sol::object btn2, sol::object function) {
+			sol::state_view view(ts);
+			return ScriptBuiltin::ui::Node::create(ts, ScriptBuiltin::Enums::ui::NodeType::Alert, view.create_table_with(
+				"title", title,
+				"content", content,
+				"btn1", btn1,
+				"btn2", btn2.is<const char*>() ? btn2.as<const char*>() : nullptr,
+				"callback", function
+			));
+		}
+	);
 }
 
 sol::table ScriptBuiltin::ui::entry(sol::state_view state) {

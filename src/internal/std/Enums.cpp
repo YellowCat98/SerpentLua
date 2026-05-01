@@ -13,7 +13,8 @@ sol::table createUITable(sol::state_view state) {
 		"Sprite", ScriptBuiltin::Enums::ui::NodeType::Sprite,
 		"Button", ScriptBuiltin::Enums::ui::NodeType::Button,
 		"Label", ScriptBuiltin::Enums::ui::NodeType::Label,
-		"Menu", ScriptBuiltin::Enums::ui::NodeType::Menu
+		"Menu", ScriptBuiltin::Enums::ui::NodeType::Menu,
+		"Alert", ScriptBuiltin::Enums::ui::NodeType::Alert
 	);
 
 	return table;

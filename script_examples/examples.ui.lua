@@ -25,6 +25,7 @@ local counter = 0
 	CCMenuItemSpriteExtra (NodeType.Button)
 	CCLabelBMFont (NodeType.Label)
 	CCMenu (NodeType.Menu)
+	FLAlertLayer (NodeType.Alert)
 ]]
 -- Any other types that aren't bound are registered of type Node.
 -- As long as a type derives from CCNode, it can be registered as Node.
@@ -55,6 +56,8 @@ Modify.createHook("hello-hook", "MenuLayer", "init", function(self)
 		counter = counter+1
 		label:method("setString")(string.format("Counter: %d", counter))
 	end)
+	-- You may also use SL.ui.createButton to create a button with another Node as its image.
+	-- SL.ui.createButtonWithSprite does the same thing as SL.ui.createButton(SL.ui.createSprite(sprite, framename), function).
 	-- The first argument is the sprite's name.
 	-- The second boolean argument is whether the sprite comes from a sprite sheet or not.
 	-- The last argument is the function that gets called when the button is pressed.
@@ -63,9 +66,21 @@ Modify.createHook("hello-hook", "MenuLayer", "init", function(self)
 
 	local menu = SL.ui.Node.getByID(selfNode, "bottom-menu")
 	menu:addChild(node)
-	-- Self explanatory.
+	-- Self explanatory, adds a node to a child.
+	-- doing addChild on bottom-menu automatically places the button inside it without having to do layout stuff.
+	-- You might need to call menu:method("updateLayout")() on some menus if the node isn't placed alongside the other buttons.
+	-- As of 1.3.0 SerpentLua does not have any layout support aside from the updateLayout function.
 
 	selfNode:addChild(label)
+
+	-- Below is an example of using the Alert node type.
+	local alertButton = SL.ui.createButtonWithSprite("GJ_button_02.png", false, function(sender) -- forgot to mention this, `sender` is just the button itself, though you have to use createFromCCNode to use it within the callback.
+		local alert = SL.ui.createAlert("SerpentLua", "Hello from my custom script!", "OK") -- (yes this is a reference to Geode SDK mod example)
+		alert:method("show")() -- Alert's only exclusive method is `show`.
+	end)
+
+	menu:addChild(alertButton)
+
 	return true
 end)
 
@@ -78,5 +93,6 @@ Modify.applyHook("hello-hook")
 	SL.ui.createButton <=> SL.ui.Node.create(SL.enums.ui.NodeType.Button, {image=Node, callback=function})
 	SL.ui.createLabel <=> SL.ui.Node.create(SL.enums.ui.NodeType.Label, {text=string, font=string})
 	SL.ui.createMenu <=> SL.ui.Node.create(SL.enums.ui.NodeType.Menu, {})
+	SL.ui.createAlert <=> SL.ui.Node.create(SL.enums.ui.NodeType.Alert, {title=string, content=string, btn1=string, btn2=string, callback=function})
 ]]
 -- I personally don't see any use case for these functions, but they're here if you want to use them.

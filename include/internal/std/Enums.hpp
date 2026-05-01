@@ -12,7 +12,8 @@ namespace SerpentLua::internal::ScriptBuiltin::Enums {
 			Sprite, // CCSprite
 			Button, // CCMenuItemExt
 			Label, // CCLabelBMFont
-			Menu // CCMenu
+			Menu, // CCMenu
+			Alert // FLAlertLayer
 		};
 	};
 };

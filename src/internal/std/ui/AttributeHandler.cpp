@@ -420,3 +420,15 @@ void ScriptBuiltin::ui::AttributeHandler::populateAttributesMenu(sol::state_view
 		return sol::make_object(state, sol::nil);
 	});
 }
+
+void ScriptBuiltin::ui::AttributeHandler::populateAttributesAlert(sol::state_view state, Node* node) {
+	if (!node) return;
+	DEFINE_ADD_LAMBDA(add);
+	ScriptBuiltin::ui::AttributeHandler::populateAttributesNode(state, node);
+
+	add("show", [state](CCNode* ccnode, std::optional<sol::object> value) {
+		auto alert = static_cast<FLAlertLayer*>(ccnode);
+		alert->show();
+		return sol::make_object(state, sol::nil);
+	});
+}

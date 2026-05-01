@@ -1,3 +1,6 @@
+# 1.3.0
+- SL Plugin v1.2.0: Add new Alert node type.
+
 # 1.2.1
 - SL Plugin v1.1.1: Basic code improvements.
 - UI: Allow multiple scripts/plugins of the same name to appear in the UI.
