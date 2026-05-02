@@ -84,7 +84,7 @@ void script::terminate() {
 	// this is quite sad
 	// the next thing i will do is script termination
 	auto res = RuntimeManager::get()->removeLoadedScript(this->metadata->id); // maybe we should remove it from loaded scripts too!
-	if (res.isErr()) log::error("Script {} termination: ", res.err().value());
+	if (res.isErr()) log::error("Script {} termination: {}", this->metadata->id, res.err().value());
 	delete this;
 	// will thi even compiling
 	// ok c/c++ extension thinks it will compile
