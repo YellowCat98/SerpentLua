@@ -35,15 +35,19 @@ CPMAddPackage(
 	DOWNLOAD_ONLY TRUE
 )
 
-if(PROJECT_IS_TOP_LEVEL) # sol is purely used for serpentlua's internal plugin
-	CPMAddPackage(
-		NAME sol2
-		GITHUB_REPOSITORY ThePhD/sol2
-		VERSION 3.5.0 # wonder who taught it was a good idea to not make the actual latest version the latest version!
-	)
+CPMAddPackage(
+	NAME sol2
+	GITHUB_REPOSITORY ThePhD/sol2
+	VERSION 3.5.0 # wonder who taught it was a good idea to not make the actual latest version the latest version!
+)
+target_include_directories(${PROJECT_NAME} PRIVATE ${sol2_SOURCE_DIR}/include)
 
-	target_include_directories(${PROJECT_NAME} PRIVATE ${sol2_SOURCE_DIR}/include)
-endif()
+CPMAddPackage(
+	NAME argon
+	GITHUB_REPOSITORY GlobedGD/argon
+	VERSION 1.4.9
+)
+target_link_libraries(${PROJECT_NAME} argon)
 
 # build lua both statically and dynmamically so you can link against it
 

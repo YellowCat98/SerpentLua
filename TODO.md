@@ -39,3 +39,8 @@
 
 ## Uncategorized
 - Native Plugin API (v2): Don't require metadata as first argument for the logging functions.
+
+## 1.5.0 (After 1.4.0)
+- UI: Fix padding.
+- Settings: Add a "install lua.dll" option and make the lua.dll popup redirect you there.
+- SL Plugin (1.3.0): Add a `Notification` type that wraps around `

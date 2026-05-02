@@ -1,3 +1,7 @@
+# 1.4.0
+- Internal: Reorganize code.
+- UI: Add a "never show again" option in the `lua.dll` popup.
+
 # 1.3.0
 - SL Plugin v1.2.0: Add new Alert node type.
 

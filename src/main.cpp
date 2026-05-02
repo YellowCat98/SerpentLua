@@ -1,6 +1,5 @@
 #include <Geode/Geode.hpp>
 #include <SerpentLua.hpp>
-#include <Geode/modify/MenuLayer.hpp>
 #include <internal/SerpentLua.hpp>
 #include <internal/ui/ScriptsLayer.hpp>
 #include <internal/std/PluginEntry.hpp>
@@ -93,88 +92,4 @@ $on_mod(Loaded) {
 			SerpentLua::internal::StartupOperations::unfortunatelyDeleteTheUnfortunates();
 		});
 	});
-
-	// and now for the scripts!
-	//SerpentLua::internal::StartupOperations::loadScripts();
-
-	//log::info("Terminating unused plugins...");
-	//SerpentLua::internal::StartupOperations::unfortunatelyDeleteTheUnfortunates();
 }
-
-
-class $modify(MenuLayerHook, MenuLayer) {
-	bool init() {
-		if (!MenuLayer::init()) return false;
-
-		static bool shownMissingWarning = std::filesystem::exists(Mod::get()->getConfigDir()/"plugin_global_deps"/"lua.dll");
-		// assume the user has seen the warning beforehand if the file exists, so instead of checking for both std::filesystem::exists and if the user saw the warning, we only check one variable!
-		if (!shownMissingWarning) {
-			auto alert = FLAlertLayer::create(nullptr, "SerpentLua: Missing DLL",
-				fmt::format(
-					"<cb>lua.dll</c> was not found in the <cj>SerpentLua</c> config <cd>directory</c>.\n"
-					"<cb>lua.dll</c> is <ca>essential</c> for <cp>plugins</c> to <cy>work</c>.\n"
-					"<cp>Scripts</c> will load <cf>fine</c>, however they will <cr>not</c> be able to <cy>use</c> <cp>plugins</c>.\n"
-					"Please install <cb>lua.dll</c> at the following <cd>path</c>:\n<cg>{}</c>",
-					Mod::get()->getConfigDir()/"plugin_global_deps"/"lua.dll"
-				).c_str(),
-				"OK", nullptr, 400, true, 0, 1
-			);
-
-			auto tooManyColors = CCLabelBMFont::create("Did I color too many words? I think I colored too many words.", "chatFont.fnt");
-			tooManyColors->setID("too-many-color"_spr);
-			tooManyColors->setOpacity(51);
-			tooManyColors->setScale(0.7f);
-
-			auto alertSize = alert->m_mainLayer->getContentSize();
-
-			tooManyColors->setAnchorPoint({0.5f, 0.0f});
-			tooManyColors->setPosition({ alertSize.width / 2, 7.0f });
-
-			alert->m_mainLayer->addChild(tooManyColors);
-
-			alert->m_scene = this;
-			alert->show();
-
-			shownMissingWarning = true;
-		}
-/*
-		if (Mod::get()->setSavedValue<bool>("should-show-warning", false)) {
-			auto popup = geode::createQuickPopup("SerpentLua: Dev mode enabled!",
-				"It appears that you have enabled dev mode.\n"
-				"Dev mode is a setting that allows any plugin to load, regardless if it was imported through the plugin importer or not.\n"
-				"This setting is meant for plugin developers.\n"
-				"This setting did not apply as a safety measure.\n"
-				"If you want this setting to apply, restart the game.\n"
-				"Otherwise, disable this setting.",
-				"Disable", "Cancel",
-				[](FLAlertLayer*, bool btn2) {
-					if (!btn2) {
-						Mod::get()->setSettingValue<bool>("dev-mode", false);
-					}
-
-					geode::createQuickPopup("Restart",
-						"Would you like to restart now?",
-						"Later", "Restart",
-						[](FLAlertLayer*, bool btn2) {
-							if (btn2) utils::game::restart(true);
-						}
-					);
-				}, false);
-
-			popup->m_scene = this;
-			popup->show();
-		}
-*/
-
-		auto bottomMenu = static_cast<CCMenu*>(this->getChildByID("bottom-menu"));
-		auto btn = CCMenuItemExt::createSpriteExtra(CircleButtonSprite::create(CCSprite::create("serpentluaButton.png"_spr), CircleBaseColor::Green, CircleBaseSize::MediumAlt), [](CCObject*) {
-			CCDirector::get()->pushScene(CCTransitionFade::create(0.5f, ui::ScriptsLayer::scene(false)));
-		});
-		btn->setID("serpentlua-btn"_spr);
-		bottomMenu->addChild(btn);
-
-		bottomMenu->updateLayout();
-
-		return true;
-	}
-};
