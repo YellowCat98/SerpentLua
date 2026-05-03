@@ -13,6 +13,16 @@ namespace SerpentLua::internal {
 		static void unfortunatelyDeleteTheUnfortunates();
 	};
 
+	class AuthManager {
+	public:
+		static AuthManager* get();
+
+		void authenticate(std::function<void(geode::Result<>)> callback);
+	private:
+		bool authenticated;
+		std::string token;
+	};
+
 	class script {
 	public:
 		static geode::Result<script*, std::string> create(ScriptMetadata* metadata);

@@ -3,6 +3,7 @@
 #include <Geode/modify/MenuLayer.hpp>
 #include <internal/SerpentLua.hpp>
 #include <internal/ui/ScriptsLayer.hpp>
+#include <argon/argon.hpp>
 
 using namespace geode::prelude;
 using namespace SerpentLua::internal;
@@ -18,8 +19,31 @@ class igiveup : public FLAlertLayerProtocol {
 };
 
 class $modify(SexyMenuLayer, MenuLayer) {
+	struct Fields {
+		async::TaskHolder<Result<std::string>> m_listener;
+	};
+
 	bool init() {
 		if (!MenuLayer::init()) return false;
+
+/*
+		if (Mod::get()->getSettingValue<bool>("should-authenticate")) {
+			m_fields->m_listener.spawn(
+				argon::startAuth(),
+				[](Result<std::string> res) {
+					if (res.isOk()) {
+						Notification::create("SerpentLua: Authentication succeeded", NotificationIcon::Success);
+					} else {
+						FLAlertLayer::create(
+							"Authentication",
+							fmt::format("An error occurred while authenticating with Argon: {}", res.unwrapErr()).c_str(),
+							"OK"
+						)->show();
+					}
+				}
+			);
+		}
+*/
 
 		static bool shownMissingWarning = std::filesystem::exists(Mod::get()->getConfigDir()/"plugin_global_deps"/"lua.dll");
 		// assume the user has seen the warning beforehand if the file exists, so instead of checking for both std::filesystem::exists and if the user saw the warning, we only check one variable!

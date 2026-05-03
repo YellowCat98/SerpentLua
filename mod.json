@@ -45,6 +45,13 @@
 			"type": "bool",
 			"default": false,
 			"requires-restart": true
+		},
+		"should-authenticate": {
+			"name": "Authenticate with Argon",
+			"description": "Determines whether to authenticate with Argon or not.\nThis is usually not needed for the average user.",
+			"type": "bool",
+			"default": false,
+			"requires-restart": true
 		}
 	}
 }
