@@ -13,14 +13,22 @@ namespace SerpentLua::internal {
 		static void unfortunatelyDeleteTheUnfortunates();
 	};
 
-	class AuthManager {
+	class ServerManager {
 	public:
-		static AuthManager* get();
 
-		void authenticate(std::function<void(geode::Result<>)> callback);
+		static ServerManager* get();
+
+		void setServerUrl(const std::string& url);
+		void setSessionToken(const std::string& token);
+
+		std::string getEndpoint(const std::string& path);
+
+		geode::utils::web::WebRequest createReq(bool withAuth = false); // withAuth just passes in the session token as Authorization lol!
+
+		void sendReq(geode::async::TaskHolder<geode::utils::web::WebResponse>& listener, const std::string& method, const std::string& path, geode::utils::web::WebRequest& req, std::function<void(geode::utils::web::WebResponse)> lambda);
 	private:
-		bool authenticated;
-		std::string token;
+		std::string sessionToken;
+		std::string url;
 	};
 
 	class script {

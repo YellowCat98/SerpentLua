@@ -21,18 +21,36 @@ class igiveup : public FLAlertLayerProtocol {
 class $modify(SexyMenuLayer, MenuLayer) {
 	struct Fields {
 		async::TaskHolder<Result<std::string>> m_listener;
+		async::TaskHolder<web::WebResponse> m_weblistener;
 	};
 
 	bool init() {
 		if (!MenuLayer::init()) return false;
 
-/*
 		if (Mod::get()->getSettingValue<bool>("should-authenticate")) {
 			m_fields->m_listener.spawn(
 				argon::startAuth(),
-				[](Result<std::string> res) {
+				[this](Result<std::string> res) {
 					if (res.isOk()) {
 						Notification::create("SerpentLua: Authentication succeeded", NotificationIcon::Success);
+
+						auto web = ServerManager::get()->createReq("/api/v1/auth/validate");
+						auto json = matjson::makeObject({
+							{"account_id", argon::getGameAccountData().accountId},
+							{"argon_token", res.unwrap()}
+						});
+
+						web.bodyJSON(json);
+						web.header("Content-Type", "application/json");
+
+						ServerManager::get()->sendReq(m_fields->m_weblistener, "POST", "/api/v1/auth/validate", web,
+							[](web::WebResponse response) {
+								if (response.string().isOk()) {
+									ServerManager::get()->setSessionToken(response.string().unwrap());
+									Notification::create("SerpentLua: Authenticated successfully!", NotificationIcon::Success)->show();
+								}
+							}
+						);
 					} else {
 						FLAlertLayer::create(
 							"Authentication",
@@ -43,7 +61,7 @@ class $modify(SexyMenuLayer, MenuLayer) {
 				}
 			);
 		}
-*/
+
 
 		static bool shownMissingWarning = std::filesystem::exists(Mod::get()->getConfigDir()/"plugin_global_deps"/"lua.dll");
 		// assume the user has seen the warning beforehand if the file exists, so instead of checking for both std::filesystem::exists and if the user saw the warning, we only check one variable!
