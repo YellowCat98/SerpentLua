@@ -207,18 +207,9 @@ bool ScriptsLayer::init(bool plugin) {
 	actionsMenu->setContentSize({38.0f, 200.0f});
 	actionsMenu->setID("actions-menu");
 
-
-	auto pluginsBtn = CCMenuItemExt::createSpriteExtra(CircleButtonSprite::create(CCSprite::create(this->plugin ? "script.png"_spr : "plugin.png"_spr), CircleBaseColor::Green, CircleBaseSize::Small), [this](CCObject*) {
-		auto layer = ScriptsLayer::scene(!this->plugin);
-		CCDirector::get()->replaceScene(CCTransitionFade::create(0.5f, layer)); // we shouldnt really do pushScene here, as then pressing the button repeatedly will cause the scene stack to fill up
-		// doing popScene after replaceScene was called will send you back to the main menu.
-	});
-	pluginsBtn->setID("plugins-btn");
-
 	auto JeomETRYdASH = CCMenuItemSpriteExtra::create(CircleButtonSprite::create(CCSprite::create(this->plugin ? "plugin_import.png"_spr : "script_import.png"_spr), CircleBaseColor::Green, CircleBaseSize::Small), this, menu_selector(ScriptsLayer::importPlugin));
 	JeomETRYdASH->setID("import-btn");
 
-	actionsMenu->addChild(pluginsBtn);
 	actionsMenu->addChild(JeomETRYdASH);
 
 	auto rightActionsMenu = CCMenu::create();

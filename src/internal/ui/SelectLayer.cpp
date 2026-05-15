@@ -1,5 +1,6 @@
 #include "Geode/ui/General.hpp"
 #include "Geode/ui/Layout.hpp"
+#include "ui/ScriptsLayer.hpp"
 #include <Geode/binding/CCMenuItemSpriteExtra.hpp>
 #include <internal/ui/SelectLayer.hpp>
 
@@ -40,7 +41,7 @@ bool SelectLayer::init() {
 	auto scriptsSpr = CategoryButtonSprite::createWithSprite("script_select.png"_spr);
 
 	auto scriptsBtn = CCMenuItemExt::createSpriteExtra(scriptsSpr, [](CCMenuItemSpriteExtra* sender) {
-		log::info("Feet!");
+		CCDirector::get()->pushScene(CCTransitionFade::create(0.5f, ui::ScriptsLayer::scene(false)));
 	});
 
 	buttonMenu->addChild(scriptsBtn);
@@ -48,7 +49,7 @@ bool SelectLayer::init() {
 	auto pluginsSpr = CategoryButtonSprite::createWithSprite("plugin_select.png"_spr);
 
 	auto pluginsBtn = CCMenuItemExt::createSpriteExtra(pluginsSpr, [](CCMenuItemSpriteExtra* sender) {
-		log::info("Feet!");
+		CCDirector::get()->pushScene(CCTransitionFade::create(0.5f, ui::ScriptsLayer::scene(true)));
 	});
 
 	buttonMenu->addChild(pluginsBtn);
