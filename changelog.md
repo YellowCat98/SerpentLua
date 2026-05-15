@@ -1,6 +1,8 @@
 # 1.4.0
 - Internal: Reorganize code.
 - UI: Add a "never show again" option in the `lua.dll` popup.
+- UI: Added new select UI for plugins, scripts, and downloading new plugins.
+- UI: Removed plugin/script button in scripts/plugins UI.
 - Script termination: Log error properly (how did it take me this long to find this)
 
 # 1.3.0
