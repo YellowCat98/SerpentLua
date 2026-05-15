@@ -158,6 +158,7 @@ bool ScriptsLayer::init(bool plugin) {
 	this->setKeypadEnabled(true);
 	winSize = CCDirector::get()->getWinSize();
 
+	this->setID("ScriptsLayer"_spr);
 	this->currentPage = 1;
 	this->itemsPerPage = 10;
 	this->plugin = plugin;

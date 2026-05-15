@@ -3,6 +3,7 @@
 #include <Geode/modify/MenuLayer.hpp>
 #include <internal/SerpentLua.hpp>
 #include <internal/ui/ScriptsLayer.hpp>
+#include <internal/ui/SelectLayer.hpp>
 #include <argon/argon.hpp>
 
 using namespace geode::prelude;
@@ -27,7 +28,10 @@ class $modify(SexyMenuLayer, MenuLayer) {
 	bool init() {
 		if (!MenuLayer::init()) return false;
 
-		if (Mod::get()->getSettingValue<bool>("should-authenticate")) {
+
+		static bool shouldAuthenticate = Mod::get()->getSettingValue<bool>("should-authenticate");
+		if (shouldAuthenticate) {
+			log::info("Authenticating...");
 			m_fields->m_listener.spawn(
 				argon::startAuth(),
 				[this](Result<std::string> res) {
@@ -45,21 +49,21 @@ class $modify(SexyMenuLayer, MenuLayer) {
 
 						ServerManager::get()->sendReq(m_fields->m_weblistener, "POST", "/api/v1/auth/validate", web,
 							[](web::WebResponse response) {
-								if (response.string().isOk()) {
+								if (response.ok() && response.string().isOk()) {
 									ServerManager::get()->setSessionToken(response.string().unwrap());
 									Notification::create("SerpentLua: Authenticated successfully!", NotificationIcon::Success)->show();
+								} else {
+									Notification::create("SerpentLua: Server Authentication failed.", NotificationIcon::Error)->show();
 								}
 							}
 						);
 					} else {
-						FLAlertLayer::create(
-							"Authentication",
-							fmt::format("An error occurred while authenticating with Argon: {}", res.unwrapErr()).c_str(),
-							"OK"
-						)->show();
+						Notification::create("SerpentLua: Argon Authentication failed", NotificationIcon::Error)->show();
 					}
 				}
 			);
+
+			shouldAuthenticate = false;
 		}
 
 
@@ -103,7 +107,7 @@ class $modify(SexyMenuLayer, MenuLayer) {
 
 		auto bottomMenu = static_cast<CCMenu*>(this->getChildByID("bottom-menu"));
 		auto btn = CCMenuItemExt::createSpriteExtra(CircleButtonSprite::create(CCSprite::create("serpentluaButton.png"_spr), CircleBaseColor::Green, CircleBaseSize::MediumAlt), [](CCObject*) {
-			CCDirector::get()->pushScene(CCTransitionFade::create(0.5f, ui::ScriptsLayer::scene(false)));
+			CCDirector::get()->pushScene(CCTransitionFade::create(0.5f, ui::SelectLayer::scene()));
 		});
 		btn->setID("serpentlua-btn"_spr);
 		bottomMenu->addChild(btn);
