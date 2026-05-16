@@ -1,3 +1,4 @@
+#include <Geode/binding/CCMenuItemSpriteExtra.hpp>
 #include <internal/ui/ScriptItem.hpp>
 
 using namespace geode::prelude;
@@ -101,60 +102,66 @@ bool ScriptItem::init(const DisplayInfo& theMetadata, std::function<void(CCMenuI
 	viewMenu->setAnchorPoint({1.0f, 0.5f});
 	viewMenu->setScale(0.4f);
 
+	viewBtn = CCMenuItemExt::createTogglerWithFrameName("GJ_checkOn_001.png", "GJ_checkOff_001.png", 1.5f, onButton);
+	viewBtn->toggle(current.has_value() ? *current : false);
+	viewBtn->setID("toggle");
+	viewMenu->addChild(viewBtn);
 
-	if (source != Source::Index) {
-		viewBtn = CCMenuItemExt::createTogglerWithFrameName("GJ_checkOn_001.png", "GJ_checkOff_001.png", 1.5f, onButton);
-		viewBtn->toggle(current.has_value() ? *current : false);
-		viewBtn->setID("toggle");
-		viewMenu->addChild(viewBtn);
+	if (this->source == Source::Plugins || this->source == Source::Index) viewBtn->setVisible(false);
 
-		auto deleteBtn = CCMenuItemExt::createSpriteExtra(
-			ButtonSprite::create(
-				CCSprite::createWithSpriteFrameName("edit_delBtn_001.png"),
-				42, true, 40, "GJ_button_04.png", 1),
-			[=, this](CCMenuItemSpriteExtra*) {
-				if (this->source == Source::Plugins) if (!metadata.native) return;
+	auto deleteBtn = CCMenuItemExt::createSpriteExtra(
+		ButtonSprite::create(
+			CCSprite::createWithSpriteFrameName("edit_delBtn_001.png"),
+			42, true, 40, "GJ_button_04.png", 1),
+		[=, this](CCMenuItemSpriteExtra*) {
+			if (this->source == Source::Plugins) if (!metadata.native) return;
 
-				geode::createQuickPopup("Confirm",
-					fmt::format("Are you sure you would like to <cr>delete</c> \"{}\"?\nThis action is <cr>irreversible</c>!", metadata.name),
-					"Cancel", "Delete",
-					[=, this](FLAlertLayer*, bool btn2) {
-						if (btn2) {
-							std::error_code ec;
-							bool removed = std::filesystem::remove(metadata.path, ec);
-							if (ec) {
-								std::string message;
-								if (ec.value() == 5) message = "<cr>This usually means a script is using this plugin.</c>";
-								FLAlertLayer::create("Error", fmt::format("Error: \"{}\" (Code: {})\n{}", ec.message(), ec.value(), message).c_str(), "OK")->show();
-							} else if (removed) {
-								FLAlertLayer::create("Success", fmt::format("\"{}\" was removed <cg>successfully</c>!", metadata.name).c_str(), "OK")->show();
-								ScriptsLayer::changesMade();
-							}
+			geode::createQuickPopup("Confirm",
+				fmt::format("Are you sure you would like to <cr>delete</c> \"{}\"?\nThis action is <cr>irreversible</c>!", metadata.name),
+				"Cancel", "Delete",
+				[=, this](FLAlertLayer*, bool btn2) {
+					if (btn2) {
+						std::error_code ec;
+						bool removed = std::filesystem::remove(metadata.path, ec);
+						if (ec) {
+							std::string message;
+							if (ec.value() == 5) message = "<cr>This usually means a script is using this plugin.</c>";
+							FLAlertLayer::create("Error", fmt::format("Error: \"{}\" (Code: {})\n{}", ec.message(), ec.value(), message).c_str(), "OK")->show();
+						} else if (removed) {
+							FLAlertLayer::create("Success", fmt::format("\"{}\" was removed <cg>successfully</c>!", metadata.name).c_str(), "OK")->show();
+							ScriptsLayer::changesMade();
 						}
 					}
-				);
-			});
-		deleteBtn->setID("delete-button");
-
-		if (this->source == Source::Plugins) deleteBtn->setVisible(metadata.native);
-		else deleteBtn->setVisible(true);
-
-		viewMenu->addChild(deleteBtn);
-
-		// @geode-ignore(unknown-resource)
-		auto errorBtn = CCMenuItemExt::createSpriteExtraWithFrameName("geode.loader/info-alert.png", 1.5f, [this](CCMenuItemSpriteExtra*) {
-			std::string errorString = fmt::format("{}", fmt::join(std::get<ScriptMetadata*>(metadata.internal)->errors, "\n"));
-			MDPopup::create("Errors", errorString, "OK")->show();
+				}
+			);
 		});
-		errorBtn->setID("error-button");
+	deleteBtn->setID("delete-button");
 
-		if (this->source != Source::Scripts) errorBtn->setVisible(false);
-		else if (std::get<ScriptMetadata*>(metadata.internal)->errors.empty()) errorBtn->setVisible(false);
+	if (this->source == Source::Plugins) deleteBtn->setVisible(metadata.native);
+	else if (this->source == Source::Scripts) deleteBtn->setVisible(true);
+	else deleteBtn->setVisible(false);
 
-		viewMenu->addChild(errorBtn);
+	viewMenu->addChild(deleteBtn);
 
-		if (this->source == Source::Plugins) viewBtn->setVisible(false);
-	}
+	// @geode-ignore(unknown-resource)
+	auto errorBtn = CCMenuItemExt::createSpriteExtraWithFrameName("geode.loader/info-alert.png", 1.5f, [this](CCMenuItemSpriteExtra*) {
+		std::string errorString = fmt::format("{}", fmt::join(std::get<ScriptMetadata*>(metadata.internal)->errors, "\n"));
+		MDPopup::create("Errors", errorString, "OK")->show();
+	});
+	errorBtn->setID("error-button");
+
+	if (this->source != Source::Scripts) errorBtn->setVisible(false);
+	else if (std::get<ScriptMetadata*>(metadata.internal)->errors.empty()) errorBtn->setVisible(false);
+
+	viewMenu->addChild(errorBtn);
+
+	auto infoBtn = CCMenuItemExt::createSpriteExtraWithFrameName("GJ_infoIcon_001.png", 1.5f, [&](CCMenuItemSpriteExtra*) {
+		FLAlertLayer::create("info", metadata.description.c_str(), "wow! helpfulness.")->show();
+	});
+	
+	if (this->source != Source::Index) infoBtn->setVisible(false);
+
+	viewMenu->addChild(infoBtn);
 
 	viewMenu->setLayout(
 		RowLayout::create()
