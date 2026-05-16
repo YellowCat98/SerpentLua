@@ -70,30 +70,26 @@ void ScriptsLayer::loadPage(int page) {
 
 
 void ScriptsLayer::setupScriptsList() {
-	CCArray* scriptItems = CCArray::create();
-	
-	
 	if (this->source == Source::Scripts) {
 		for (const auto [k, v] : RuntimeManager::get()->getAllScripts()) {
-			scripts.insert({k, static_cast<void*>(v)});
+			scripts.push_back({k, static_cast<void*>(v)});
+			nameCache.insert({k, v->name});
 		}
 	} else {
 		for (const auto [k, v] : RuntimeManager::get()->getAllPlugins()) {
-			scripts.insert({k, static_cast<void*>(v)});
+			scripts.push_back({k, static_cast<void*>(v)});
+			nameCache.insert({k, v->name});
 		}
 	}
 
-/*
-	for (auto& script : SerpentLua::internal::RuntimeManager::get()->getAllScripts()) {
-		scriptItems->addObject(ScriptItem::create(script.second, [](CCMenuItemToggler* button) {
-			auto item = typeinfo_cast<ScriptItem*>(button->getParent()->getParent()); // normally this should never return nullptr, but just in case!
-			if (!item) return;
-			auto metadata = item->metadata;
-			Mod::get()->setSavedValue<bool>(fmt::format("enabled-{}", metadata->id), !button->isToggled());
-		}, CCSize(358.0f, 30)));
-	}
-*/
-	
+	std::sort(scripts.begin(), scripts.end(), [&](const auto& a, const auto& b) {
+		if (source == Source::Plugins) {
+			if (a.first == "serpentlua.std") return true;
+			if (b.first == "serpentlua.std") return false;
+		}
+		
+		return nameCache[a.first] < nameCache[b.first];
+	});
 
 /*
 	for (int i = 0; i < 81; i++) {
@@ -162,7 +158,7 @@ bool ScriptsLayer::init(Source source) {
 	this->currentPage = 1;
 	this->itemsPerPage = 10;
 	this->source = source;
-	this->scripts = std::multimap<std::string, void*, MapOrder>(MapOrder(source));
+	this->scripts = {};
 	this->infoLabel = CCLabelBMFont::create("", "goldFont.fnt");
 
 	this->infoLabel->setScale(0.5f);

@@ -12,31 +12,6 @@ namespace SerpentLua::internal::ui {
 		Index
 	};
 
-	struct MapOrder {
-		Source source;
-
-		MapOrder() = default;
-		MapOrder(Source source) : source(source) {}
-
-		bool operator()(const std::string& a, const std::string& b) const {
-			std::string newA;
-			std::string newB;
-
-			if (source == Source::Plugins) {
-				if (a == "serpentlua.std") return true;
-				if (b == "serpentlua.std") return false;
-
-				newA = SerpentLua::internal::RuntimeManager::get()->getPluginByID(a).unwrap()->name; // it is safe to do unwrap without error checking because the map using this is populated using getAllPlugins and getAllScripts
-				newB = SerpentLua::internal::RuntimeManager::get()->getPluginByID(b).unwrap()->name;
-			} else {
-				newA = SerpentLua::internal::RuntimeManager::get()->getScriptByID(a).unwrap()->name;
-				newB = SerpentLua::internal::RuntimeManager::get()->getScriptByID(b).unwrap()->name;
-			}
-
-			return newA < newB;
-		}
-	};
-
 	class ScriptsLayer : public cocos2d::CCLayer {
 	public:
 		static ScriptsLayer* create(Source source); // whether to make it show plugins or show scripts
@@ -74,7 +49,8 @@ namespace SerpentLua::internal::ui {
 		Source source;
 
 		cocos2d::CCSize winSize;
-		std::multimap<std::string, void*, MapOrder> scripts; // it appears that it was a pain in the ass to use templates here, so im using a raw pointer and then converting it to either pluginmetadata or scriptmetadata! all of this just to avoid copying
+		std::vector<std::pair<std::string, void*>> scripts; // it appears that it was a pain in the ass to use templates here, so im using a raw pointer and then converting it to either pluginmetadata or scriptmetadata! all of this just to avoid copying
+		std::unordered_map<std::string, std::string> nameCache; // caches the plugins and scripts names so we can use them in the comparator without having to use runtimemanager to look up
 
 		void pendingRestartListener(float dt);
 		cocos2d::CCSprite* pendingRestartIndicator;
