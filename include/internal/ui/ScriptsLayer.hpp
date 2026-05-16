@@ -5,17 +5,24 @@
 
 namespace SerpentLua::internal::ui {
 	// this takes into account always on top members of std::map<std::string, T>
+
+	enum class Source {
+		Scripts,
+		Plugins,
+		Index
+	};
+
 	struct MapOrder {
-		bool plugin;
+		Source source;
 
 		MapOrder() = default;
-		MapOrder(bool plugin) : plugin(plugin) {}
+		MapOrder(Source source) : source(source) {}
 
 		bool operator()(const std::string& a, const std::string& b) const {
 			std::string newA;
 			std::string newB;
 
-			if (plugin) {
+			if (source == Source::Plugins) {
 				if (a == "serpentlua.std") return true;
 				if (b == "serpentlua.std") return false;
 
@@ -32,15 +39,15 @@ namespace SerpentLua::internal::ui {
 
 	class ScriptsLayer : public cocos2d::CCLayer {
 	public:
-		static ScriptsLayer* create(bool plugin); // whether to make it show plugins or show scripts
-		static cocos2d::CCScene* scene(bool plugin);
+		static ScriptsLayer* create(Source source); // whether to make it show plugins or show scripts
+		static cocos2d::CCScene* scene(Source source);
 		inline static bool pendingRestart = false; // making it static allows for when you enter the plugins ui the indicator is still there
 		static void changesMade();
 	private:
 
 		void keyBackClicked() override;
 
-		bool init(bool plugin);
+		bool init(Source source);
 
 		void setupScriptsList();
 
@@ -64,7 +71,7 @@ namespace SerpentLua::internal::ui {
 		int currentPage;
 		int itemsPerPage;
 
-		bool plugin;
+		Source source;
 
 		cocos2d::CCSize winSize;
 		std::multimap<std::string, void*, MapOrder> scripts; // it appears that it was a pain in the ass to use templates here, so im using a raw pointer and then converting it to either pluginmetadata or scriptmetadata! all of this just to avoid copying

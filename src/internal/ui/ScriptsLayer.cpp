@@ -40,7 +40,7 @@ void ScriptsLayer::loadPage(int page) {
 				return; // even though by default you shouldnt be able to reach this button, you can make it visible and clickable through devtools, which is bad
 			}
 			Mod::get()->setSavedValue<bool>(fmt::format("enabled-{}", std::get<ScriptMetadata*>(metadata)->id), !button->isToggled());
-		}, CCSize(358.0f, 30), plugin));
+		}, CCSize(358.0f, 30), source));
 	}
 
 	backBtn->setVisible(true);
@@ -73,7 +73,7 @@ void ScriptsLayer::setupScriptsList() {
 	CCArray* scriptItems = CCArray::create();
 	
 	
-	if (!plugin) {
+	if (this->source == Source::Scripts) {
 		for (const auto [k, v] : RuntimeManager::get()->getAllScripts()) {
 			scripts.insert({k, static_cast<void*>(v)});
 		}
@@ -112,7 +112,7 @@ void ScriptsLayer::setupScriptsList() {
 
 	auto listView = ListView::create(CCArray::create(), 30);
 	
-	m_scriptsListLayer = GJListLayer::create(listView, plugin ? "plugins" : "scripts", {194, 114, 62, 255}, 358.0f, 220.0f, 0);
+	m_scriptsListLayer = GJListLayer::create(listView, this->source == Source::Plugins ? "plugins" : "scripts", {194, 114, 62, 255}, 358.0f, 220.0f, 0);
 	m_scriptsListLayer->setID("script-list"); // normally i WOULD make it so it would be plugins-list if it was a plugin but eh it would be too wonky
 	auto listlayerSize = m_scriptsListLayer->getContentSize();
 	m_scriptsListLayer->setPosition(ccp((winSize.width - listlayerSize.width)/2, (winSize.height - listlayerSize.height)/2));
@@ -153,7 +153,7 @@ void ScriptsLayer::callbackMovePage(CCObject* object) {
 	this->loadPage(this->currentPage + object->getTag());
 }
 
-bool ScriptsLayer::init(bool plugin) {
+bool ScriptsLayer::init(Source source) {
 	if (!CCLayer::init()) return false;
 	this->setKeypadEnabled(true);
 	winSize = CCDirector::get()->getWinSize();
@@ -161,8 +161,8 @@ bool ScriptsLayer::init(bool plugin) {
 	this->setID("ScriptsLayer"_spr);
 	this->currentPage = 1;
 	this->itemsPerPage = 10;
-	this->plugin = plugin;
-	this->scripts = std::multimap<std::string, void*, MapOrder>(MapOrder(plugin));
+	this->source = source;
+	this->scripts = std::multimap<std::string, void*, MapOrder>(MapOrder(source));
 	this->infoLabel = CCLabelBMFont::create("", "goldFont.fnt");
 
 	this->infoLabel->setScale(0.5f);
@@ -207,7 +207,7 @@ bool ScriptsLayer::init(bool plugin) {
 	actionsMenu->setContentSize({38.0f, 200.0f});
 	actionsMenu->setID("actions-menu");
 
-	auto JeomETRYdASH = CCMenuItemSpriteExtra::create(CircleButtonSprite::create(CCSprite::create(this->plugin ? "plugin_import.png"_spr : "script_import.png"_spr), CircleBaseColor::Green, CircleBaseSize::Small), this, menu_selector(ScriptsLayer::importPlugin));
+	auto JeomETRYdASH = CCMenuItemSpriteExtra::create(CircleButtonSprite::create(CCSprite::create(this->source == Source::Plugins ? "plugin_import.png"_spr : "script_import.png"_spr), CircleBaseColor::Green, CircleBaseSize::Small), this, menu_selector(ScriptsLayer::importPlugin));
 	JeomETRYdASH->setID("import-btn");
 
 	actionsMenu->addChild(JeomETRYdASH);
@@ -297,7 +297,7 @@ void ScriptsLayer::startImport(std::filesystem::path path, std::filesystem::path
 		)->show();
 	} else {
 		ScriptsLayer::changesMade();
-		if (this->plugin) Mod::get()->setSavedValue<bool>(fmt::format("safe-{}", path.stem()), true);
+		if (this->source == Source::Plugins) Mod::get()->setSavedValue<bool>(fmt::format("safe-{}", path.stem()), true);
 		else if (!Mod::get()->hasSavedValue(fmt::format("enabled-{}", path.stem()))) Mod::get()->setSavedValue<bool>(fmt::format("enabled-{}", path.stem()), true); // auto enable script on import
 		geode::createQuickPopup(
 			"Success",
@@ -315,14 +315,14 @@ void ScriptsLayer::startImport(std::filesystem::path path, std::filesystem::path
 void ScriptsLayer::importPlugin(CCObject*) {
 	geode::createQuickPopup(
 		"Import",
-		fmt::format("Would you like to import a {}?", this->plugin ? "plugin" : "script"),
+		fmt::format("Would you like to import a {}?", this->source == Source::Plugins ? "plugin" : "script"),
 		"Cancel", "Import",
 		[this](FLAlertLayer*, bool btn2) {
 			if (btn2) {
 				async::spawn(file::pick(file::PickMode::OpenFile, file::FilePickOptions {
 					.filters = { file::FilePickOptions::Filter {
-						.description = this->plugin ? "SerpentLua Plugins" : "Lua Scripts",
-						.files = { this->plugin ? "*.slp" : "*.lua"}
+						.description = this->source == Source::Plugins ? "SerpentLua Plugins" : "Lua Scripts",
+						.files = { this->source == Source::Plugins ? "*.slp" : "*.lua"}
 					}}
 				}), ([this](geode::Result<std::optional<std::filesystem::path>> result) {
 					if (result.isErr()) {
@@ -344,7 +344,7 @@ void ScriptsLayer::importPlugin(CCObject*) {
 						"Cancel", "Confirm",
 						[=, this](FLAlertLayer*, bool btn2) {
 							if (btn2) {
-								auto dest = Mod::get()->getConfigDir()/(this->plugin ? "plugins" : "scripts")/path.filename();
+								auto dest = Mod::get()->getConfigDir()/(this->source == Source::Plugins ? "plugins" : "scripts")/path.filename();
 
 								std::error_code ec;
 								if (Mod::get()->getSettingValue<bool>("overwrite")) {
@@ -374,9 +374,9 @@ void ScriptsLayer::importPlugin(CCObject*) {
 		});
 }
 
-ScriptsLayer* ScriptsLayer::create(bool plugin) {
+ScriptsLayer* ScriptsLayer::create(Source source) {
 	auto ret = new ScriptsLayer();
-	if (ret->init(plugin)) {
+	if (ret->init(source)) {
 		ret->autorelease();
 		return ret;
 	}
@@ -384,9 +384,9 @@ ScriptsLayer* ScriptsLayer::create(bool plugin) {
 	return nullptr;
 }
 
-CCScene* ScriptsLayer::scene(bool plugin) {
+CCScene* ScriptsLayer::scene(Source source) {
 	auto scene = CCScene::create();
-	scene->addChild(ScriptsLayer::create(plugin));
+	scene->addChild(ScriptsLayer::create(source));
 	return scene;
 }
 

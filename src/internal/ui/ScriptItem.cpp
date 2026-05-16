@@ -3,13 +3,13 @@
 using namespace geode::prelude;
 using namespace SerpentLua::internal::ui;
 
-bool ScriptItem::init(void* theMetadata, std::function<void(CCMenuItemToggler*)> onButton, const cocos2d::CCSize& size, bool plugin) {
+bool ScriptItem::init(void* theMetadata, std::function<void(CCMenuItemToggler*)> onButton, const cocos2d::CCSize& size, Source source) {
 	if (!CCNode::init()) return false;
-	this->plugin = plugin;
+	this->source = source;
 
 	std::optional<bool> current;
 
-	if (plugin) {
+	if (this->source == Source::Plugins) {
 		this->metadata = static_cast<PluginMetadata*>(theMetadata);
 	} else {
 		this->metadata = static_cast<ScriptMetadata*>(theMetadata);
@@ -113,7 +113,7 @@ bool ScriptItem::init(void* theMetadata, std::function<void(CCMenuItemToggler*)>
 			CCSprite::createWithSpriteFrameName("edit_delBtn_001.png"),
 			42, true, 40, "GJ_button_04.png", 1),
 		[=, this](CCMenuItemSpriteExtra*) {
-			if (this->plugin) if (!std::get<PluginMetadata*>(this->metadata)->native) return;
+			if (this->source == Source::Plugins) if (!std::get<PluginMetadata*>(this->metadata)->native) return;
 
 			geode::createQuickPopup("Confirm",
 				fmt::format("Are you sure you would like to <cr>delete</c> \"{}\"?\nThis action is <cr>irreversible</c>!", METADATA_GET(name), METADATA_GET(id)),
@@ -136,7 +136,7 @@ bool ScriptItem::init(void* theMetadata, std::function<void(CCMenuItemToggler*)>
 		});
 	deleteBtn->setID("delete-button");
 
-	if (plugin) deleteBtn->setVisible(std::get<PluginMetadata*>(this->metadata)->native);
+	if (this->source == Source::Plugins) deleteBtn->setVisible(std::get<PluginMetadata*>(this->metadata)->native);
 	else deleteBtn->setVisible(true);
 
 	viewMenu->addChild(deleteBtn);
@@ -148,7 +148,7 @@ bool ScriptItem::init(void* theMetadata, std::function<void(CCMenuItemToggler*)>
 	});
 	errorBtn->setID("error-button");
 
-	if (plugin) {
+	if (this->source == Source::Plugins) {
 		errorBtn->setVisible(false);
 	} else if (std::get<ScriptMetadata*>(metadata)->errors.empty()) errorBtn->setVisible(false);
 
@@ -160,7 +160,7 @@ bool ScriptItem::init(void* theMetadata, std::function<void(CCMenuItemToggler*)>
 			->setAxisAlignment(AxisAlignment::End)
 			->setGap(10)
 	);
-	if (plugin) viewBtn->setVisible(false);
+	if (this->source == Source::Plugins) viewBtn->setVisible(false);
 
 	
 	CCSize indicatorSize = {30, 30};
@@ -193,7 +193,7 @@ bool ScriptItem::init(void* theMetadata, std::function<void(CCMenuItemToggler*)>
 	indicator->setID("native-indicator");
 	indicator->setAnchorPoint({1.0f, 0.5f});
 	indicatorContainer->addChild(indicator);
-	if (plugin) indicator->setVisible(!std::get<PluginMetadata*>(this->metadata)->native);
+	if (this->source == Source::Plugins) indicator->setVisible(!std::get<PluginMetadata*>(this->metadata)->native);
 	else indicator->setVisible(false);
 
 	this->addChild(bg);
@@ -212,7 +212,7 @@ bool ScriptItem::init(void* theMetadata, std::function<void(CCMenuItemToggler*)>
 
 // listens for changes and applies them
 void ScriptItem::listener(float) {
-	if (plugin) return;
+	if (this->source == Source::Plugins) return;
 
 	bool current = Mod::get()->getSavedValue<bool>(fmt::format("enabled-{}", std::get<ScriptMetadata*>(metadata)->id));
 
@@ -223,9 +223,9 @@ void ScriptItem::listener(float) {
 	}
 }
 
-ScriptItem* ScriptItem::create(void* metadata, std::function<void(CCMenuItemToggler*)> onButton, const cocos2d::CCSize& size, bool plugin) {
+ScriptItem* ScriptItem::create(void* metadata, std::function<void(CCMenuItemToggler*)> onButton, const cocos2d::CCSize& size, Source source) {
 	auto ret = new ScriptItem();
-	if (ret && ret->init(metadata, onButton, size, plugin)) {
+	if (ret && ret->init(metadata, onButton, size, source)) {
 		ret->autorelease();
 		return ret;
 	}

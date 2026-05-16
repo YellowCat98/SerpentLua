@@ -41,7 +41,7 @@ bool SelectLayer::init() {
 	auto scriptsSpr = CategoryButtonSprite::createWithSprite("script_select.png"_spr);
 
 	auto scriptsBtn = CCMenuItemExt::createSpriteExtra(scriptsSpr, [](CCMenuItemSpriteExtra* sender) {
-		CCDirector::get()->pushScene(CCTransitionFade::create(0.5f, ui::ScriptsLayer::scene(false)));
+		CCDirector::get()->pushScene(CCTransitionFade::create(0.5f, ui::ScriptsLayer::scene(Source::Scripts)));
 	});
 
 	buttonMenu->addChild(scriptsBtn);
@@ -49,7 +49,7 @@ bool SelectLayer::init() {
 	auto pluginsSpr = CategoryButtonSprite::createWithSprite("plugin_select.png"_spr);
 
 	auto pluginsBtn = CCMenuItemExt::createSpriteExtra(pluginsSpr, [](CCMenuItemSpriteExtra* sender) {
-		CCDirector::get()->pushScene(CCTransitionFade::create(0.5f, ui::ScriptsLayer::scene(true)));
+		CCDirector::get()->pushScene(CCTransitionFade::create(0.5f, ui::ScriptsLayer::scene(Source::Plugins)));
 	});
 
 	buttonMenu->addChild(pluginsBtn);
