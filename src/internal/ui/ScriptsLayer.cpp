@@ -75,11 +75,13 @@ void ScriptsLayer::setupScriptsList() {
 			scripts.push_back({k, static_cast<void*>(v)});
 			nameCache.insert({k, v->name});
 		}
-	} else {
+	} else if (this->source == Source::Plugins) {
 		for (const auto [k, v] : RuntimeManager::get()->getAllPlugins()) {
 			scripts.push_back({k, static_cast<void*>(v)});
 			nameCache.insert({k, v->name});
 		}
+	} else {
+		// i will populate this soon
 	}
 
 	std::sort(scripts.begin(), scripts.end(), [&](const auto& a, const auto& b) {
@@ -108,7 +110,7 @@ void ScriptsLayer::setupScriptsList() {
 
 	auto listView = ListView::create(CCArray::create(), 30);
 	
-	m_scriptsListLayer = GJListLayer::create(listView, this->source == Source::Plugins ? "plugins" : "scripts", {194, 114, 62, 255}, 358.0f, 220.0f, 0);
+	m_scriptsListLayer = GJListLayer::create(listView, sourceValue(source, "scripts", "plugins", "browse"), {194, 114, 62, 255}, 358.0f, 220.0f, 0);
 	m_scriptsListLayer->setID("script-list"); // normally i WOULD make it so it would be plugins-list if it was a plugin but eh it would be too wonky
 	auto listlayerSize = m_scriptsListLayer->getContentSize();
 	m_scriptsListLayer->setPosition(ccp((winSize.width - listlayerSize.width)/2, (winSize.height - listlayerSize.height)/2));
@@ -203,10 +205,12 @@ bool ScriptsLayer::init(Source source) {
 	actionsMenu->setContentSize({38.0f, 200.0f});
 	actionsMenu->setID("actions-menu");
 
-	auto JeomETRYdASH = CCMenuItemSpriteExtra::create(CircleButtonSprite::create(CCSprite::create(this->source == Source::Plugins ? "plugin_import.png"_spr : "script_import.png"_spr), CircleBaseColor::Green, CircleBaseSize::Small), this, menu_selector(ScriptsLayer::importPlugin));
-	JeomETRYdASH->setID("import-btn");
+	if (source != Source::Index) {
+		auto JeomETRYdASH = CCMenuItemSpriteExtra::create(CircleButtonSprite::create(CCSprite::create(this->source == Source::Plugins ? "plugin_import.png"_spr : "script_import.png"_spr), CircleBaseColor::Green, CircleBaseSize::Small), this, menu_selector(ScriptsLayer::importPlugin));
+		JeomETRYdASH->setID("import-btn");
 
-	actionsMenu->addChild(JeomETRYdASH);
+		actionsMenu->addChild(JeomETRYdASH);
+	}
 
 	auto rightActionsMenu = CCMenu::create();
 	rightActionsMenu->setLayout(SimpleColumnLayout::create()

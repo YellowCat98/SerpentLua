@@ -57,7 +57,7 @@ bool SelectLayer::init() {
 	auto indexSpr = CategoryButtonSprite::createWithSprite("index_select.png"_spr);
 
 	auto indexBtn = CCMenuItemExt::createSpriteExtra(indexSpr, [](CCMenuItemSpriteExtra* sender) {
-		log::info("Feet!");
+		CCDirector::get()->pushScene(CCTransitionFade::create(0.5f, ui::ScriptsLayer::scene(Source::Index)));
 	});
 
 	buttonMenu->addChild(indexBtn);

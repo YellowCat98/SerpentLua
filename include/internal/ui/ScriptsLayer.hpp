@@ -12,6 +12,16 @@ namespace SerpentLua::internal::ui {
 		Index
 	};
 
+	template <typename T> T sourceValue(Source source, T script, T plugin, T index) {
+		if (source == Source::Scripts) {
+			return script;
+		} else if (source == Source::Plugins) {
+			return plugin;
+		} else {
+			return index;
+		}
+	}
+
 	class ScriptsLayer : public cocos2d::CCLayer {
 	public:
 		static ScriptsLayer* create(Source source); // whether to make it show plugins or show scripts
