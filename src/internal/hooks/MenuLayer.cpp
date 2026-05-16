@@ -38,7 +38,7 @@ class $modify(SexyMenuLayer, MenuLayer) {
 					if (res.isOk()) {
 						Notification::create("SerpentLua: Authentication succeeded", NotificationIcon::Success);
 
-						auto web = ServerManager::get()->createReq("/api/v1/auth/validate");
+						auto web = ServerManager::get()->createReq();
 						auto json = matjson::makeObject({
 							{"account_id", argon::getGameAccountData().accountId},
 							{"argon_token", res.unwrap()}

@@ -12,6 +12,40 @@ namespace SerpentLua::internal::ui {
 		Index
 	};
 
+	// this only contains what scriptitem needs
+	struct DisplayInfo {
+		static DisplayInfo create(matjson::Value& metadata);
+		static DisplayInfo createFromScript(void* script, bool isScript);
+
+		std::string name;
+		std::string developer;
+		std::string id;
+		std::string version;
+		std::string serpentVersion;
+
+		std::string description;
+		std::string downloadLink;
+		std::string scriptExample;
+
+		std::string sourceCode;
+		std::string source;
+
+		int downloadCount = 0;
+		int accountId = 0;
+
+		int64_t releaseDate = 0;
+		int64_t lastUpdateDate = 0;
+
+		bool featured;
+
+		std::string path;
+		bool native;
+		bool loaded;
+		bool script;
+
+		std::variant<ScriptMetadata*, PluginMetadata*> internal; // represents the ScriptMetadata or PluginMetadata, nullptr if index.
+	};
+
 	template <typename T> T sourceValue(Source source, T script, T plugin, T index) {
 		if (source == Source::Scripts) {
 			return script;
@@ -36,7 +70,9 @@ namespace SerpentLua::internal::ui {
 
 		void setupScriptsList();
 
-		void loadPage(int page);
+		void loadPageServer(int page);
+		void loadPageLocal(int page);
+		void loadPage(int page); // just forwards the call to loadPageServer or loadPageLocal lol
 		void refreshWith(cocos2d::CCArray* array);
 
 		GJListLayer* m_scriptsListLayer;
@@ -59,10 +95,12 @@ namespace SerpentLua::internal::ui {
 		Source source;
 
 		cocos2d::CCSize winSize;
-		std::vector<std::pair<std::string, void*>> scripts; // it appears that it was a pain in the ass to use templates here, so im using a raw pointer and then converting it to either pluginmetadata or scriptmetadata! all of this just to avoid copying
+		std::vector<std::pair<std::string, DisplayInfo>> scripts;
 		std::unordered_map<std::string, std::string> nameCache; // caches the plugins and scripts names so we can use them in the comparator without having to use runtimemanager to look up
 
 		void pendingRestartListener(float dt);
 		cocos2d::CCSprite* pendingRestartIndicator;
+
+		geode::async::TaskHolder<geode::utils::web::WebResponse> serverListener;
 	};
 }

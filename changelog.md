@@ -3,7 +3,8 @@
 - UI: Add a "never show again" option in the `lua.dll` popup.
 - UI: Added new select UI for plugins, scripts, and downloading new plugins.
 - UI: Removed plugin/script button in scripts/plugins UI.
-- UI: Unnoticeably faster.
+- UI: Unnoticeably faster plugin/script lookup.
+- Plugin Index: Added new plugin index for installing plugins in-game.
 - Script termination: Log error properly (how did it take me this long to find this)
 
 # 1.3.0

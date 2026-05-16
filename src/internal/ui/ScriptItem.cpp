@@ -3,21 +3,20 @@
 using namespace geode::prelude;
 using namespace SerpentLua::internal::ui;
 
-bool ScriptItem::init(void* theMetadata, std::function<void(CCMenuItemToggler*)> onButton, const cocos2d::CCSize& size, Source source) {
+bool ScriptItem::init(const DisplayInfo& theMetadata, std::function<void(CCMenuItemToggler*)> onButton, const cocos2d::CCSize& size, Source source) {
 	if (!CCNode::init()) return false;
 	this->source = source;
 
 	std::optional<bool> current;
 
-	if (this->source == Source::Plugins) {
-		this->metadata = static_cast<PluginMetadata*>(theMetadata);
-	} else {
-		this->metadata = static_cast<ScriptMetadata*>(theMetadata);
-		current = Mod::get()->getSavedValue<bool>(fmt::format("enabled-{}", std::get<ScriptMetadata*>(metadata)->id));
+	this->metadata = theMetadata;
+
+	if (metadata.script) {
+		current = Mod::get()->getSavedValue<bool>(fmt::format("enabled-{}", metadata.id));
 		this->lastState = *current; // guranteed to have a value
 	}
 
-	this->setID(fmt::format("script-item/{}", METADATA_GET(id)));
+	this->setID(fmt::format("script-item/{}", metadata.id));
 
 
 	auto bg = CCScale9Sprite::create("GJ_square01.png");
@@ -56,7 +55,7 @@ bool ScriptItem::init(void* theMetadata, std::function<void(CCMenuItemToggler*)>
 	devContainer->ignoreAnchorPointForPosition(false);
 	devContainer->setAnchorPoint({0.0f, 0.0f});
 
-	dev = CCLabelBMFont::create(METADATA_GET(developer).c_str(), "goldFont.fnt");
+	dev = CCLabelBMFont::create(metadata.developer.c_str(), "goldFont.fnt");
 
 	devContainer->addChild(dev);
 
@@ -74,12 +73,12 @@ bool ScriptItem::init(void* theMetadata, std::function<void(CCMenuItemToggler*)>
 
 	mainContainer->addChild(title);
 
-	titleLabel = CCLabelBMFont::create(METADATA_GET(name).c_str(), "bigFont.fnt");
+	titleLabel = CCLabelBMFont::create(metadata.name.c_str(), "bigFont.fnt");
 	titleLabel->setID("title-label");
 	titleLabel->setLayoutOptions(AxisLayoutOptions::create()->setScalePriority(1));
 	title->addChild(titleLabel);
 
-	versionLabel = CCLabelBMFont::create(METADATA_GET(version).c_str(), "bigFont.fnt");
+	versionLabel = CCLabelBMFont::create(metadata.version.c_str(), "bigFont.fnt");
 	versionLabel->setID("version-label");
 	versionLabel->setLayoutOptions(AxisLayoutOptions::create()
 		->setScalePriority(1)
@@ -103,56 +102,59 @@ bool ScriptItem::init(void* theMetadata, std::function<void(CCMenuItemToggler*)>
 	viewMenu->setScale(0.4f);
 
 
-	viewBtn = CCMenuItemExt::createTogglerWithFrameName("GJ_checkOn_001.png", "GJ_checkOff_001.png", 1.5f, onButton);
-	viewBtn->toggle(current.has_value() ? *current : false);
-	viewBtn->setID("toggle");
-	viewMenu->addChild(viewBtn);
+	if (source != Source::Index) {
+		viewBtn = CCMenuItemExt::createTogglerWithFrameName("GJ_checkOn_001.png", "GJ_checkOff_001.png", 1.5f, onButton);
+		viewBtn->toggle(current.has_value() ? *current : false);
+		viewBtn->setID("toggle");
+		viewMenu->addChild(viewBtn);
 
-	auto deleteBtn = CCMenuItemExt::createSpriteExtra(
-		ButtonSprite::create(
-			CCSprite::createWithSpriteFrameName("edit_delBtn_001.png"),
-			42, true, 40, "GJ_button_04.png", 1),
-		[=, this](CCMenuItemSpriteExtra*) {
-			if (this->source == Source::Plugins) if (!std::get<PluginMetadata*>(this->metadata)->native) return;
+		auto deleteBtn = CCMenuItemExt::createSpriteExtra(
+			ButtonSprite::create(
+				CCSprite::createWithSpriteFrameName("edit_delBtn_001.png"),
+				42, true, 40, "GJ_button_04.png", 1),
+			[=, this](CCMenuItemSpriteExtra*) {
+				if (this->source == Source::Plugins) if (!metadata.native) return;
 
-			geode::createQuickPopup("Confirm",
-				fmt::format("Are you sure you would like to <cr>delete</c> \"{}\"?\nThis action is <cr>irreversible</c>!", METADATA_GET(name), METADATA_GET(id)),
-				"Cancel", "Delete",
-				[=, this](FLAlertLayer*, bool btn2) {
-					if (btn2) {
-						std::error_code ec;
-						bool removed = std::filesystem::remove(METADATA_GET(path), ec);
-						if (ec) {
-							std::string message;
-							if (ec.value() == 5) message = "<cr>This usually means a script is using this plugin.</c>";
-							FLAlertLayer::create("Error", fmt::format("Error: \"{}\" (Code: {})\n{}", ec.message(), ec.value(), message).c_str(), "OK")->show();
-						} else if (removed) {
-							FLAlertLayer::create("Success", fmt::format("\"{}\" was removed <cg>successfully</c>!", METADATA_GET(name)).c_str(), "OK")->show();
-							ScriptsLayer::changesMade();
+				geode::createQuickPopup("Confirm",
+					fmt::format("Are you sure you would like to <cr>delete</c> \"{}\"?\nThis action is <cr>irreversible</c>!", metadata.name),
+					"Cancel", "Delete",
+					[=, this](FLAlertLayer*, bool btn2) {
+						if (btn2) {
+							std::error_code ec;
+							bool removed = std::filesystem::remove(metadata.path, ec);
+							if (ec) {
+								std::string message;
+								if (ec.value() == 5) message = "<cr>This usually means a script is using this plugin.</c>";
+								FLAlertLayer::create("Error", fmt::format("Error: \"{}\" (Code: {})\n{}", ec.message(), ec.value(), message).c_str(), "OK")->show();
+							} else if (removed) {
+								FLAlertLayer::create("Success", fmt::format("\"{}\" was removed <cg>successfully</c>!", metadata.name).c_str(), "OK")->show();
+								ScriptsLayer::changesMade();
+							}
 						}
 					}
-				}
-			);
+				);
+			});
+		deleteBtn->setID("delete-button");
+
+		if (this->source == Source::Plugins) deleteBtn->setVisible(metadata.native);
+		else deleteBtn->setVisible(true);
+
+		viewMenu->addChild(deleteBtn);
+
+		// @geode-ignore(unknown-resource)
+		auto errorBtn = CCMenuItemExt::createSpriteExtraWithFrameName("geode.loader/info-alert.png", 1.5f, [this](CCMenuItemSpriteExtra*) {
+			std::string errorString = fmt::format("{}", fmt::join(std::get<ScriptMetadata*>(metadata.internal)->errors, "\n"));
+			MDPopup::create("Errors", errorString, "OK")->show();
 		});
-	deleteBtn->setID("delete-button");
+		errorBtn->setID("error-button");
 
-	if (this->source == Source::Plugins) deleteBtn->setVisible(std::get<PluginMetadata*>(this->metadata)->native);
-	else deleteBtn->setVisible(true);
+		if (this->source != Source::Scripts) errorBtn->setVisible(false);
+		else if (std::get<ScriptMetadata*>(metadata.internal)->errors.empty()) errorBtn->setVisible(false);
 
-	viewMenu->addChild(deleteBtn);
+		viewMenu->addChild(errorBtn);
 
-	// @geode-ignore(unknown-resource)
-	auto errorBtn = CCMenuItemExt::createSpriteExtraWithFrameName("geode.loader/info-alert.png", 1.5f, [this](CCMenuItemSpriteExtra*) {
-		std::string errorString = fmt::format("{}", fmt::join(std::get<ScriptMetadata*>(metadata)->errors, "\n"));
-		MDPopup::create("Errors", errorString, "OK")->show();
-	});
-	errorBtn->setID("error-button");
-
-	if (this->source == Source::Plugins) {
-		errorBtn->setVisible(false);
-	} else if (std::get<ScriptMetadata*>(metadata)->errors.empty()) errorBtn->setVisible(false);
-
-	viewMenu->addChild(errorBtn);
+		if (this->source == Source::Plugins) viewBtn->setVisible(false);
+	}
 
 	viewMenu->setLayout(
 		RowLayout::create()
@@ -160,7 +162,6 @@ bool ScriptItem::init(void* theMetadata, std::function<void(CCMenuItemToggler*)>
 			->setAxisAlignment(AxisAlignment::End)
 			->setGap(10)
 	);
-	if (this->source == Source::Plugins) viewBtn->setVisible(false);
 
 	
 	CCSize indicatorSize = {30, 30};
@@ -193,7 +194,7 @@ bool ScriptItem::init(void* theMetadata, std::function<void(CCMenuItemToggler*)>
 	indicator->setID("native-indicator");
 	indicator->setAnchorPoint({1.0f, 0.5f});
 	indicatorContainer->addChild(indicator);
-	if (this->source == Source::Plugins) indicator->setVisible(!std::get<PluginMetadata*>(this->metadata)->native);
+	if (this->source == Source::Plugins) indicator->setVisible(!metadata.native);
 	else indicator->setVisible(false);
 
 	this->addChild(bg);
@@ -214,7 +215,7 @@ bool ScriptItem::init(void* theMetadata, std::function<void(CCMenuItemToggler*)>
 void ScriptItem::listener(float) {
 	if (this->source == Source::Plugins) return;
 
-	bool current = Mod::get()->getSavedValue<bool>(fmt::format("enabled-{}", std::get<ScriptMetadata*>(metadata)->id));
+	bool current = Mod::get()->getSavedValue<bool>(fmt::format("enabled-{}", metadata.id));
 
 	if (lastState != current) {
 		this->viewBtn->toggle(current);
@@ -223,7 +224,7 @@ void ScriptItem::listener(float) {
 	}
 }
 
-ScriptItem* ScriptItem::create(void* metadata, std::function<void(CCMenuItemToggler*)> onButton, const cocos2d::CCSize& size, Source source) {
+ScriptItem* ScriptItem::create(const DisplayInfo& metadata, std::function<void(CCMenuItemToggler*)> onButton, const cocos2d::CCSize& size, Source source) {
 	auto ret = new ScriptItem();
 	if (ret && ret->init(metadata, onButton, size, source)) {
 		ret->autorelease();

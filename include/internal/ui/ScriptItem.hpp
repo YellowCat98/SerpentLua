@@ -16,13 +16,13 @@ namespace SerpentLua::internal::ui {
 		cocos2d::CCMenu* devContainer;
 		cocos2d::CCLabelBMFont* dev;
 		cocos2d::CCMenu* viewMenu;
-		bool init(void* theMetadata, std::function<void(CCMenuItemToggler*)> onButton, const cocos2d::CCSize& size, Source source);
+		bool init(const DisplayInfo& theMetadata, std::function<void(CCMenuItemToggler*)> onButton, const cocos2d::CCSize& size, Source source);
 		void listener(float dt);
 		Source source;
 		bool lastState;
 	public:
-		static ScriptItem* create(void* metadata, std::function<void(CCMenuItemToggler*)> onButton, const cocos2d::CCSize& size, Source source);
+		static ScriptItem* create(const DisplayInfo& metadata, std::function<void(CCMenuItemToggler*)> onButton, const cocos2d::CCSize& size, Source source);
 		CCMenuItemToggler* viewBtn;
-		std::variant<ScriptMetadata*, PluginMetadata*> metadata; // nvm this was the one that was needed to access within ScriptsLayer!
+		DisplayInfo metadata;
 	};
 }

@@ -6,6 +6,72 @@
 using namespace SerpentLua::internal::ui;
 using namespace geode::prelude;
 
+DisplayInfo DisplayInfo::create(matjson::Value& map) {
+    DisplayInfo info;
+
+    info.name = map["name"].asString().unwrapOr("");
+    info.developer = map["developer"].asString().unwrapOr("");
+    info.id = map["id"].asString().unwrapOr("");
+    info.version = map["version"].asString().unwrapOr("");
+    info.serpentVersion = map["serpent_version"].asString().unwrapOr("");
+
+    info.description = map["description"].asString().unwrapOr("");
+    info.downloadLink = map["download_link"].asString().unwrapOr("");
+    info.scriptExample = map["script_example"].asString().unwrapOr("");
+
+    info.sourceCode = map["source_code"].asString().unwrapOr("");
+    info.source = map["source"].asString().unwrapOr("");
+
+    info.downloadCount = map["download_count"].asInt().unwrapOr(0);
+    info.accountId = map["account_id"].asInt().unwrapOr(0);
+
+    info.releaseDate = map["release_date"].asInt().unwrapOr(0);
+    info.lastUpdateDate = map["last_update_date"].asInt().unwrapOr(0);
+
+    info.featured = map["featured"].asBool().unwrapOr(false);
+
+    info.native = false; // you arent really meant to use this to construct local plugins/scripts
+    info.loaded = false;
+	info.script = false;
+
+    return info;
+}
+
+DisplayInfo DisplayInfo::createFromScript(void* script, bool isScript) {
+	DisplayInfo info;
+
+	if (isScript) {
+		auto theScript = static_cast<ScriptMetadata*>(script);
+
+		info.name = theScript->name;
+		info.id = theScript->id;
+		info.developer = theScript->developer;
+		info.version = theScript->version;
+		info.serpentVersion = theScript->serpentVersion;
+		info.path = theScript->path;
+
+		info.internal = static_cast<ScriptMetadata*>(script);
+	} else {
+		auto thePlugin = static_cast<PluginMetadata*>(script);
+
+		info.name = thePlugin->name;
+		info.id = thePlugin->id;
+		info.developer = thePlugin->developer;
+		info.version = thePlugin->version;
+		info.serpentVersion = thePlugin->serpentVersion;
+		info.path = thePlugin->path;
+
+		info.native = thePlugin->native;
+		info.loaded = thePlugin->loaded;
+
+		info.internal = static_cast<PluginMetadata*>(script);
+	}
+
+	info.script = isScript;
+
+	return info;
+}
+
 void ScriptsLayer::refreshWith(CCArray* array) {
 	this->m_scriptsListLayer->m_listView->removeFromParent();
 
@@ -13,10 +79,10 @@ void ScriptsLayer::refreshWith(CCArray* array) {
 	m_scriptsListLayer->addChild(m_scriptsListLayer->m_listView);
 }
 
-void ScriptsLayer::loadPage(int page) {
+void ScriptsLayer::loadPageLocal(int page) {
 	//auto allScripts = internal::RuntimeManager::get()->getAllScripts();
 
-	std::vector<void*> scriptsInPage;
+	std::vector<DisplayInfo> scriptsInPage;
 
 	int start = (page - 1) * itemsPerPage; // reason we do page - 1 is because indexes start at 0
 	int end = start + itemsPerPage - 1; // pages overlap when you dont do the -1
@@ -35,11 +101,11 @@ void ScriptsLayer::loadPage(int page) {
 			auto item = typeinfo_cast<ScriptItem*>(button->getParent()->getParent()); // normally this should never return nullptr, but just in case!
 			if (!item) return;
 			auto metadata = item->metadata;
-			if (std::holds_alternative<PluginMetadata*>(metadata)) {
+			if (!metadata.script) {
 				Notification::create("You cannot enable/disable a plugin!")->show();
 				return; // even though by default you shouldnt be able to reach this button, you can make it visible and clickable through devtools, which is bad
 			}
-			Mod::get()->setSavedValue<bool>(fmt::format("enabled-{}", std::get<ScriptMetadata*>(metadata)->id), !button->isToggled());
+			Mod::get()->setSavedValue<bool>(fmt::format("enabled-{}", metadata.id), !button->isToggled());
 		}, CCSize(358.0f, 30), source));
 	}
 
@@ -47,11 +113,11 @@ void ScriptsLayer::loadPage(int page) {
 	nextBtn->setVisible(true);
 	
 	if (!scriptsInPage.empty()) {
-		if (scriptsInPage.front() == scripts.begin()->second) { // basically if were on the first page
+		if (scriptsInPage.front().id == scripts.begin()->second.id) { // basically if were on the first page
 			backBtn->setVisible(false);
 		}
 
-		if (scriptsInPage.back() == scripts.rbegin()->second) { // basically if were on the last page
+		if (scriptsInPage.back().id == scripts.rbegin()->second.id) { // basically if were on the last page
 			nextBtn->setVisible(false);
 		}
 	} else {
@@ -68,21 +134,69 @@ void ScriptsLayer::loadPage(int page) {
 
 }
 
+void ScriptsLayer::loadPageServer(int page) {
+	backBtn->setVisible(false);
+	nextBtn->setVisible(false);
+
+	auto req = ServerManager::get()->createReq();
+
+	req.param("sort", "most_recent");
+	req.param("page", page);
+
+	ServerManager::get()->sendReq(this->serverListener, "GET", "/api/v1/plugin/fetch/bulk", req, [this, page](web::WebResponse res) {
+		if (!res.ok()) {
+			MDPopup::create("Server Error", res.string().unwrap(), "ok");
+			return;
+		}
+		auto jsonRes = res.json();
+		if (jsonRes.isErr()) {
+			MDPopup::create("Server Error", jsonRes.unwrapErr(), "ok");
+			return;
+		}
+		auto json = res.json().unwrap();
+
+		bool hasNext = json["has_next"].asBool().unwrap();
+		bool hasPrev = json["has_prev"].asBool().unwrap();
+		int totalItems = json["total"].asInt().unwrap();
+		int totalPages = json["total_pages"].asInt().unwrap();
+
+		CCArray* array = CCArray::create();
+		for (auto& item : json["items"].asArray().unwrap()) {
+			array->addObject(ScriptItem::create(DisplayInfo::create(item), [](CCMenuItemToggler*){}, CCSize(358.0f, 30), source));
+		}
+
+		this->refreshWith(array);
+		this->currentPage = page;
+
+		backBtn->setVisible(hasPrev);
+		nextBtn->setVisible(hasNext);
+
+		infoLabel->setString(fmt::format("Page {}/{} ({} Items)", page, totalPages, totalItems).c_str());
+		log::info("page: {}", page);
+	});
+}
+
+void ScriptsLayer::loadPage(int page) {
+	if (source == Source::Index) {
+		return loadPageServer(page);
+	} else {
+		return loadPageLocal(page);
+	}
+}
+
 
 void ScriptsLayer::setupScriptsList() {
 	if (this->source == Source::Scripts) {
 		for (const auto [k, v] : RuntimeManager::get()->getAllScripts()) {
-			scripts.push_back({k, static_cast<void*>(v)});
+			scripts.push_back({k, DisplayInfo::createFromScript(v, true)});
 			nameCache.insert({k, v->name});
 		}
 	} else if (this->source == Source::Plugins) {
 		for (const auto [k, v] : RuntimeManager::get()->getAllPlugins()) {
-			scripts.push_back({k, static_cast<void*>(v)});
+			scripts.push_back({k, DisplayInfo::createFromScript(v, false)});
 			nameCache.insert({k, v->name});
 		}
-	} else {
-		// i will populate this soon
-	}
+	} // because this takes all the scripts it would be illogical to just get the entire index and split it!
 
 	std::sort(scripts.begin(), scripts.end(), [&](const auto& a, const auto& b) {
 		if (source == Source::Plugins) {
