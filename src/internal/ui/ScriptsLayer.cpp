@@ -137,6 +137,9 @@ void ScriptsLayer::loadPageLocal(int page) {
 void ScriptsLayer::loadPageServer(int page) {
 	backBtn->setVisible(false);
 	nextBtn->setVisible(false);
+	this->spinner->setVisible(true);
+
+	this->refreshWith(CCArray::create());
 
 	auto req = ServerManager::get()->createReq();
 
@@ -144,17 +147,19 @@ void ScriptsLayer::loadPageServer(int page) {
 	req.param("page", page);
 
 	ServerManager::get()->sendReq(this->serverListener, "GET", "/api/v1/plugin/fetch/bulk", req, [this, page](web::WebResponse res) {
+		spinner->setVisible(false);
 		if (!res.ok()) {
-			MDPopup::create("Server Error", res.string().unwrap(), "ok");
+			MDPopup::create("Server Error", res.string().unwrap(), "ok")->show();
 			return;
 		}
 		auto jsonRes = res.json();
 		if (jsonRes.isErr()) {
-			MDPopup::create("Server Error", jsonRes.unwrapErr(), "ok");
+			MDPopup::create("Server Error", jsonRes.unwrapErr(), "ok")->show();
 			return;
 		}
-		auto json = res.json().unwrap();
+		auto json = jsonRes.unwrap();
 
+		// safe to unwrap these without checking because the server will always return these in case of success
 		bool hasNext = json["has_next"].asBool().unwrap();
 		bool hasPrev = json["has_prev"].asBool().unwrap();
 		int totalItems = json["total"].asInt().unwrap();
@@ -275,9 +280,15 @@ bool ScriptsLayer::init(Source source) {
 	this->source = source;
 	this->scripts = {};
 	this->infoLabel = CCLabelBMFont::create("", "goldFont.fnt");
+	this->spinner = LoadingSpinner::create(100.0f);
 
 	this->infoLabel->setScale(0.5f);
 	this->infoLabel->setAnchorPoint({1.0f, 1.0f});
+
+	this->addChild(this->spinner);
+	this->spinner->setVisible(false);
+	this->spinner->setZOrder(1);
+	this->spinner->setPosition(CCDirector::get()->getWinSize()/2);
 
 	auto background = geode::createLayerBG();
 	background->setID("background"); // background is better than bg imo
@@ -323,6 +334,14 @@ bool ScriptsLayer::init(Source source) {
 		JeomETRYdASH->setID("import-btn");
 
 		actionsMenu->addChild(JeomETRYdASH);
+	} else {
+		auto FUCKINGBUASLDJAOSIDJOAFJOASJOASDOIASJD = CCMenuItemExt::createSpriteExtra(CircleButtonSprite::create(CCSprite::createWithSpriteFrameName("geode.loader/reload.png"), CircleBaseColor::Green, CircleBaseSize::Small), [this](CCMenuItemSpriteExtra*) {
+			this->loadPageServer(currentPage);
+		});
+		// FUCKINGBUASLDJAOSIDJOAFJOASJOASDOIASJD->setID("FUCKING BULLSHIT");
+		FUCKINGBUASLDJAOSIDJOAFJOASJOASDOIASJD->setID("refresh-btn");
+
+		actionsMenu->addChild(FUCKINGBUASLDJAOSIDJOAFJOASJOASDOIASJD);
 	}
 
 	auto rightActionsMenu = CCMenu::create();

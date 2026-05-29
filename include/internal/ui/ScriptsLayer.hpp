@@ -102,5 +102,7 @@ namespace SerpentLua::internal::ui {
 		cocos2d::CCSprite* pendingRestartIndicator;
 
 		geode::async::TaskHolder<geode::utils::web::WebResponse> serverListener;
+
+		geode::LoadingSpinner* spinner;
 	};
 }
