@@ -1,0 +1,13 @@
+#pragma once
+
+#include <Geode/Geode.hpp>
+#include <internal/ui/ScriptsLayer.hpp>
+
+namespace SerpentLua::internal::ui {
+	class PluginInfoPopup : public geode::Popup {
+	protected:
+		bool init(const DisplayInfo& info);
+	public:
+		static PluginInfoPopup* create(const DisplayInfo& info);
+	};
+};

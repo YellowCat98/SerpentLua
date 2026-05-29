@@ -172,7 +172,6 @@ void ScriptsLayer::loadPageServer(int page) {
 		nextBtn->setVisible(hasNext);
 
 		infoLabel->setString(fmt::format("Page {}/{} ({} Items)", page, totalPages, totalItems).c_str());
-		log::info("page: {}", page);
 	});
 }
 

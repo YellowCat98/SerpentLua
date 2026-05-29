@@ -1,5 +1,6 @@
 #include <Geode/binding/CCMenuItemSpriteExtra.hpp>
 #include <internal/ui/ScriptItem.hpp>
+#include <internal/ui/PluginInfoPopup.hpp>
 
 using namespace geode::prelude;
 using namespace SerpentLua::internal::ui;
@@ -156,7 +157,7 @@ bool ScriptItem::init(const DisplayInfo& theMetadata, std::function<void(CCMenuI
 	viewMenu->addChild(errorBtn);
 
 	auto infoBtn = CCMenuItemExt::createSpriteExtraWithFrameName("GJ_infoIcon_001.png", 1.5f, [&](CCMenuItemSpriteExtra*) {
-		FLAlertLayer::create("info", metadata.description.c_str(), "wow! helpfulness.")->show();
+		PluginInfoPopup::create(metadata)->show();
 	});
 	
 	if (this->source != Source::Index) infoBtn->setVisible(false);

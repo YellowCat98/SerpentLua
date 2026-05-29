@@ -37,10 +37,7 @@
 - ~~UI (1.0.0-alpha.2): Make missing lua.dll popup #Better.~~ ✓
 - ~~UI (1.0.0-alpha.2): Add an indicator when changes have been made~~ ✓
 
-## Uncategorized
-- Native Plugin API (v2): Don't require metadata as first argument for the logging functions.
-
-## 1.5.0 (After 1.4.0)
-- UI: Fix padding.
-- Settings: Add a "install lua.dll" option and make the lua.dll popup redirect you there.
-- SL Plugin (1.3.0): Add a `Notification` type that wraps around `
+## 2.0.0 (Unsure if after 1.4.0):
+- Plugins: Stop supporting dynamic linking.
+- Lua: Use LuaJIT.
+- Plugins: Rebuild plugins to be a .zip file and use a lua file as an entry point. (While the developer can make the actual plugin a DLL loaded by the lua script via FFI. Metadata will be provided in the plugin script entry like scripts.)
