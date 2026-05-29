@@ -1,5 +1,6 @@
 #pragma once
 #include <Geode/Geode.hpp>
+#include <Geode/binding/SetIDPopupDelegate.hpp>
 #include <internal/SerpentLua.hpp>
 
 
@@ -56,7 +57,7 @@ namespace SerpentLua::internal::ui {
 		}
 	}
 
-	class ScriptsLayer : public cocos2d::CCLayer {
+	class ScriptsLayer : public cocos2d::CCLayer, public SetIDPopupDelegate {
 	public:
 		static ScriptsLayer* create(Source source); // whether to make it show plugins or show scripts
 		static cocos2d::CCScene* scene(Source source);
@@ -82,15 +83,17 @@ namespace SerpentLua::internal::ui {
 		// these buttons are needed here so that we can change their opacity in loadPage
 		void callbackMovePage(cocos2d::CCObject*);
 
+		cocos2d::CCMenu* infoMenu;
 		cocos2d::CCLabelBMFont* infoLabel; // shows info about what page it is, how many pages, and how many items
-
-		
+	
 		void importPlugin(cocos2d::CCObject*);
 
 		void startImport(std::filesystem::path path, std::filesystem::path dest, std::filesystem::copy_options options);
 
 		int currentPage;
 		int itemsPerPage;
+		int totalPages;
+		int totalItems;
 
 		Source source;
 
@@ -104,5 +107,7 @@ namespace SerpentLua::internal::ui {
 		geode::async::TaskHolder<geode::utils::web::WebResponse> serverListener;
 
 		geode::LoadingSpinner* spinner;
+
+		void setIDPopupClosed(SetIDPopup* popup, int num) override;
 	};
 }

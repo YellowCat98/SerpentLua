@@ -129,8 +129,11 @@ void ScriptsLayer::loadPageLocal(int page) {
 	this->refreshWith(array);
 
 	this->currentPage = page;
+	this->totalPages = (scripts.size() + itemsPerPage - 1) / itemsPerPage;
+	this->totalItems = scripts.size();
 
-	infoLabel->setString(fmt::format("Page {}/{} ({} Items)", currentPage, (scripts.size() + itemsPerPage - 1) / itemsPerPage, scripts.size()).c_str());
+	infoLabel->setString(fmt::format("Page {}/{} ({} Items)", currentPage, totalPages, totalItems).c_str());
+	infoMenu->updateLayout();
 
 }
 
@@ -172,11 +175,14 @@ void ScriptsLayer::loadPageServer(int page) {
 
 		this->refreshWith(array);
 		this->currentPage = page;
+		this->totalPages = totalPages;
+		this->totalItems = totalItems;
 
 		backBtn->setVisible(hasPrev);
 		nextBtn->setVisible(hasNext);
 
 		infoLabel->setString(fmt::format("Page {}/{} ({} Items)", page, totalPages, totalItems).c_str());
+		infoMenu->updateLayout();
 	});
 }
 
@@ -280,10 +286,33 @@ bool ScriptsLayer::init(Source source) {
 	this->source = source;
 	this->scripts = {};
 	this->infoLabel = CCLabelBMFont::create("", "goldFont.fnt");
+	this->infoMenu = CCMenu::create();
 	this->spinner = LoadingSpinner::create(100.0f);
 
-	this->infoLabel->setScale(0.5f);
-	this->infoLabel->setAnchorPoint({1.0f, 1.0f});
+	//this->infoLabel->setAnchorPoint({0.5f, 1.0f});
+
+	// https://github.com/geode-sdk/geode/blob/c1f1bba4ef1f6689f4d81e49bd32692a9740eee3/loader/src/ui/mods/ModsLayer.cpp#L632
+	infoMenu->setContentSize({200.0f, 16.0f});
+	infoMenu->setAnchorPoint({1.0f, 1.0f});
+	infoMenu->setScale(0.65f);
+	infoMenu->setZOrder(1);
+	this->infoMenu->setLayout(SimpleRowLayout::create()
+		->setMainAxisDirection(AxisDirection::RightToLeft)
+		->setMainAxisAlignment(MainAxisAlignment::Start)
+		->setCrossAxisAlignment(CrossAxisAlignment::End)
+		->setCrossAxisScaling(AxisScaling::ScaleDown)
+		->setGap(5.0f)
+	);
+	auto goToPageBtn = CCMenuItemExt::createSpriteExtra(CCSprite::createWithSpriteFrameName("gj_navDotBtn_on_001.png"), [this](CCMenuItemSpriteExtra*) {
+		auto popup = SetIDPopup::create(currentPage, 1, totalPages, "Go to Page", "Go", true, 1, 60.0f, true, false);
+		popup->m_delegate = this;
+		popup->setID("go-to-page"_spr);
+		popup->show();
+	});
+	infoMenu->addChild(goToPageBtn);
+	this->infoMenu->addChild(infoLabel);
+	this->addChildAtPosition(infoMenu, Anchor::TopRight, {-2.0f, 0.0f}, false); // theres a 67 joke here you just dont know it
+	
 
 	this->addChild(this->spinner);
 	this->spinner->setVisible(false);
@@ -398,8 +427,6 @@ bool ScriptsLayer::init(Source source) {
 
 	this->setupScriptsList();
 
-	this->addChildAtPosition(infoLabel, Anchor::TopRight, {-3.5f, -0.5f}, false);
-
 	actionsMenu->updateLayout();
 	rightActionsMenu->updateLayout();
 	backMenu->updateLayout();
@@ -504,6 +531,12 @@ void ScriptsLayer::importPlugin(CCObject*) {
 				}));
 			}
 		});
+}
+
+void ScriptsLayer::setIDPopupClosed(SetIDPopup* popup, int num) {
+	if (popup->getID() == "go-to-page"_spr) {
+		loadPage(num);
+	}
 }
 
 ScriptsLayer* ScriptsLayer::create(Source source) {
