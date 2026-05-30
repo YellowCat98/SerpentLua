@@ -7,7 +7,6 @@ using namespace geode::prelude;
 
 bool PluginInfoPopup::init(const DisplayInfo& info) {
 	if (!Popup::init({300.0f, 200.0f})) return false;
-	m_mainLayer->setID("main-layer"); // so i can tell which one is the main layer in devtools
 
 	auto layoutMenu = CCMenu::create();
 	layoutMenu->setID("layout-menu");
@@ -104,8 +103,11 @@ bool PluginInfoPopup::init(const DisplayInfo& info) {
 	});
 	auto get = CCMenuItemExt::createSpriteExtra(
 		ButtonSprite::create("Get", btns->getContentWidth(), btns->getContentWidth(), 1.0f, true, "goldFont.fnt", "GJ_button_01.png"),
-		[info](CCMenuItemSpriteExtra*) {
-			log::info("downloading: {}", info.downloadLink);
+		[this, info](CCMenuItemSpriteExtra*) {
+			ServerManager::get()->downloadPlugin(m_listener, false, info.id, [](web::WebResponse resp) {
+				log::info("yoyo");
+				log::info("code: {}", resp.code());
+			});
 	});
 	auto getexple = CCMenuItemExt::createSpriteExtra(
 		ButtonSprite::create("Get Example", btns->getContentWidth(), btns->getContentWidth(), 1.0f, true, "goldFont.fnt", "GJ_button_01.png"),

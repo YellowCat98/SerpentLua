@@ -63,6 +63,7 @@ namespace SerpentLua::internal::ui {
 		static cocos2d::CCScene* scene(Source source);
 		inline static bool pendingRestart = false; // making it static allows for when you enter the plugins ui the indicator is still there
 		static void changesMade();
+		geode::async::TaskHolder<geode::utils::web::WebResponse> serverListener;
 	private:
 
 		void keyBackClicked() override;
@@ -103,8 +104,6 @@ namespace SerpentLua::internal::ui {
 
 		void pendingRestartListener(float dt);
 		cocos2d::CCSprite* pendingRestartIndicator;
-
-		geode::async::TaskHolder<geode::utils::web::WebResponse> serverListener;
 
 		geode::LoadingSpinner* spinner;
 

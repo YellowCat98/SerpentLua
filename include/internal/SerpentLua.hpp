@@ -26,6 +26,7 @@ namespace SerpentLua::internal {
 		geode::utils::web::WebRequest createReq(bool withAuth = false); // withAuth just passes in the session token as Authorization lol!
 
 		void sendReq(geode::async::TaskHolder<geode::utils::web::WebResponse>& listener, const std::string& method, const std::string& path, geode::utils::web::WebRequest& req, std::function<void(geode::utils::web::WebResponse)> lambda);
+		void downloadPlugin(geode::async::TaskHolder<geode::utils::web::WebResponse>& listener, bool script, const std::string& id, std::function<void(geode::utils::web::WebResponse)> lambda);
 	private:
 		std::string sessionToken;
 		std::string url;
