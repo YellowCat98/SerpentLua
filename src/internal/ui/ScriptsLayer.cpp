@@ -151,7 +151,7 @@ void ScriptsLayer::loadPageServer(int page) {
 		spinner->setVisible(false);
 		MDPopup* popup = nullptr;
 		if (!res.ok()) {
-			popup = MDPopup::create("Server Error", res.string().unwrap(), "ok");
+			popup = MDPopup::create("Server Error", res.string().unwrapOr("No Response"), "ok");
 		}
 		auto jsonRes = res.json();
 		if (jsonRes.isErr()) {
