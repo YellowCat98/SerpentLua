@@ -80,8 +80,6 @@ void ScriptsLayer::refreshWith(CCArray* array) {
 }
 
 void ScriptsLayer::loadPageLocal(int page) {
-	//auto allScripts = internal::RuntimeManager::get()->getAllScripts();
-
 	std::vector<DisplayInfo> scriptsInPage;
 
 	int start = (page - 1) * itemsPerPage; // reason we do page - 1 is because indexes start at 0
@@ -134,13 +132,13 @@ void ScriptsLayer::loadPageLocal(int page) {
 
 	infoLabel->setString(fmt::format("Page {}/{} ({} Items)", currentPage, totalPages, totalItems).c_str());
 	infoMenu->updateLayout();
-
 }
 
 void ScriptsLayer::loadPageServer(int page) {
 	backBtn->setVisible(false);
 	nextBtn->setVisible(false);
 	this->spinner->setVisible(true);
+	infoMenu->setVisible(false);
 
 	this->refreshWith(CCArray::create());
 
@@ -151,15 +149,22 @@ void ScriptsLayer::loadPageServer(int page) {
 
 	ServerManager::get()->sendReq(this->serverListener, "GET", "/api/v1/plugin/fetch/bulk", req, [this, page](web::WebResponse res) {
 		spinner->setVisible(false);
+		MDPopup* popup = nullptr;
 		if (!res.ok()) {
-			MDPopup::create("Server Error", res.string().unwrap(), "ok")->show();
-			return;
+			popup = MDPopup::create("Server Error", res.string().unwrap(), "ok");
 		}
 		auto jsonRes = res.json();
 		if (jsonRes.isErr()) {
-			MDPopup::create("Server Error", jsonRes.unwrapErr(), "ok")->show();
+			popup = MDPopup::create("Server Error", jsonRes.unwrapErr(), "ok");
+		}
+
+		if (popup) {
+			// because `popup` only gets created in the case of an error, we can just check if its nullptr or not to check if there was an error!
+			popup->m_scene = this;
+			popup->show();
 			return;
 		}
+
 		auto json = jsonRes.unwrap();
 
 		// safe to unwrap these without checking because the server will always return these in case of success
@@ -181,6 +186,7 @@ void ScriptsLayer::loadPageServer(int page) {
 		backBtn->setVisible(hasPrev);
 		nextBtn->setVisible(hasNext);
 
+		infoMenu->setVisible(true);
 		infoLabel->setString(fmt::format("Page {}/{} ({} Items)", page, totalPages, totalItems).c_str());
 		infoMenu->updateLayout();
 	});
