@@ -86,3 +86,35 @@ void ServerManager::downloadPlugin(async::TaskHolder<web::WebResponse>& listener
 		lambda(resp, "");
 	});
 }
+
+void ServerManager::authenticate(async::TaskHolder<web::WebResponse>& webListener) {
+	Notification::create("SerpentLua: Authentication Started", NotificationIcon::Info)->show();
+	async::spawn(
+		argon::startAuth(),
+		[&webListener](Result<std::string> res) {
+			if (res.isOk()) {
+				auto web = ServerManager::get()->createReq();
+				auto json = matjson::makeObject({
+					{"account_id", argon::getGameAccountData().accountId},
+					{"argon_token", res.unwrap()}
+				});
+
+				web.bodyJSON(json);
+				web.header("Content-Type", "application/json");
+
+				ServerManager::get()->sendReq(webListener, "POST", "/api/v1/auth/validate", web,
+					[](web::WebResponse response) {
+						if (response.ok() && response.string().isOk()) {
+							ServerManager::get()->setSessionToken(response.string().unwrap());
+							Notification::create("SerpentLua: Authenticated successfully!", NotificationIcon::Success)->show();
+						} else {
+							Notification::create("SerpentLua: Server Authentication failed.", NotificationIcon::Error)->show();
+						}
+					}
+				);
+			} else {
+				Notification::create("SerpentLua: Argon Authentication failed", NotificationIcon::Error)->show();
+			}
+		}
+	);
+}

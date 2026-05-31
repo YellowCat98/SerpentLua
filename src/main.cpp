@@ -41,6 +41,8 @@ $on_mod(Loaded) {
 
 	(void)Mod::get()->registerCustomSettingType("open-scripts-btn", &OpenScriptsSettingV3::parse);
 
+	ServerManager::get()->setServerUrl(Mod::get()->getSettingValue<std::string>("server-url"));
+
 	auto configDir = Mod::get()->getConfigDir();
 	
 	auto res = createDirs(configDir, {"plugin_global_deps", "plugin_deps", "plugins", "scripts", "playground", "pending_install"});

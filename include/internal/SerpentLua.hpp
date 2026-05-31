@@ -66,6 +66,7 @@ namespace SerpentLua::internal {
 
 		void sendReq(geode::async::TaskHolder<geode::utils::web::WebResponse>& listener, const std::string& method, const std::string& path, geode::utils::web::WebRequest& req, std::function<void(geode::utils::web::WebResponse)> lambda);
 		void downloadPlugin(geode::async::TaskHolder<geode::utils::web::WebResponse>& listener, bool script, const DisplayInfo& info, std::function<void(geode::utils::web::WebResponse, const std::string&)> lambda);
+		void authenticate(geode::async::TaskHolder<geode::utils::web::WebResponse>& webListener);
 	private:
 		std::string sessionToken;
 		std::string url;
@@ -140,6 +141,8 @@ namespace SerpentLua::internal {
 		void updateState(cocos2d::CCNode* invoker) override;
 		void onCommit() override;
 		void onResetToDefault() override;
+
+		geode::async::TaskHolder<geode::utils::web::WebResponse> listener;
 
 	public:
 		static OpenScriptsSettingNodeV3* create(std::shared_ptr<OpenScriptsSettingV3> setting, float width);
