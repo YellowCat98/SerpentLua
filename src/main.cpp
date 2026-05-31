@@ -41,8 +41,6 @@ $on_mod(Loaded) {
 
 	(void)Mod::get()->registerCustomSettingType("open-scripts-btn", &OpenScriptsSettingV3::parse);
 
-	ServerManager::get()->setServerUrl("http://127.0.0.1:8787");
-
 	auto configDir = Mod::get()->getConfigDir();
 	
 	auto res = createDirs(configDir, {"plugin_global_deps", "plugin_deps", "plugins", "scripts", "playground", "pending_install"});
@@ -53,17 +51,19 @@ $on_mod(Loaded) {
 		}
 		return;
 	}
+
+	StartupOperations::installPending(false);
+	StartupOperations::installPending(true);
+
+	geode::listenForSettingChanges<std::string>("server-url", +[](const std::string& url) {
+		ServerManager::get()->setServerUrl(url);
+	});
+
 	auto initpluginres = ScriptBuiltin::initPlugin();
 	if (initpluginres.isErr()) {
 		log::error("{}", initpluginres.err().value());
 		return;
 	}
-
-	//geode::listenForSettingChanges<bool>("dev-mode", +[](bool change) {
-	//	if (change) {
-	//		Mod::get()->setSavedValue<bool>("should-show-warning", true); // basically, since this function gets called after the setting was set, it makes it a little wonky to add a warning here
-	//	}
-	//});
 
 	// initialize all the native plugins! (mod plugins are initialized by the mods themselves)
 

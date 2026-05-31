@@ -2,6 +2,26 @@
 
 using namespace geode::prelude;
 
+void SerpentLua::internal::StartupOperations::installPending(bool scripts) {
+	auto configDir = Mod::get()->getConfigDir();
+	std::string where = scripts ? "scripts" : "plugins";
+
+	std::vector<std::filesystem::path> files;
+	for (const auto& fileEntry : std::filesystem::directory_iterator(configDir/"pending_install"/where))
+		files.push_back(fileEntry.path());
+
+	for (const auto& file : files) {
+		auto final = configDir/where/file.filename();
+		std::filesystem::remove(final); // no biggie if it fails
+
+		std::error_code ec;
+		std::filesystem::rename(file, final, ec);
+		if (ec) {
+			log::error("Unable to move file: {}", ec.message());
+		}
+	}
+}
+
 void SerpentLua::internal::StartupOperations::loadNativePlugins() {
 	auto configDir = Mod::get()->getConfigDir();
 	for (const auto& file : std::filesystem::directory_iterator(configDir/"plugins")) {

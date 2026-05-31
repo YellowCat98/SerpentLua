@@ -46,6 +46,12 @@
 			"default": false,
 			"requires-restart": true
 		},
+		"server-url": {
+			"name": "Index URL",
+			"description": "The server URL wto get plugins from.",
+			"type": "string",
+			"default": ""
+		},
 		"should-authenticate": {
 			"name": "Authenticate with Argon",
 			"description": "Determines whether to authenticate with Argon or not.\nThis is usually not needed for the average user.",

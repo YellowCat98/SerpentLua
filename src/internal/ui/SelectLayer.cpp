@@ -54,6 +54,7 @@ bool SelectLayer::init() {
 
 	buttonMenu->addChild(pluginsBtn);
 
+	/*
 	auto indexSpr = CategoryButtonSprite::createWithSprite("index_select.png"_spr);
 
 	auto indexBtn = CCMenuItemExt::createSpriteExtra(indexSpr, [](CCMenuItemSpriteExtra* sender) {
@@ -61,6 +62,7 @@ bool SelectLayer::init() {
 	});
 
 	buttonMenu->addChild(indexBtn);
+	*/
 
 	buttonMenu->setLayout(
 		RowLayout::create()
