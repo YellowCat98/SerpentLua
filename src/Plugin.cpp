@@ -58,7 +58,7 @@ geode::Result<Plugin*, std::string> Plugin::createNative(const std::filesystem::
 	log::info("Loading Native Plugin {}: initialized", path.filename());
 	if (!Mod::get()->getSavedValue<bool>(fmt::format("safe-{}", path.stem())) && !Mod::get()->getSettingValue<bool>("dev-mode") && !Mod::get()->getSavedValue<bool>("should-show-warning")) return Err("Native Plugin {} was imported manually.\nThis plugin will not load unless it's imported through the plugin importer in-game.", path.stem());
 	auto configDir = Mod::get()->getConfigDir();
-	bool depsDir = std::filesystem::exists(configDir/"plugin_deps"/path.stem());
+	bool depsDir = std::filesystem::exists(configDir/"plugin_deps"/path.filename());
 	if (depsDir) {
 		log::warn("Plugin {}: Dynamically linking libraries via the plugin_deps directory is deprecated. This feature will be removed in SerpentLua v2.0.0.", path.filename());
 	}
