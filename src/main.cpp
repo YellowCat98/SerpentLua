@@ -67,9 +67,8 @@ $on_mod(Loaded) {
 		return;
 	}
 
-	// initialize all the native plugins! (mod plugins are initialized by the mods themselves)
+	// initialize all the native plugins! (non-native plugins are initialized by the mods themselves)
 
-	// No need to add native plugins and serpentlua.std to SerpentLua::globals::pluginsYetToLoad.
 	SerpentLua::internal::StartupOperations::loadNativePlugins();
 
 	// Assume every dependant of SerpentLua is a native plugin.
