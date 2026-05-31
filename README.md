@@ -39,7 +39,7 @@
 
 ## Scripts:
 ### Creating your first script:
-- Simply create a `.lua` file (preferably in the `author.script_name` format.)
+- Simply create a `.lua` file with the ID of your script. (e.g.: `author.script_name.lua` (this is the preferred naming format.))
 - At the first few lines, that is where we insert our metadata.
 - In order for them to not interfere with the Lua interpreter, they are in the form of comments.
 - Example metadata:
@@ -137,21 +137,21 @@
 ### Non-native plugins:
 #### Creating your first non-native plugin with the SerpentLua API:
 - Note: Prior Geode SDK knowledge is highly recommended.
-1. Add `yellowcat98.serpentlua` as a dependency in your `mod.json`
-1.5. Optional, but super duper recommended. Enable `early-load` in your mod.json to ensure Scripts can run as early as possible.
-2. Include `<yellowcat98.serpentlua/include/SerpentLua.hpp>`
-3. Define your `entry` function. This function is the same as `entry` in native plugins.
+1. Add `yellowcat98.serpentlua` as a dependency in your `mod.json`.
+2. Enable `early-load` in your `mod.json`. This won't cause any issues, though scripts will load too late.
+3. Include `<yellowcat98.serpentlua/include/SerpentLua.hpp>`
+4. Define your `entry` function. This function is the same as `entry` in native plugins.
 - (Read ["Creating your first native plugin"](#creating-your-first-native-plugin) steps 10, 11. theyre the exact same i just dont want to rewrite them here)
-4. Inside your `$on_mod(Loaded)` or `$execute`, create your metadata.
+5. Inside your `$on_mod(Loaded)` or `$execute`, create your metadata.
 > ```c++
 >     auto metadata = SerpentLua::PluginMetadata::createFromMod(Mod::get());
 >     // You can use PluginMetadata::create, which instead of taking a `Mod*` argument, it takes a `std::map<std::string, std::string>` that contains your metadata keys. Though there are no advantages over `PluginMetadata::createFromMod`.
 >     // PluginMetadata::createFromMod also makes your Plugin automatically use whatever SerpentLua version you have installed.
 >     if (!metadata) /* Handle Error. */; // Optional, `metadata` is most unlikely to be nullptr.
 >     // The metadata keys aren't constant, you can modify them.
->    // Though if you're modifying the version (for example, separating the plugin's version from your mod's version.), It is recommended to make it have a leading V. (Doesn't make any difference, though it looks weird in the plugins list.)
+>    // Though if you're modifying the version (for example, separating the plugin's version from your mod's version.), It is recommended to make it have a leading V. (doesn't make any difference, though it looks weird in the plugins list.)
 > ```
-5. Create your `Plugin*`.
+6. Create your `Plugin*`.
 > ```c++
 >     auto res = SerpentLua::Plugin::create(metadata, myEntryFunction); // returns a geode::Result<Plugin*, std::string>.
 >     if (res.isErr()) /* Handle error. */;
@@ -159,12 +159,12 @@
 >     auto plugin = res.unwrap();
 >     plugin->setPlugin(); // Makes the plugin visible to SerpentLua's Runtime manager.
 > ```
-6. Remove your Mod ID from the `SerpentLua::globals::pluginsYetToLoad` vector.
+7. Remove your Mod ID from the `SerpentLua::globals::pluginsYetToLoad` vector.
 > ```c++
 >     SerpentLua::globals::pluginsYetToLoad.erase(std::remove(SerpentLua::globals::pluginsYetToLoad.begin(), SerpentLua::globals::pluginsYetToLoad.end(), Mod::get()->getID()), SerpentLua::globals::pluginsYetToLoad.end());
 >    // This operation must run regardless of whether the plugin failed to load or not. If not removed, scripts will not load at all.
 > ```
-7. Compile and run your plugin!
+8. Compile and run your plugin!
 
 #### Non-native plugin example worth looking at:
 [Non-native Plugintest](plugin_examples/yellowcat98.nonativeplugintest): This pretty much the same thing as PluginTest.

@@ -130,6 +130,8 @@ geode::Result<Plugin*, std::string> Plugin::createNative(const std::filesystem::
 		if (it == requiredKeys.end()) return Err("Plugin {}: Unknown Metadata key: {}", path.filename(), key);
 	}
 
+	if (string::pathToString(path.stem()) != metadataMap.at("id")) return Err("Plugin {}: ID must match the plugin file name without the `.slp` extension.", path.filename());
+
 	auto verRes = utility::handleVersion(metadataMap.at("version"));
 	if (verRes.isErr()) return Err("Plugin {}: Version cannot be parsed: {}", metadataMap.at("id"), *(verRes.err()));
 
