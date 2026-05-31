@@ -159,9 +159,8 @@ bool ScriptItem::init(const DisplayInfo& theMetadata, std::function<void(CCMenuI
 	auto infoBtn = CCMenuItemExt::createSpriteExtraWithFrameName("GJ_infoIcon_001.png", 1.5f, [&](CCMenuItemSpriteExtra*) {
 		PluginInfoPopup::create(metadata)->show();
 	});
-	
+	infoBtn->setID("info-btn");
 	if (this->source != Source::Index) infoBtn->setVisible(false);
-
 	viewMenu->addChild(infoBtn);
 
 	viewMenu->setLayout(

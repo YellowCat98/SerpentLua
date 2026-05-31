@@ -1,6 +1,5 @@
 #pragma once
 #include <Geode/Geode.hpp>
-#include <Geode/binding/SetIDPopupDelegate.hpp>
 #include <internal/SerpentLua.hpp>
 
 
@@ -11,40 +10,6 @@ namespace SerpentLua::internal::ui {
 		Scripts,
 		Plugins,
 		Index
-	};
-
-	// this only contains what scriptitem needs
-	struct DisplayInfo {
-		static DisplayInfo create(matjson::Value& metadata);
-		static DisplayInfo createFromScript(void* script, bool isScript);
-
-		std::string name;
-		std::string developer;
-		std::string id;
-		std::string version;
-		std::string serpentVersion;
-
-		std::string description;
-		std::string downloadLink;
-		std::string scriptExample;
-
-		std::string sourceCode;
-		std::string source;
-
-		int downloadCount = 0;
-		int accountId = 0;
-
-		int64_t releaseDate = 0;
-		int64_t lastUpdateDate = 0;
-
-		bool featured;
-
-		std::string path;
-		bool native;
-		bool loaded;
-		bool script;
-
-		std::variant<ScriptMetadata*, PluginMetadata*> internal; // represents the ScriptMetadata or PluginMetadata, nullptr if index.
 	};
 
 	template <typename T> T sourceValue(Source source, T script, T plugin, T index) {

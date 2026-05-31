@@ -101,18 +101,33 @@ bool PluginInfoPopup::init(const DisplayInfo& info) {
 	auto gh = CCMenuItemExt::createSpriteExtraWithFrameName("geode.loader/github.png", 0.8f, [info](CCMenuItemSpriteExtra*) {
 		web::openLinkInBrowser(info.source);
 	});
+
+	auto download = [this, info](bool script) {
+		Notification::create("SerpentLua: Starting download...", NotificationIcon::Info)->show();
+		ServerManager::get()->downloadPlugin(m_listener, script, info, [this, info, script](web::WebResponse resp, const std::string& err) {
+			bool isErr = !err.empty();
+
+			if (isErr) {
+				auto alert = MDPopup::create("Error", err, "OK");
+				alert->m_scene = this;
+				alert->show();
+			} else {
+				Notification::create(fmt::format("Downloaded {} plugin \"{}\" successfully!", script ? "script example for" : "", info.name), NotificationIcon::Success)->show();
+				ScriptsLayer::changesMade();
+				onClose(nullptr); // geode does this when you start downloading idk why lol!
+			}
+		});
+	};
+
 	auto get = CCMenuItemExt::createSpriteExtra(
 		ButtonSprite::create("Get", btns->getContentWidth(), btns->getContentWidth(), 1.0f, true, "goldFont.fnt", "GJ_button_01.png"),
-		[this, info](CCMenuItemSpriteExtra*) {
-			ServerManager::get()->downloadPlugin(m_listener, false, info.id, [](web::WebResponse resp) {
-				log::info("yoyo");
-				log::info("code: {}", resp.code());
-			});
+		[download](CCMenuItemSpriteExtra*) {
+			download(false);
 	});
 	auto getexple = CCMenuItemExt::createSpriteExtra(
 		ButtonSprite::create("Get Example", btns->getContentWidth(), btns->getContentWidth(), 1.0f, true, "goldFont.fnt", "GJ_button_01.png"),
-		[info](CCMenuItemSpriteExtra*) {
-			log::info("downloading: {}", info.scriptExample);
+		[download](CCMenuItemSpriteExtra*) {
+			download(true);
 		}
 	);
 

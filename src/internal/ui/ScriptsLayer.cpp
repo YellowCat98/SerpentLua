@@ -1,9 +1,9 @@
-#include <internal/ui/ScriptsLayer.hpp>
-#include <internal/ui/ScriptItem.hpp>
-#include <Geode/utils/async.hpp>
 #include <Geode/ui/GeodeUI.hpp>
+#include <internal/ui/ScriptsLayer.hpp>
+#include <ui/ScriptItem.hpp>
 
 using namespace SerpentLua::internal::ui;
+using namespace SerpentLua::internal;
 using namespace geode::prelude;
 
 DisplayInfo DisplayInfo::create(matjson::Value& map) {
@@ -14,12 +14,15 @@ DisplayInfo DisplayInfo::create(matjson::Value& map) {
     info.id = map["id"].asString().unwrapOr("");
     info.version = map["version"].asString().unwrapOr("");
     info.serpentVersion = map["serpent_version"].asString().unwrapOr("");
-
     info.description = map["description"].asString().unwrapOr("");
+
     info.downloadLink = map["download_link"].asString().unwrapOr("");
     info.scriptExample = map["script_example"].asString().unwrapOr("");
+	info.downloadHash = map["download_hash"].asString().unwrapOr("");
+	info.downloadHash = map["script_download_hash"].asString().unwrapOr("");
+	info.filename = map["filename"].asString().unwrapOr("");
+	info.scriptFilename = map["script_filename"].asString().unwrapOr("");
 
-    info.sourceCode = map["source_code"].asString().unwrapOr("");
     info.source = map["source"].asString().unwrapOr("");
 
     info.downloadCount = map["download_count"].asInt().unwrapOr(0);

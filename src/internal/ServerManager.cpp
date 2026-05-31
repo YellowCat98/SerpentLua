@@ -53,31 +53,36 @@ void ServerManager::sendReq(async::TaskHolder<utils::web::WebResponse>& listener
 	);
 }
 
-void ServerManager::downloadPlugin(async::TaskHolder<web::WebResponse>& listener, bool script, const std::string& id, std::function<void(web::WebResponse)> lambda) {
+void ServerManager::downloadPlugin(async::TaskHolder<web::WebResponse>& listener, bool script, const DisplayInfo& info, std::function<void(web::WebResponse, const std::string&)> lambda) {
+	if (info.scriptExample.empty() && script) return;
+
 	auto req = this->createReq(false);
 
 	req.param("script", script);
-	req.param("id", id);
+	req.param("id", info.id);
 
-	this->sendReq(listener, "GET", "/api/v1/plugin/download", req, [lambda, script, id](web::WebResponse resp) {
+	this->sendReq(listener, "GET", "/api/v1/plugin/download", req, [lambda, script, info](web::WebResponse resp) {
 		if (resp.ok()) {
 			auto dir = Mod::get()->getConfigDir() / "pending_install" / (script ? "scripts" : "plugins");
 			auto createdRes = file::createDirectoryAll(dir);
 			if (createdRes.isErr()) {
-				log::error("Unable to install plugin (create dir failed): {}", createdRes.unwrapErr());
-				lambda(resp);
+				lambda(resp, createdRes.unwrapErr());
 				return;
 			}
-			auto res = resp.into(dir / fmt::format("{}.slp", id));
+			auto final = dir / (script ? info.scriptFilename : info.filename);
+			if (std::filesystem::exists(final)) {
+				std::filesystem::remove_all(final);
+			}
+			auto res = resp.into(dir / (script ? info.scriptFilename : info.filename));
 			if (res.isErr()) {
-				log::error("Unable to install plugin: {}", createdRes.unwrapErr());
-				lambda(resp);
+				lambda(resp, res.unwrapErr());
 				return;
 			}
 		} else {
-			log::error("Err: {}", resp.errorMessage());
+			lambda(resp, std::string(resp.errorMessage()));
+			return;
 		}
 
-		lambda(resp);
+		lambda(resp, "");
 	});
 }
