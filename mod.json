@@ -50,11 +50,12 @@
 			"name": "Index URL",
 			"description": "The server URL wto get plugins from.",
 			"type": "string",
+			"filter": "!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~",
 			"default": ""
 		},
 		"should-authenticate": {
-			"name": "Authenticate with Argon",
-			"description": "Determines whether to authenticate with Argon or not.\nThis is usually not needed for the average user.",
+			"name": "Authenticate on Startup",
+			"description": "Determines whether to authenticate with Argon on startup or not.\nThis is usually not needed for the average user.",
 			"type": "bool",
 			"default": false,
 			"requires-restart": true
