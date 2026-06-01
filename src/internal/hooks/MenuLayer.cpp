@@ -29,7 +29,7 @@ class $modify(SexyMenuLayer, MenuLayer) {
 
 		static bool shouldAuthenticate = Mod::get()->getSettingValue<bool>("should-authenticate");
 		if (shouldAuthenticate) {
-			ServerManager::get()->authenticate(m_fields->listener);
+			ServerManager::get()->authenticate(argon::getGameAccountData());
 			shouldAuthenticate = false;
 		}
 

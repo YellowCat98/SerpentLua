@@ -102,7 +102,9 @@ bool PluginInfoPopup::init(const DisplayInfo& info) {
 
 	auto download = [this, info](bool script) {
 		Notification::create("SerpentLua: Starting download...", NotificationIcon::Info)->show();
-		ServerManager::get()->downloadPlugin(m_listener, script, info, [this, info, script](web::WebResponse resp, const std::string& err) {
+		async::spawn(ServerManager::get()->downloadPlugin(script, info), [this, info, script](std::pair<web::WebResponse, std::string> lovelyPair) {
+			auto& err = lovelyPair.second;
+			auto& resp = lovelyPair.first;
 			bool isErr = !err.empty();
 
 			if (isErr) {
@@ -112,7 +114,6 @@ bool PluginInfoPopup::init(const DisplayInfo& info) {
 			} else {
 				Notification::create(fmt::format("Downloaded {} plugin \"{}\" successfully!", script ? "script example for" : "", info.name), NotificationIcon::Success)->show();
 				ScriptsLayer::changesMade();
-				onClose(nullptr); // geode does this when you start downloading idk why lol!
 			}
 		});
 	};

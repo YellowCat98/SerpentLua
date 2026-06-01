@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 #include <filesystem>
+#include <argon/argon.hpp>
 extern "C" {
 	#include <lua.h>
 	#include <lualib.h>

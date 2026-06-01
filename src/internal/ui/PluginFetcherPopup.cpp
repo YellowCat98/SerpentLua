@@ -24,28 +24,42 @@ bool PluginFetcherPopup::init() {
 	textInput->setPosition({m_mainLayer->getContentWidth() / 2, (m_mainLayer->getContentHeight()/2) + 5.0f});
 	m_mainLayer->addChild(textInput);
 
-	auto ok = CCMenuItemExt::createSpriteExtra(ButtonSprite::create("View"), [this](CCMenuItemSpriteExtra*) {
+	auto ok = CCMenuItemExt::createSpriteExtra(ButtonSprite::create("View"), [this](CCMenuItemSpriteExtra* sender) {
+		sender->setEnabled(false);
 		textInput->setEnabled(false);
 		statusLabel->setString("Fetching...");
 		statusLabel->setColor({255 , 255, 255});
 		// begin da web requestino!
 		auto req = ServerManager::get()->createReq(false);
 		req.param("id", textInput->getString());
-	
-		ServerManager::get()->sendReq(listener, "GET", "/api/v1/plugin/fetch", req, [this](web::WebResponse resp) {
+
+		Ref<PluginFetcherPopup> self = this;
+		Ref<CCMenuItemSpriteExtra> betterSender = sender;
+
+		listener.spawn(ServerManager::get()->sendReq("GET", "/api/v1/plugin/fetch", std::move(req)), [self = std::move(self), betterSender = std::move(betterSender)](web::WebResponse resp) {
 			if (!(resp.code() >= 200 && resp.code() < 300)) {
+				log::debug("error response");
+				auto msg = fmt::format("Error: {} (Code {})", resp.string().unwrapOr("unknown error"), resp.code());
 				// the server only returns strings in the case of an error (i promise ill make it better in the v2 api trust me)
-				statusLabel->setString(fmt::format("Error: {} (Code {})", resp.string().unwrap(), resp.code()).c_str());
-				statusLabel->setColor({255, 0, 0});
+				
+				log::debug("queueinmainthread err");
+				betterSender->setEnabled(true);
+				self->statusLabel->setString(msg.c_str());
+				self->statusLabel->setColor({255, 0, 0});
+				self->textInput->setEnabled(true);
 				return;
 			}
 
-			auto json = resp.json().unwrap(); // the fetch endpoint always returns a json in the case of a success
-			PluginInfoPopup::create(DisplayInfo::create(json))->show();
+			log::debug("no error getting json");
 
-			statusLabel->setString("");
-			textInput->setEnabled(true);
-			textInput->setString("");
+			auto json = resp.json().unwrapOr(matjson::Value()); // the fetch endpoint always returns a json in the case of a success
+			
+			PluginInfoPopup::create(DisplayInfo::create(json))->show();
+			log::debug("success queueinmainthread");
+			betterSender->setEnabled(true);
+			self->statusLabel->setString("");
+			self->textInput->setEnabled(true);
+			self->textInput->setString("");
 		});
 	});
 	m_buttonMenu->addChildAtPosition(ok, Anchor::Bottom, {0.0f, 25.0f});

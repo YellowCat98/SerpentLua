@@ -63,7 +63,7 @@ bool OpenScriptsSettingNodeV3::init(std::shared_ptr<OpenScriptsSettingV3> settin
 	authSpr->setScale(0.5f);
 
 	auto authBtn = CCMenuItemExt::createSpriteExtra(authSpr, [&](CCMenuItemSpriteExtra* sender) {
-		ServerManager::get()->authenticate(listener);
+		ServerManager::get()->authenticate(argon::getGameAccountData());
 	});
 	this->getButtonMenu()->addChild(authBtn);
 

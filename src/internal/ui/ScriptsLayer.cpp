@@ -7,7 +7,7 @@ using namespace SerpentLua::internal::ui;
 using namespace SerpentLua::internal;
 using namespace geode::prelude;
 
-DisplayInfo DisplayInfo::create(matjson::Value& map) {
+DisplayInfo DisplayInfo::create(matjson::Value map) {
     DisplayInfo info;
 
     info.name = map["name"].asString().unwrapOr("");
@@ -151,7 +151,7 @@ void ScriptsLayer::loadPageServer(int page) {
 	req.param("sort", "most_recent");
 	req.param("page", page);
 
-	ServerManager::get()->sendReq(this->serverListener, "GET", "/api/v1/plugin/fetch/bulk", req, [this, page](web::WebResponse res) {
+	async::spawn(ServerManager::get()->sendReq("GET", "/api/v1/plugin/fetch/bulk", req), [this, page](web::WebResponse res) {
 		spinner->setVisible(false);
 		MDPopup* popup = nullptr;
 		if (!res.ok()) {

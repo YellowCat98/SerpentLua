@@ -17,7 +17,7 @@ namespace SerpentLua::internal {
 
 	// universal metadata for both scripts, plugins, and serverside plugins! this is meant for ui
 	struct DisplayInfo {
-		static DisplayInfo create(matjson::Value& metadata);
+		static DisplayInfo create(matjson::Value metadata);
 		static DisplayInfo createFromScript(void* script, bool isScript);
 
 		std::string name;
@@ -64,9 +64,9 @@ namespace SerpentLua::internal {
 
 		geode::utils::web::WebRequest createReq(bool withAuth = false); // withAuth just passes in the session token as Authorization lol!
 
-		void sendReq(geode::async::TaskHolder<geode::utils::web::WebResponse>& listener, const std::string& method, const std::string& path, geode::utils::web::WebRequest& req, std::function<void(geode::utils::web::WebResponse)> lambda);
-		void downloadPlugin(geode::async::TaskHolder<geode::utils::web::WebResponse>& listener, bool script, const DisplayInfo& info, std::function<void(geode::utils::web::WebResponse, const std::string&)> lambda);
-		void authenticate(geode::async::TaskHolder<geode::utils::web::WebResponse>& webListener);
+		geode::utils::web::WebFuture sendReq(const std::string& method, const std::string& path, geode::utils::web::WebRequest req);
+		arc::Future<std::pair<geode::utils::web::WebResponse, std::string>> downloadPlugin(bool script, const DisplayInfo& info);
+		void authenticate(argon::AccountData data);
 	private:
 		std::string sessionToken;
 		std::string url;
