@@ -15,7 +15,7 @@ Result<void, std::vector<std::pair<std::string, std::string>>> createDirs(const 
 	for (auto& dir : dirs) {
 		if (!std::filesystem::exists(where / dir)) {
 			log::info("Directory {} does not exist, creating it now.", dir);
-			auto createDirRes = utils::file::createDirectory(where / dir);
+			auto createDirRes = utils::file::createDirectoryAll(where / dir);
 			if (createDirRes.isErr()) errs.push_back({dir, createDirRes.err().value()});
 		}
 	}
@@ -45,7 +45,7 @@ $on_mod(Loaded) {
 
 	auto configDir = Mod::get()->getConfigDir();
 	
-	auto res = createDirs(configDir, {"plugin_global_deps", "plugin_deps", "plugins", "scripts", "playground", "pending_install"});
+	auto res = createDirs(configDir, {"plugin_global_deps", "plugin_deps", "plugins", "scripts", "playground", "pending_install/plugins", "pending_install/scripts"});
 	if (res.isErr()) {
 		auto errs = *(res.err());
 		for (auto& err : errs) {

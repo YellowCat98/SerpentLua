@@ -18,6 +18,11 @@ void SerpentLua::internal::StartupOperations::installPending(bool scripts) {
 		std::filesystem::rename(file, final, ec);
 		if (ec) {
 			log::error("Unable to move file: {}", ec.message());
+			return;
+		}
+
+		if (!scripts) {
+			Mod::get()->setSavedValue<bool>(fmt::format("safe-{}", file.stem()), true);
 		}
 	}
 }
