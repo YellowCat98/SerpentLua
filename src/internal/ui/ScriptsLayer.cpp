@@ -1,6 +1,7 @@
 #include <Geode/ui/GeodeUI.hpp>
 #include <internal/ui/ScriptsLayer.hpp>
-#include <ui/ScriptItem.hpp>
+#include <internal/ui/ScriptItem.hpp>
+#include <internal/ui/PluginFetcherPopup.hpp>
 
 using namespace SerpentLua::internal::ui;
 using namespace SerpentLua::internal;
@@ -368,7 +369,27 @@ bool ScriptsLayer::init(Source source) {
 	actionsMenu->setID("actions-menu");
 
 	if (source != Source::Index) {
-		auto JeomETRYdASH = CCMenuItemSpriteExtra::create(CircleButtonSprite::create(CCSprite::create(this->source == Source::Plugins ? "plugin_import.png"_spr : "script_import.png"_spr), CircleBaseColor::Green, CircleBaseSize::Small), this, menu_selector(ScriptsLayer::importPlugin));
+		CCMenuItemSpriteExtra* JeomETRYdASH;
+
+		if (source == Source::Plugins) {
+			JeomETRYdASH = CCMenuItemExt::createSpriteExtra(CircleButtonSprite::create(CCSprite::create("plugin_import.png"_spr), CircleBaseColor::Green, CircleBaseSize::Small), [this](CCObject* sender) {
+				geode::createQuickPopup(
+					"Choose Method",
+					"What method would you like to use to import?",
+					"From Disk", "From Server",
+					[this, sender](FLAlertLayer*, bool btn2) {
+						if (btn2) {
+							PluginFetcherPopup::create()->show();
+						} else {
+							this->importPlugin(sender);
+						}
+					}
+				);
+			});
+		} else {
+			JeomETRYdASH = CCMenuItemSpriteExtra::create(CircleButtonSprite::create(CCSprite::create("script_import.png"_spr), CircleBaseColor::Green, CircleBaseSize::Small), this, menu_selector(ScriptsLayer::importPlugin));
+		}
+
 		JeomETRYdASH->setID("import-btn");
 
 		actionsMenu->addChild(JeomETRYdASH);

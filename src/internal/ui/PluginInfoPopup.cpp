@@ -1,5 +1,3 @@
-#include "Geode/utils/web.hpp"
-#include <Geode/binding/CCMenuItemSpriteExtra.hpp>
 #include <internal/ui/PluginInfoPopup.hpp>
 
 using namespace SerpentLua::internal::ui;

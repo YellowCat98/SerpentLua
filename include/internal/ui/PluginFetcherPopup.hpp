@@ -2,13 +2,14 @@
 
 #include <Geode/Geode.hpp>
 #include <internal/ui/ScriptsLayer.hpp>
+#include <internal/ui/ScriptItem.hpp>
 
 namespace SerpentLua::internal::ui {
-	class PluginInfoPopup : public geode::Popup {
+	class PluginFetcherPopup : public geode::Popup {
 	protected:
 		geode::async::TaskHolder<geode::utils::web::WebResponse> m_listener;
-		bool init(const DisplayInfo& info);
+		bool init();
 	public:
-		static PluginInfoPopup* create(const DisplayInfo& info);
+		static PluginFetcherPopup* create();
 	};
 };
