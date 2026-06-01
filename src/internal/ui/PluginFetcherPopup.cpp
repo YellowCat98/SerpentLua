@@ -1,12 +1,54 @@
 #include <internal/ui/PluginFetcherPopup.hpp>
+#include <internal/ui/PluginInfoPopup.hpp>
 
 using namespace SerpentLua::internal::ui;
 using namespace geode::prelude;
 
 bool PluginFetcherPopup::init() {
-	if (!Popup::init(200.0f, 160.0f)) return false;
+	if (!Popup::init(333.0f, 130.0f)) return false;
+	this->setTitle("Enter Plugin ID");
+	m_closeBtn->setID("close-btn"); // close button deserves an id too!!!
 
-	this->setTitle("Plugin Fetcher");
+	statusLabel = CCLabelBMFont::create("", "bigFont.fnt");
+	statusLabel->setScale(0.5f);
+	m_mainLayer->addChildAtPosition(statusLabel, Anchor::Bottom, {0.0f, -10.0f});
+
+	auto infoBtn = CCMenuItemExt::createSpriteExtraWithFrameName("GJ_infoIcon_001.png", 0.8f, [](CCMenuItemSpriteExtra*) {
+		FLAlertLayer::create("Info", "The <co>plugin fetcher</c> allows you to get information about a plugin from the server chosen in the settings via ID.", "OK")->show();
+	});
+	infoBtn->setID("info-btn");
+	m_buttonMenu->addChildAtPosition(infoBtn, Anchor::BottomRight, {-20.0f, 20.0f});
+
+	textInput = TextInput::create(m_mainLayer->getContentWidth() - 15.0f, "plugin.id");
+	textInput->setCommonFilter(CommonFilter::ID);
+	textInput->setPosition({m_mainLayer->getContentWidth() / 2, (m_mainLayer->getContentHeight()/2) + 5.0f});
+	m_mainLayer->addChild(textInput);
+
+	auto ok = CCMenuItemExt::createSpriteExtra(ButtonSprite::create("View"), [this](CCMenuItemSpriteExtra*) {
+		textInput->setEnabled(false);
+		statusLabel->setString("Fetching...");
+		statusLabel->setColor({255 , 255, 255});
+		// begin da web requestino!
+		auto req = ServerManager::get()->createReq(false);
+		req.param("id", textInput->getString());
+	
+		ServerManager::get()->sendReq(listener, "GET", "/api/v1/plugin/fetch", req, [this](web::WebResponse resp) {
+			if (!(resp.code() >= 200 && resp.code() < 300)) {
+				// the server only returns strings in the case of an error (i promise ill make it better in the v2 api trust me)
+				statusLabel->setString(fmt::format("Error: {} (Code {})", resp.string().unwrap(), resp.code()).c_str());
+				statusLabel->setColor({255, 0, 0});
+				return;
+			}
+
+			auto json = resp.json().unwrap(); // the fetch endpoint always returns a json in the case of a success
+			PluginInfoPopup::create(DisplayInfo::create(json))->show();
+
+			statusLabel->setString("");
+			textInput->setEnabled(true);
+			textInput->setString("");
+		});
+	});
+	m_buttonMenu->addChildAtPosition(ok, Anchor::Bottom, {0.0f, 25.0f});
 
 	return true;
 }

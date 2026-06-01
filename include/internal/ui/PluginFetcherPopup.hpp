@@ -7,8 +7,10 @@
 namespace SerpentLua::internal::ui {
 	class PluginFetcherPopup : public geode::Popup {
 	protected:
-		geode::async::TaskHolder<geode::utils::web::WebResponse> m_listener;
+		geode::async::TaskHolder<geode::utils::web::WebResponse> listener;
 		bool init();
+		geode::TextInput* textInput;
+		cocos2d::CCLabelBMFont* statusLabel;
 	public:
 		static PluginFetcherPopup* create();
 	};
