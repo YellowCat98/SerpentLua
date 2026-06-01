@@ -56,7 +56,7 @@ Plugin::__metadata Plugin::SerpentLuaAPIImpl::get_script(lua_State* L) {
 
 geode::Result<Plugin*, std::string> Plugin::createNative(const std::filesystem::path& path) {
 	log::info("Loading Native Plugin {}: initialized", path.filename());
-	if (!Mod::get()->getSavedValue<bool>(fmt::format("safe-{}", path.stem())) && !Mod::get()->getSettingValue<bool>("dev-mode") && !Mod::get()->getSavedValue<bool>("should-show-warning")) return Err("Native Plugin {} was imported manually.\nThis plugin will not load unless it's imported through the plugin importer in-game.", path.stem());
+	if (!Mod::get()->getSavedValue<bool>(fmt::format("safe-{}", path.stem())) && !Mod::get()->getSettingValue<bool>("dev-mode")) return Err("Native Plugin {} was imported manually.\nThis plugin will not load unless it's imported through the plugin importer in-game.", path.stem());
 	auto configDir = Mod::get()->getConfigDir();
 	bool depsDir = std::filesystem::exists(configDir/"plugin_deps"/path.filename());
 	if (depsDir) {
