@@ -34,23 +34,20 @@ bool PluginFetcherPopup::init() {
 		req.param("id", textInput->getString());
 
 		listener.spawn(ServerManager::get()->sendReq("GET", "/api/v1/plugin/fetch", std::move(req)), [this, sender](web::WebResponse resp) {
-			if (!(resp.code() >= 200 && resp.code() < 300)) {
-				auto msg = fmt::format("Error: {} (Code {})", resp.string().unwrapOr("unknown error"), resp.code());
-				// the server only returns strings in the case of an error (i promise ill make it better in the v2 api trust me)
-				sender->setEnabled(true);
-				this->statusLabel->setString(msg.c_str());
-				this->statusLabel->setColor({255, 0, 0});
-				this->textInput->setEnabled(true);
-				return;
-			}
-
-			auto json = resp.json().unwrapOr(matjson::Value()); // the fetch endpoint always returns a json in the case of a success
-			
-			PluginInfoPopup::create(DisplayInfo::create(json))->show();
 			sender->setEnabled(true);
 			this->statusLabel->setString("");
 			this->textInput->setEnabled(true);
-			this->textInput->setString("");
+			if (!(resp.code() >= 200 && resp.code() < 300)) {
+				auto msg = fmt::format("Error: {} (Code {})", resp.string().unwrapOr("unknown error"), resp.code());
+				this->statusLabel->setString(msg.c_str());
+				this->statusLabel->setColor({255, 0, 0});
+				return;
+			}
+
+			auto json = resp.json().unwrapOr(matjson::Value());
+			
+			PluginInfoPopup::create(DisplayInfo::create(json))->show();
+			textInput->setString("");
 		});
 	});
 	m_buttonMenu->addChildAtPosition(ok, Anchor::Bottom, {0.0f, 25.0f});
