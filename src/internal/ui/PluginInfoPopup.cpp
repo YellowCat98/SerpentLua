@@ -96,9 +96,17 @@ bool PluginInfoPopup::init(const DisplayInfo& info) {
 		->setAxisReverse(true)
 	);
 
-	auto gh = CCMenuItemExt::createSpriteExtraWithFrameName("geode.loader/github.png", 0.8f, [info](CCMenuItemSpriteExtra*) {
-		web::openLinkInBrowser(info.source);
+	auto source = CCMenuItemExt::createSpriteExtraWithFrameName("geode.loader/source_generic.png", 0.8f, [info](CCMenuItemSpriteExtra*) {
+		geode::createQuickPopup(
+			"Confirm",
+			fmt::format("Would you like to visit <cf>{}</c>?", info.source),
+			"Cancel", "Confirm",
+			[info](FLAlertLayer*, bool btn2) {
+				if (btn2) web::openLinkInBrowser(info.source);
+			}
+		);
 	});
+	source->setID("source");
 
 	auto download = [this, info](bool script, CCMenuItemSpriteExtra* sender) {
 		Notification::create("SerpentLua: Starting download...", NotificationIcon::Info)->show();
@@ -129,14 +137,20 @@ bool PluginInfoPopup::init(const DisplayInfo& info) {
 		[download](CCMenuItemSpriteExtra* sender) {
 			download(false, sender);
 	});
+	get->setID("get");
 	auto getexple = CCMenuItemExt::createSpriteExtra(
 		ButtonSprite::create("Get Example", btns->getContentWidth(), btns->getContentWidth(), 1.0f, true, "goldFont.fnt", "GJ_button_01.png"),
 		[download](CCMenuItemSpriteExtra* sender) {
 			download(true, sender);
 		}
 	);
+	if (info.scriptExample.empty()) {
+		getexple->setEnabled(false);
+		static_cast<ButtonSprite*>(getexple->getNormalImage())->setColor({127, 127, 127});
+	}
+	getexple->setID("get-example");
 
-	btns->addChild(gh);
+	btns->addChild(source);
 	btns->addChild(get);
 	btns->addChild(getexple);
 

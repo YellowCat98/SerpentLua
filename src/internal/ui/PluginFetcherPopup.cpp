@@ -24,6 +24,7 @@ bool PluginFetcherPopup::init() {
 	textInput->setCommonFilter(CommonFilter::ID);
 	textInput->setID("text-input");
 	textInput->setPosition({m_mainLayer->getContentWidth() / 2, (m_mainLayer->getContentHeight()/2) + 5.0f});
+	textInput->focus();
 	m_mainLayer->addChild(textInput);
 
 	auto ok = CCMenuItemExt::createSpriteExtra(ButtonSprite::create("View"), [this](CCMenuItemSpriteExtra* sender) {
@@ -50,6 +51,7 @@ bool PluginFetcherPopup::init() {
 			
 			PluginInfoPopup::create(DisplayInfo::create(json))->show();
 			textInput->setString("");
+			textInput->defocus();
 		});
 	});
 	ok->setID("ok");
