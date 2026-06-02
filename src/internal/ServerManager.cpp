@@ -52,18 +52,23 @@ arc::Future<web::WebResponse> ServerManager::sendReq(std::string method, std::st
 	co_return co_await req.send(method, url);
 }
 
-arc::Future<std::pair<web::WebResponse, std::string>> ServerManager::downloadPlugin(bool script, const DisplayInfo& info) {
+arc::Future<std::pair<web::WebResponse, std::string>> ServerManager::downloadPlugin(bool script, const DisplayInfo& info, ButtonSprite* button) {
 	using FuckassPair = std::pair<web::WebResponse, std::string>;
 	if (info.scriptExample.empty() && script) co_return FuckassPair();
 
 	auto req = this->createReq(false);
 	req.param("id", info.id);
-	req.param("script", script);
-	req.onProgress([](const web::WebProgress& prog) {
-		log::info("progress: {}", prog.downloadProgress().value_or(0.0f));
-	});
+	req.param("script", static_cast<int>(script));
+	std::string originalBtnStr; 
+	if (button) {
+		req.onProgress([button](const web::WebProgress& prog) {
+			if (button) {
+				auto downloadProg = prog.downloadProgress().value_or(0.0f);
+				button->setString(fmt::format("Prog: {:.2f}%", downloadProg).c_str());
+			}
+		});
+	}
 
-	auto url = script ? info.scriptExample : info.downloadLink;
 	auto originalHash = script ? info.scriptDownloadHash : info.downloadHash;
 
 	auto resp = co_await this->sendReq("GET", "/api/v1/plugin/download", req);
