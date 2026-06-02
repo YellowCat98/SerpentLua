@@ -33,33 +33,24 @@ bool PluginFetcherPopup::init() {
 		auto req = ServerManager::get()->createReq(false);
 		req.param("id", textInput->getString());
 
-		Ref<PluginFetcherPopup> self = this;
-		Ref<CCMenuItemSpriteExtra> betterSender = sender;
-
-		listener.spawn(ServerManager::get()->sendReq("GET", "/api/v1/plugin/fetch", std::move(req)), [self = std::move(self), betterSender = std::move(betterSender)](web::WebResponse resp) {
+		listener.spawn(ServerManager::get()->sendReq("GET", "/api/v1/plugin/fetch", std::move(req)), [this, sender](web::WebResponse resp) {
 			if (!(resp.code() >= 200 && resp.code() < 300)) {
-				log::debug("error response");
 				auto msg = fmt::format("Error: {} (Code {})", resp.string().unwrapOr("unknown error"), resp.code());
 				// the server only returns strings in the case of an error (i promise ill make it better in the v2 api trust me)
-				
-				log::debug("queueinmainthread err");
-				betterSender->setEnabled(true);
-				self->statusLabel->setString(msg.c_str());
-				self->statusLabel->setColor({255, 0, 0});
-				self->textInput->setEnabled(true);
+				sender->setEnabled(true);
+				this->statusLabel->setString(msg.c_str());
+				this->statusLabel->setColor({255, 0, 0});
+				this->textInput->setEnabled(true);
 				return;
 			}
-
-			log::debug("no error getting json");
 
 			auto json = resp.json().unwrapOr(matjson::Value()); // the fetch endpoint always returns a json in the case of a success
 			
 			PluginInfoPopup::create(DisplayInfo::create(json))->show();
-			log::debug("success queueinmainthread");
-			betterSender->setEnabled(true);
-			self->statusLabel->setString("");
-			self->textInput->setEnabled(true);
-			self->textInput->setString("");
+			sender->setEnabled(true);
+			this->statusLabel->setString("");
+			this->textInput->setEnabled(true);
+			this->textInput->setString("");
 		});
 	});
 	m_buttonMenu->addChildAtPosition(ok, Anchor::Bottom, {0.0f, 25.0f});

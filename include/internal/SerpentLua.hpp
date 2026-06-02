@@ -64,7 +64,7 @@ namespace SerpentLua::internal {
 
 		geode::utils::web::WebRequest createReq(bool withAuth = false); // withAuth just passes in the session token as Authorization lol!
 
-		geode::utils::web::WebFuture sendReq(const std::string& method, const std::string& path, geode::utils::web::WebRequest req);
+		arc::Future<geode::utils::web::WebResponse> sendReq(std::string method, std::string path, geode::utils::web::WebRequest req);
 		arc::Future<std::pair<geode::utils::web::WebResponse, std::string>> downloadPlugin(bool script, const DisplayInfo& info);
 		void authenticate(argon::AccountData data);
 	private:

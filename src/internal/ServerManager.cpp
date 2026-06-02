@@ -45,9 +45,10 @@ web::WebRequest ServerManager::createReq(bool withAuth) {
 	return req;
 }
 
-web::WebFuture ServerManager::sendReq(const std::string& method, const std::string& path, web::WebRequest req) {
+arc::Future<web::WebResponse> ServerManager::sendReq(std::string method, std::string path, web::WebRequest req) {
+	log::info("sendreq called");
 	auto url = this->getEndpoint(path);
-	return std::move(req).send(method, url);
+	co_return co_await req.send(method, url);
 }
 
 arc::Future<std::pair<web::WebResponse, std::string>> ServerManager::downloadPlugin(bool script, const DisplayInfo& info) {

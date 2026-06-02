@@ -100,12 +100,18 @@ bool PluginInfoPopup::init(const DisplayInfo& info) {
 		web::openLinkInBrowser(info.source);
 	});
 
-	auto download = [this, info](bool script) {
+	auto download = [this, info](bool script, CCMenuItemSpriteExtra* sender) {
 		Notification::create("SerpentLua: Starting download...", NotificationIcon::Info)->show();
-		async::spawn(ServerManager::get()->downloadPlugin(script, info), [this, info, script](std::pair<web::WebResponse, std::string> lovelyPair) {
+		sender->setEnabled(false);
+		auto image = static_cast<ButtonSprite*>(sender->getNormalImage());
+		image->updateBGImage("GJ_button_02.png");
+		async::spawn(ServerManager::get()->downloadPlugin(script, info), [this, info, script, image, sender](std::pair<web::WebResponse, std::string> lovelyPair) {
 			auto& err = lovelyPair.second;
 			auto& resp = lovelyPair.first;
 			bool isErr = !err.empty();
+
+			image->updateBGImage("GJ_button_01.png");
+			sender->setEnabled(true);
 
 			if (isErr) {
 				auto alert = MDPopup::create("Error", err, "OK");
@@ -120,13 +126,13 @@ bool PluginInfoPopup::init(const DisplayInfo& info) {
 
 	auto get = CCMenuItemExt::createSpriteExtra(
 		ButtonSprite::create("Get", btns->getContentWidth(), btns->getContentWidth(), 1.0f, true, "goldFont.fnt", "GJ_button_01.png"),
-		[download](CCMenuItemSpriteExtra*) {
-			download(false);
+		[download](CCMenuItemSpriteExtra* sender) {
+			download(false, sender);
 	});
 	auto getexple = CCMenuItemExt::createSpriteExtra(
 		ButtonSprite::create("Get Example", btns->getContentWidth(), btns->getContentWidth(), 1.0f, true, "goldFont.fnt", "GJ_button_01.png"),
-		[download](CCMenuItemSpriteExtra*) {
-			download(true);
+		[download](CCMenuItemSpriteExtra* sender) {
+			download(true, sender);
 		}
 	);
 
