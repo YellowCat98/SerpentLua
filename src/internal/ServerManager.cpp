@@ -1,5 +1,6 @@
 #include <SerpentLua.hpp>
 #include <internal/SerpentLua.hpp>
+#include <libs/picosha2/picosha2.h>
 
 using namespace geode::prelude;
 using namespace SerpentLua;
@@ -56,28 +57,44 @@ arc::Future<std::pair<web::WebResponse, std::string>> ServerManager::downloadPlu
 	if (info.scriptExample.empty() && script) co_return FuckassPair();
 
 	auto req = this->createReq(false);
-
-	req.param("script", script);
 	req.param("id", info.id);
+	req.param("script", script);
+	req.onProgress([](const web::WebProgress& prog) {
+		log::info("progress: {}", prog.downloadProgress().value_or(0.0f));
+	});
+
+	auto url = script ? info.scriptExample : info.downloadLink;
+	auto originalHash = script ? info.scriptDownloadHash : info.downloadHash;
 
 	auto resp = co_await this->sendReq("GET", "/api/v1/plugin/download", req);
-		if (resp.ok()) {
-			auto dir = Mod::get()->getConfigDir() / "pending_install" / (script ? "scripts" : "plugins");
-			auto createdRes = file::createDirectoryAll(dir);
-			if (createdRes.isErr()) {
-				co_return FuckassPair{resp, createdRes.unwrapErr()};
-			}
-			auto final = dir / (script ? info.scriptFilename : info.filename);
-			if (std::filesystem::exists(final)) {
-				std::filesystem::remove_all(final);
-			}
-			auto res = resp.into(final);
-			if (res.isErr()) {
-				co_return FuckassPair{resp, res.unwrapErr()};
-			}
-		}
 	
-	co_return FuckassPair{resp, resp.errorMessage()};
+	if (resp.ok()) {
+		// first tings first we check da hash
+		// https://github.com/geode-sdk/geode/blob/f60a77bdf41ba5974dbd1aa2368e5db9cae4a3b2/loader/hash/hash.cpp#L29
+		std::vector<uint8_t> hashVec(picosha2::k_digest_size);
+		picosha2::hash256(resp.data().begin(), resp.data().end(), hashVec);
+		auto hash = fmt::format("sha256:{}", picosha2::bytes_to_hex_string(hashVec.begin(), hashVec.end()));
+		log::info("original: \"{}\"\ngot: \"{}\"", originalHash, hash);
+		if (originalHash != hash) co_return FuckassPair{resp, "Hash mismatch"};
+
+		auto dir = Mod::get()->getConfigDir() / "pending_install" / (script ? "scripts" : "plugins");
+		auto createdRes = file::createDirectoryAll(dir);
+		if (createdRes.isErr()) {
+			co_return FuckassPair{resp, createdRes.unwrapErr()};
+		}
+		auto final = dir / (script ? info.scriptFilename : info.filename);
+		if (std::filesystem::exists(final)) {
+			std::filesystem::remove_all(final);
+		}
+		auto res = resp.into(final);
+		if (res.isErr()) {
+			co_return FuckassPair{resp, res.unwrapErr()};
+		}
+
+		co_return FuckassPair({resp, ""});
+	}
+	
+	co_return FuckassPair{resp, resp.string().unwrapOr("")};
 }
 
 void ServerManager::authenticate(argon::AccountData data) {

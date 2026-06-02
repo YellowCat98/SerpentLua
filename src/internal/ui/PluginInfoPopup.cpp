@@ -125,6 +125,7 @@ bool PluginInfoPopup::init(const DisplayInfo& info) {
 				auto alert = MDPopup::create("Error", err, "OK");
 				alert->m_scene = this;
 				alert->show();
+				return;
 			} else {
 				Notification::create(fmt::format("Downloaded {} plugin \"{}\" successfully!", script ? "script example for" : "", info.name), NotificationIcon::Success)->show();
 				ScriptsLayer::changesMade();

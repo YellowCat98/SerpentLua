@@ -20,7 +20,7 @@ DisplayInfo DisplayInfo::create(matjson::Value map) {
     info.downloadLink = map["download_link"].asString().unwrapOr("");
     info.scriptExample = map["script_example"].asString().unwrapOr("");
 	info.downloadHash = map["download_hash"].asString().unwrapOr("");
-	info.downloadHash = map["script_download_hash"].asString().unwrapOr("");
+	info.scriptDownloadHash = map["script_download_hash"].asString().unwrapOr("");
 	info.filename = map["filename"].asString().unwrapOr("");
 	info.scriptFilename = map["script_filename"].asString().unwrapOr("");
 
