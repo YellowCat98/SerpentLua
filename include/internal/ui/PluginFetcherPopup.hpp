@@ -11,6 +11,7 @@ namespace SerpentLua::internal::ui {
 		bool init();
 		geode::TextInput* textInput;
 		cocos2d::CCLabelBMFont* statusLabel;
+		void setStatusLabel(const std::string& text);
 	public:
 		static PluginFetcherPopup* create();
 	};

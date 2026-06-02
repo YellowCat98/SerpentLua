@@ -10,6 +10,7 @@ bool PluginFetcherPopup::init() {
 	m_closeBtn->setID("close-btn"); // close button deserves an id too!!!
 
 	statusLabel = CCLabelBMFont::create("", "bigFont.fnt");
+	statusLabel->setID("status");
 	statusLabel->setScale(0.5f);
 	m_mainLayer->addChildAtPosition(statusLabel, Anchor::Bottom, {0.0f, -10.0f});
 
@@ -21,13 +22,14 @@ bool PluginFetcherPopup::init() {
 
 	textInput = TextInput::create(m_mainLayer->getContentWidth() - 15.0f, "plugin.id");
 	textInput->setCommonFilter(CommonFilter::ID);
+	textInput->setID("text-input");
 	textInput->setPosition({m_mainLayer->getContentWidth() / 2, (m_mainLayer->getContentHeight()/2) + 5.0f});
 	m_mainLayer->addChild(textInput);
 
 	auto ok = CCMenuItemExt::createSpriteExtra(ButtonSprite::create("View"), [this](CCMenuItemSpriteExtra* sender) {
 		sender->setEnabled(false);
 		textInput->setEnabled(false);
-		statusLabel->setString("Fetching...");
+		setStatusLabel("Fetching...");
 		statusLabel->setColor({255 , 255, 255});
 		// begin da web requestino!
 		auto req = ServerManager::get()->createReq(false);
@@ -35,11 +37,11 @@ bool PluginFetcherPopup::init() {
 
 		listener.spawn(ServerManager::get()->sendReq("GET", "/api/v1/plugin/fetch", std::move(req)), [this, sender](web::WebResponse resp) {
 			sender->setEnabled(true);
-			this->statusLabel->setString("");
+			setStatusLabel("");
 			this->textInput->setEnabled(true);
 			if (!(resp.code() >= 200 && resp.code() < 300)) {
 				auto msg = fmt::format("Error: {} (Code {})", resp.string().unwrapOr("unknown error"), resp.code());
-				this->statusLabel->setString(msg.c_str());
+				setStatusLabel(msg);
 				this->statusLabel->setColor({255, 0, 0});
 				return;
 			}
@@ -50,9 +52,15 @@ bool PluginFetcherPopup::init() {
 			textInput->setString("");
 		});
 	});
+	ok->setID("ok");
 	m_buttonMenu->addChildAtPosition(ok, Anchor::Bottom, {0.0f, 25.0f});
 
 	return true;
+}
+
+void PluginFetcherPopup::setStatusLabel(const std::string& text) {
+	statusLabel->setString(text.c_str());
+	statusLabel->limitLabelWidth(m_mainLayer->getContentWidth() + 50.0f, 0.5f, 0.01f);
 }
 
 PluginFetcherPopup* PluginFetcherPopup::create() {
