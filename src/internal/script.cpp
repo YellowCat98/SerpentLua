@@ -67,12 +67,24 @@ lua_State* script::createState() {
 			return 1;
 		});
 		lua_setglobal(state, "require");
-
 	}
 
+	*static_cast<script**>(lua_getextraspace(state)) = this;
+
 	lua_atpanic(state, [](lua_State* L) -> int {
-		log::error("LUA PANIC: {}", lua_tostring(L, -1));
-		MessageBoxA(nullptr, fmt::format("{}", lua_tostring(L, -1)).c_str(), "LUA PANIC!", MB_OK | MB_ICONERROR);
+		auto* self = *static_cast<script**>(lua_getextraspace(L));
+		log::error("[SCRIPT] [{}] LUA PANIC: {}", self->getMetadata()->name, lua_tostring(L, -1));
+		MessageBoxA(
+			nullptr,
+			fmt::format(
+				"A script has encountered an unrecoverable error and has panicked.\n"
+				"=======================================\n"
+				"Faulty script: {}\n\n"
+				"=================Error===================\n"
+				"{}",
+				self->getMetadata()->id, lua_tostring(L, -1)
+			).c_str(), 
+			"SerpentLua: LUA PANIC!", MB_OK | MB_ICONERROR);
 		return 0;
 	});
 

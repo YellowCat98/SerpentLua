@@ -44,7 +44,7 @@ namespace SerpentLua::internal::ScriptBuiltin::ui {
 		// not binding this but i need them in attribute handler
 		std::unordered_map<std::string, Attribute> methods;
 	private:
-		cocos2d::CCNode* node; // casted to whatever type it is
+		cocos2d::CCNode* node; // casted to whatever type it is when needed to be used
 		ScriptBuiltin::Enums::ui::NodeType type;
 	};
 
@@ -55,5 +55,7 @@ namespace SerpentLua::internal::ScriptBuiltin::ui {
 		static void populateAttributesLabel(sol::state_view state, Node* node);
 		static void populateAttributesMenu(sol::state_view state, Node* node);
 		static void populateAttributesAlert(sol::state_view state, Node* node);
+
+		static void populateAttributesAccordingly(sol::state_view state, Node* node);
 	};
 }

@@ -6,6 +6,8 @@
 - UI: Unnoticeably faster plugin/script lookup.
 - Plugins: Install plugin via URL.
 - Script termination: Log error properly (how did it take me this long to find this)
+- SL Plugin v1.2.1: Fixed issue with createFromCCNode not allowing calling non-Node exclusive methods when type is provided.
+- Error handling: Made lua panic popup more detailed.
 
 # 1.3.0
 - SL Plugin v1.2.0: Add new `Alert` node type.

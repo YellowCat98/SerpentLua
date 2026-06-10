@@ -95,7 +95,7 @@ ScriptBuiltin::ui::Node* ScriptBuiltin::ui::Node::createFromCCNode(sol::this_sta
 
 	ret->node = rawNode;
 
-	ScriptBuiltin::ui::AttributeHandler::populateAttributesNode(state, ret);
+	ScriptBuiltin::ui::AttributeHandler::populateAttributesAccordingly(state, ret);
 
 	return ret;
 }

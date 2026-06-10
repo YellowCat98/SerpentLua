@@ -1,7 +1,7 @@
 --@name SL Example 05
 --@id examples.ui
 --@version 1.0.0
---@serpent-version 1.0.0
+--@serpent-version 1.3.0
 --@developer YellowCat98
 --@plugins serpentlua.std yellowcat98.modify
 
@@ -40,6 +40,15 @@ Modify.createHook("hello-hook", "MenuLayer", "init", function(self)
 	-- `self` is a MenuLayer, which derives from CCNode. (i mean it derives from a bunch of stuff but it ultimately goes down to ccnode anyway)
 	-- You may also provide an argument containing the type of the node (with NodeType)
 
+	-- Via the Node IDs mod, most vanilla nodes have an ID to distinguish between them.
+	-- The first argument determines what node should we look for the child with the provided ID (second argument) in.
+	-- The second argument is simply the ID.
+	-- The third argument is optional. It is the type of the node. If not provided, it will default to the type `Node`.
+	local bottomMenu = SL.ui.Node.getByID(selfNode, "bottom-menu", SL.enums.ui.NodeType.Menu)
+	local rightSideMenu = SL.ui.Node.getByID(selfNode, "right-side-menu", SL.enums.ui.NodeType.Menu)
+	-- getByID returns nil if the ID doesn't exist. If you're not sure that a node of that ID exists, make sure to check if it is and handle accordingly.
+	-- In this case, bottom-menu and right-side-menu are surely children of MenuLayer (SerpentLua already requires the Node IDs mod as well as most other mods anyway.)
+
 	local label = SL.ui.createLabel(string.format("Counter: %d", counter), "bigFont.fnt")
 	-- SL.ui.createLabel is just a wrapper around the SL.ui.Node.create(SL.enums.ui.NodeType.Label, {text="...",font="..."})
 	-- The same goes for other types.
@@ -50,7 +59,7 @@ Modify.createHook("hello-hook", "MenuLayer", "init", function(self)
 		x=SL.ui.getWinSize().width/2,
 		y=SL.ui.getWinSize().height/2
 	})
-	-- getWinSize is self explanatory. Returns a table containing the width and height of the screen.
+	-- getWinSize is self explanatory. Returns a table {width=width, height=height} containing the width and height of the screen.
 
 	local node = SL.ui.createButtonWithSprite("GJ_button_01.png", false, function(sender)
 		counter = counter+1
@@ -62,24 +71,45 @@ Modify.createHook("hello-hook", "MenuLayer", "init", function(self)
 	-- The second boolean argument is whether the sprite comes from a sprite sheet or not.
 	-- The last argument is the function that gets called when the button is pressed.
 	node:method("setID")("my-counter")
-	-- Most nodes have an ID that is used to distinguish between nodes.
 
-	local menu = SL.ui.Node.getByID(selfNode, "bottom-menu")
-	menu:addChild(node)
+	bottomMenu:addChild(node)
 	-- Self explanatory, adds a node to a child.
 	-- doing addChild on bottom-menu automatically places the button inside it without having to do layout stuff.
-	-- You might need to call menu:method("updateLayout")() on some menus if the node isn't placed alongside the other buttons.
+	-- You might need to call bottomMenu:method("updateLayout")() on some menus if the node isn't placed alongside the other buttons. (This method only exists for the `Menu` type.)
 	-- As of 1.3.0 SerpentLua does not have any layout support aside from the updateLayout function.
 
 	selfNode:addChild(label)
 
 	-- Below is an example of using the Alert node type.
-	local alertButton = SL.ui.createButtonWithSprite("GJ_button_02.png", false, function(sender) -- forgot to mention this, `sender` is just the button itself, though you have to use createFromCCNode to use it within the callback.
+	local alertButton = SL.ui.createButtonWithSprite("GJ_button_03.png", false, function(sender) -- forgot to mention this, `sender` is just the button itself, though you have to use createFromCCNode to use it within the callback.
 		local alert = SL.ui.createAlert("SerpentLua", "Hello from my custom script!", "OK") -- (yes this is a reference to Geode SDK mod example)
+		-- First argument is the title, the second is the content of the alert, and the third is the text within the button.
 		alert:method("show")() -- Alert's only exclusive method is `show`.
 	end)
+	bottomMenu:addChild(alertButton) -- note that buttons are only clickable if their parent is a `Menu` node.
 
-	menu:addChild(alertButton)
+	-- Below is an even better example of using the Alert node type the awesome way.
+	local awesomeAlertButton = SL.ui.createButtonWithSprite("GJ_button_02.png", false, function(sender)
+		local alert = SL.ui.createAlert(
+			"SerpentLua: Conditional",
+			"You're <cb>blue</c> now!\nThis is my special attack.\nHit one of the buttons to print something to your terminal.", -- the Alert node type supports the color codes that RobTop uses.
+			"Print Hello", "Print Script Name", --"Print Hello" is the first button, "Print Script Name" is the second button.
+			function(sender, btn2)
+				-- The first argument is the `alert` type itself, though you have to use createFromCCNode to access its members.
+				-- The second argument is a boolean. In this case, `btn2` is false if Print Hello is pressed, otherwise true if `Print Script Name` is pressed.
+				if btn2 then
+					local metadata = SL.ScriptMetadata.get()
+					SL.log.info(string.format("Script Name: %s", metadata.name))
+				else
+					SL.log.info("Hello")
+				end
+			end
+		)
+		alert:method("show")()
+	end)
+	rightSideMenu:addChild(awesomeAlertButton)
+	rightSideMenu:method("updateLayout")() -- This menu requires updateLayout to be called to position the button accordingly.
+	rightSideMenu:method("yooooooo")()
 
 	return true
 end)
@@ -87,7 +117,7 @@ end)
 Modify.applyHook("hello-hook")
 
 --[[
-	Creating a Node through the manual way.
+	Creating a Node through the manual way:
 	SL.ui.createNode <=> SL.ui.Node.create(SL.enums.ui.NodeType.Node, {})
 	SL.ui.createSprite <=> SL.ui.Node.create(SL.enums.ui.NodeType.Sprite, {sprite=string, frameName=bool})
 	SL.ui.createButton <=> SL.ui.Node.create(SL.enums.ui.NodeType.Button, {image=Node, callback=function})

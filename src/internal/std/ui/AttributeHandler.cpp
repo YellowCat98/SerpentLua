@@ -432,3 +432,22 @@ void ScriptBuiltin::ui::AttributeHandler::populateAttributesAlert(sol::state_vie
 		return sol::make_object(state, sol::nil);
 	});
 }
+
+void ScriptBuiltin::ui::AttributeHandler::populateAttributesAccordingly(sol::state_view state, Node* node) {
+	if (!node) return;
+
+	switch (node->getType(sol::this_state(state.lua_state()))) { // huh didnt know i could do that
+		case ScriptBuiltin::Enums::ui::NodeType::Node:
+			ScriptBuiltin::ui::AttributeHandler::populateAttributesNode(state, node); break;
+		case ScriptBuiltin::Enums::ui::NodeType::Sprite:
+			ScriptBuiltin::ui::AttributeHandler::populateAttributesSprite(state, node); break;
+		case ScriptBuiltin::Enums::ui::NodeType::Button:
+			ScriptBuiltin::ui::AttributeHandler::populateAttributesButton(state, node); break;
+		case ScriptBuiltin::Enums::ui::NodeType::Label:
+			ScriptBuiltin::ui::AttributeHandler::populateAttributesLabel(state, node); break;
+		case ScriptBuiltin::Enums::ui::NodeType::Menu:
+			ScriptBuiltin::ui::AttributeHandler::populateAttributesMenu(state, node); break;
+		case ScriptBuiltin::Enums::ui::NodeType::Alert:
+			ScriptBuiltin::ui::AttributeHandler::populateAttributesAlert(state, node); break;
+	}
+}
