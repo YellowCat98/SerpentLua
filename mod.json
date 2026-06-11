@@ -48,14 +48,14 @@
 		},
 		"server-url": {
 			"name": "Index URL",
-			"description": "The server URL wto get plugins from.",
+			"description": "The base server URL to use for plugins.",
 			"type": "string",
 			"filter": "!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~",
 			"default": ""
 		},
 		"should-authenticate": {
 			"name": "Authenticate on Startup",
-			"description": "Determines whether to authenticate with Argon on startup or not.\nThis is usually not needed for the average user.",
+			"description": "Determines whether to authenticate with Argon on startup or not.\nThis is usually only needed if you're looking to upload your own plugins to the plugin index.",
 			"type": "bool",
 			"default": false,
 			"requires-restart": true
