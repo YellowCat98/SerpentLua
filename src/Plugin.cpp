@@ -74,76 +74,9 @@ geode::Result<Plugin*, std::string> Plugin::createNative(const std::filesystem::
 
 	log::debug("Plugin {}: SLP loaded, gathering metadata...", path.filename());
 
-	HRSRC res = FindResource(temphDll, "SERPENTLUA_METADATA", RT_RCDATA);
-	if (!res) {
-		FreeLibrary(temphDll);
-		return Err("Plugin {}: Resource \"SERPENTLUA_METADATA\" was not found.", path.filename());
-	}
-	HGLOBAL hRes = LoadResource(temphDll, res);
-	if (!hRes) {
-		FreeLibrary(temphDll);
-		return Err("Plugin {}: Failed to load resource (err {})", path.filename(), GetLastError());
-	}
-	void* rawMeta = LockResource(hRes);
-	if (!rawMeta) {
-		FreeLibrary(temphDll);
-		return Err("Plugin {}: Failed to lock resource.", path.filename());
-	}
-	DWORD size = SizeofResource(temphDll, res);
-	if (size == 0) {
-		FreeLibrary(temphDll);
-		return Err("Plugin {}: Resource size is equal to 0.", path.filename());
-	}
-
-	std::string metadataMiniRaw(reinterpret_cast<char*>(rawMeta), size); // this means that its a tiny bit raw, not too much raw. (basically meaning that its in a format thats too hard to understand)
-
-	std::vector<std::string> lines;
-	std::string line;
-	std::stringstream ss(metadataMiniRaw);
-
-	while (std::getline(ss, line, '\n')) {
-		if (!line.empty() && line.back() == '\r') {
-			line.pop_back();
-		}
-		lines.push_back(line);
-	}
-
-	std::map<std::string, std::string> metadataMap;
-
-	for (auto& line : lines) {
-		auto pair = ScriptMetadata::createPair(line);
-		if (pair == std::pair<std::string, std::string>({})) return Err("Plugin {}: Invalid metadata.", path.filename());
-		if (metadataMap.contains(pair.first)) log::warn("Plugin {}: Metadata already contains {}, skipping.", path.filename(), pair.first);
-		metadataMap.insert(pair);
-	}
-
-	// checking for metadata validity
-	std::vector<std::string> requiredKeys = {"name", "id", "version", "serpent-version", "developer"};
-
-	for (auto& req : requiredKeys) {
-		if (!metadataMap.contains(req)) return Err("Plugin {}: Metadata is missing `{}` key.", path.filename(), req);
-	}
-
-	// repurposes requiredKeys to check for unknown keys
-	for (const auto& [key, value] : metadataMap) { // this also disallows things like `--@  developer hello`
-		auto it = std::find(requiredKeys.begin(), requiredKeys.end(), key);
-		if (it == requiredKeys.end()) return Err("Plugin {}: Unknown Metadata key: {}", path.filename(), key);
-	}
-
-	if (string::pathToString(path.stem()) != metadataMap.at("id")) return Err("Plugin {}: ID must match the plugin file name without the `.slp` extension.", path.filename());
-
-	auto verRes = utility::handleVersion(metadataMap.at("version"));
-	if (verRes.isErr()) return Err("Plugin {}: Version cannot be parsed: {}", metadataMap.at("id"), *(verRes.err()));
-
-	metadataMap["version"] = verRes.unwrap();
-
-	auto serpVerRes = utility::handleVersion(metadataMap.at("serpent-version"));
-	if (serpVerRes.isErr()) return Err("Plugin {}: Serpent version cannot be parsed: {}", metadataMap.at("id"), *(serpVerRes.err()));
-
-	metadataMap["serpent-version"] = serpVerRes.unwrap();
-
-	auto metadata = PluginMetadata::create(metadataMap);
-	metadata->path = utils::string::pathToString(path);
+	auto metaRes = PluginMetadata::createFromSLP(path, temphDll);
+	if (metaRes.isErr()) return Err("Gathering Metadata: {}", metaRes.unwrapErr());
+	auto metadata = metaRes.unwrap();
 
 	FreeLibrary(temphDll);
 

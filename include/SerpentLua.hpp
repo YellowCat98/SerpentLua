@@ -32,6 +32,9 @@ namespace SerpentLua {
 	struct SERPENTLUA_DLL PluginMetadata final {
 		static PluginMetadata* create(std::map<std::string, std::string>& metadata);
 		static PluginMetadata* createFromMod(geode::Mod* mod);
+		#ifdef YELLOWCAT98_SERPENTLUA_EXPORTING
+		static geode::Result<PluginMetadata*, std::string> createFromSLP(const std::filesystem::path& path, HMODULE module);
+		#endif
 		std::string name;
 		std::string developer;
 		std::string id;
