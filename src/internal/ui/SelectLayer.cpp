@@ -7,7 +7,7 @@
 using namespace geode::prelude;
 using namespace SerpentLua::internal::ui;
 
-bool SelectLayer::init() {
+bool SelectLayer::init(bool adminPanel) {
 	if (!CCLayer::init()) return false;
 	this->setKeypadEnabled(true);
 
@@ -36,6 +36,16 @@ bool SelectLayer::init() {
 	);
 	this->addChildAtPosition(backMenu, Anchor::TopLeft, {12.0f, -25.0f}, false);
 
+	if (adminPanel && ServerManager::get()->isAuthenticated()) {
+		createAdminPanel();
+	} else {
+		createPeasantPanel();
+	}
+
+	return true;
+}
+
+void SelectLayer::createPeasantPanel() {
 	auto buttonMenu = CCMenu::create();
 
 	auto scriptsSpr = CategoryButtonSprite::createWithSprite("script_select.png"_spr);
@@ -78,16 +88,19 @@ bool SelectLayer::init() {
 	buttonMenu->updateLayout();
 	
 	this->addChild(buttonMenu);
-	return true;
+}
+
+void SelectLayer::createAdminPanel() {
+	
 }
 
 void SelectLayer::keyBackClicked() {
 	CCDirector::get()->popSceneWithTransition(0.5f, PopTransition::kPopTransitionFade);
 }
 
-SelectLayer* SelectLayer::create() {
+SelectLayer* SelectLayer::create(bool adminPanel) {
 	auto ret = new SelectLayer();
-	if (ret && ret->init()) {
+	if (ret && ret->init(adminPanel)) {
 		ret->autorelease();
 		return ret;
 	}
@@ -95,8 +108,8 @@ SelectLayer* SelectLayer::create() {
 	return nullptr;
 }
 
-CCScene* SelectLayer::scene() {
+CCScene* SelectLayer::scene(bool adminPanel) {
 	auto ret = CCScene::create();
-	ret->addChild(SelectLayer::create());
+	ret->addChild(SelectLayer::create(adminPanel));
 	return ret;
 }

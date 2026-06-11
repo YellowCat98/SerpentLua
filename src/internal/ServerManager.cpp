@@ -131,3 +131,49 @@ void ServerManager::authenticate(argon::AccountData data) {
 		}
 	});
 }
+
+bool ServerManager::isAuthenticated() {
+	return !sessionToken.empty();
+}
+
+// tiny helper function
+ServerManager::Status statusFromString(const std::string& str) {
+	if (str == "banned") return ServerManager::Status::Banned;
+	if (str.empty()) return ServerManager::Status::Peasant;
+	if (str == "verified") return ServerManager::Status::Verified;
+	if (str == "staff") return ServerManager::Status::Staff;
+	if (str == "admin") return ServerManager::Status::Admin;
+	if (str == "owner") return ServerManager::Status::Owner;
+	return ServerManager::Status::Unknown;
+}
+
+arc::Future<std::pair<std::string, ServerManager::Status>> ServerManager::getStatus(bool cached) {
+	using FUCKINGPAIR = std::pair<std::string, ServerManager::Status>;
+	if (cached && status != ServerManager::Status::Unknown) co_return FUCKINGPAIR{"", status};
+
+	auto req = this->createReq(false);
+	req.param("account_id", GJAccountManager::get()->m_accountID);
+
+	auto resp = co_await this->sendReq("GET", "/api/v1/user/status", req);
+
+	if (!(resp.code() >= 200 && resp.code() < 300)) co_return FUCKINGPAIR{resp.string().unwrap(), ServerManager::Status::Unknown};
+
+	auto jsonRes = resp.json();
+	if (jsonRes.isErr()) co_return FUCKINGPAIR{jsonRes.unwrapErr(), ServerManager::Status::Unknown};
+
+	auto json = jsonRes.unwrap();
+	// ok got it
+
+	auto statusStrRes = json["status"].asString();
+	if (statusStrRes.isErr()) status = ServerManager::Status::Peasant;
+	else {
+		status = statusFromString(statusStrRes.unwrap());
+
+		if (status == ServerManager::Status::Banned) {
+			auto banReasonRes = json["ban_reason"].asString();
+			if (!banReasonRes.isErr()) banReason = banReasonRes.unwrap();
+		}
+	}
+
+	co_return FUCKINGPAIR{"", status};
+}
