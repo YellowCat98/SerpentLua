@@ -45,7 +45,7 @@ $on_mod(Loaded) {
 
 	auto configDir = Mod::get()->getConfigDir();
 	
-	auto res = createDirs(configDir, {"plugin_global_deps", "plugin_deps", "plugins", "scripts", "playground", "pending_install/plugins", "pending_install/scripts"});
+	auto res = createDirs(configDir, {"plugin_global_deps", "plugin_deps", "plugins", "scripts", "playground", "pending_install/plugins", "pending_install/scripts", "temp"});
 	if (res.isErr()) {
 		auto errs = *(res.err());
 		for (auto& err : errs) {
