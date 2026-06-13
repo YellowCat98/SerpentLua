@@ -36,43 +36,17 @@ bool SelectLayer::init(bool adminPanel) {
 	);
 	this->addChildAtPosition(backMenu, Anchor::TopLeft, {12.0f, -25.0f}, false);
 
+	buttonMenu = CCMenu::create();
+	buttonMenu->setID("button-menu");
+
+	infoMenu = CCMenu::create();
+	infoMenu->setID("safe-menu");
+
 	if (adminPanel && ServerManager::get()->isAuthenticated()) {
 		createAdminPanel();
 	} else {
 		createPeasantPanel();
 	}
-
-	return true;
-}
-
-void SelectLayer::createPeasantPanel() {
-	auto buttonMenu = CCMenu::create();
-
-	auto scriptsSpr = CategoryButtonSprite::createWithSprite("script_select.png"_spr);
-
-	auto scriptsBtn = CCMenuItemExt::createSpriteExtra(scriptsSpr, [](CCMenuItemSpriteExtra* sender) {
-		CCDirector::get()->pushScene(CCTransitionFade::create(0.5f, ui::ScriptsLayer::scene(Source::Scripts)));
-	});
-
-	buttonMenu->addChild(scriptsBtn);
-
-	auto pluginsSpr = CategoryButtonSprite::createWithSprite("plugin_select.png"_spr);
-
-	auto pluginsBtn = CCMenuItemExt::createSpriteExtra(pluginsSpr, [](CCMenuItemSpriteExtra* sender) {
-		CCDirector::get()->pushScene(CCTransitionFade::create(0.5f, ui::ScriptsLayer::scene(Source::Plugins)));
-	});
-
-	buttonMenu->addChild(pluginsBtn);
-
-	/*
-	auto indexSpr = CategoryButtonSprite::createWithSprite("index_select.png"_spr);
-
-	auto indexBtn = CCMenuItemExt::createSpriteExtra(indexSpr, [](CCMenuItemSpriteExtra* sender) {
-		CCDirector::get()->pushScene(CCTransitionFade::create(0.5f, ui::ScriptsLayer::scene(Source::Index)));
-	});
-
-	buttonMenu->addChild(indexBtn);
-	*/
 
 	buttonMenu->setLayout(
 		RowLayout::create()
@@ -83,11 +57,56 @@ void SelectLayer::createPeasantPanel() {
 		->setCrossAxisLineAlignment(AxisAlignment::Center)
 		->setGrowCrossAxis(true)
 	);
-
-	buttonMenu->setContentWidth(scriptsBtn->getContentWidth() * 3 + 12);
 	buttonMenu->updateLayout();
-	
+
+	infoMenu->setLayout(
+		SimpleRowLayout::create()
+		->setMainAxisDirection(AxisDirection::RightToLeft)
+		->setMainAxisAlignment(MainAxisAlignment::Start)
+		->setCrossAxisAlignment(CrossAxisAlignment::End)
+		->setCrossAxisScaling(AxisScaling::Fit)
+		->setMainAxisScaling(AxisScaling::Fit)
+	);
+	infoMenu->updateLayout();
+
+
 	this->addChild(buttonMenu);
+	this->addChildAtPosition(infoMenu, Anchor::BottomLeft, {25.0f, 25.0f}, false);
+	return true;
+}
+
+void SelectLayer::createPeasantPanel() {
+	auto scriptsSpr = CategoryButtonSprite::createWithSprite("script_select.png"_spr);
+	auto scriptsBtn = CCMenuItemExt::createSpriteExtra(scriptsSpr, [](CCMenuItemSpriteExtra* sender) {
+		CCDirector::get()->pushScene(CCTransitionFade::create(0.5f, ui::ScriptsLayer::scene(Source::Scripts)));
+	});
+
+	buttonMenu->addChild(scriptsBtn);
+
+	auto pluginsSpr = CategoryButtonSprite::createWithSprite("plugin_select.png"_spr);
+	auto pluginsBtn = CCMenuItemExt::createSpriteExtra(pluginsSpr, [](CCMenuItemSpriteExtra* sender) {
+		CCDirector::get()->pushScene(CCTransitionFade::create(0.5f, ui::ScriptsLayer::scene(Source::Plugins)));
+	});
+
+	buttonMenu->addChild(pluginsBtn);
+
+	auto safeSpr = CCSprite::createWithSpriteFrameName("GJ_safeBtn_001.png");
+	safeSpr->setScale(0.8f);
+	auto safeBtn = CCMenuItemExt::createSpriteExtra(safeSpr, [](CCMenuItemSpriteExtra*) {
+		if (!ServerManager::get()->isAuthenticated()) {
+			FLAlertLayer::create("Forbidden", "You must be <cb>authenticated</c> to enter the <ca>dashboard</c>.", "OK")->show();
+			return;
+		} else if (ServerManager::get()->getStatusCached() == ServerManager::Status::Banned) {
+			FLAlertLayer::create("Banned", fmt::format("You are <cr>banned</c> from the dashboard.\n\n<cf>Reason:</c> {}", ServerManager::get()->getBanReason()).c_str(), "OK")->show();
+			return;
+		} else if (ServerManager::get()->getStatusCached() == ServerManager::Status::Unknown) {
+			FLAlertLayer::create("Forbidden", "<cb>SerpentLua</c> could not determine your rank.", "OK")->show(); // this will be our lovely secret message because under normal circumstances you should never see this
+			return;
+		}
+
+		CCDirector::get()->pushScene(CCTransitionFade::create(0.5f, SelectLayer::scene(true)));
+	});
+	infoMenu->addChild(safeBtn);
 }
 
 void SelectLayer::createAdminPanel() {

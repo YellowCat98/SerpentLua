@@ -12,6 +12,8 @@ namespace SerpentLua::internal::ui {
 		void createPeasantPanel();
 		void createAdminPanel();
 
+		cocos2d::CCMenu* buttonMenu;
+		cocos2d::CCMenu* infoMenu;
 	public:
 		static SelectLayer* create(bool adminPanel);
 		static cocos2d::CCScene* scene(bool adminPanel);

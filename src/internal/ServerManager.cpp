@@ -180,3 +180,7 @@ arc::Future<std::string> ServerManager::setStatus() {
 ServerManager::Status ServerManager::getStatusCached() {
 	return status;
 }
+
+std::string ServerManager::getBanReason() {
+	return banReason;
+}
