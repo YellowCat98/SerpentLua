@@ -47,7 +47,6 @@ web::WebRequest ServerManager::createReq(bool withAuth) {
 }
 
 arc::Future<web::WebResponse> ServerManager::sendReq(std::string method, std::string path, web::WebRequest req) {
-	log::info("sendreq called");
 	auto url = this->getEndpoint(path);
 	co_return co_await req.send(method, url);
 }
@@ -79,7 +78,6 @@ arc::Future<std::pair<web::WebResponse, std::string>> ServerManager::downloadPlu
 		std::vector<uint8_t> hashVec(picosha2::k_digest_size);
 		picosha2::hash256(resp.data().begin(), resp.data().end(), hashVec);
 		auto hash = fmt::format("sha256:{}", picosha2::bytes_to_hex_string(hashVec.begin(), hashVec.end()));
-		log::info("original: \"{}\"\ngot: \"{}\"", originalHash, hash);
 		if (originalHash != hash) co_return FuckassPair{resp, "Hash mismatch"};
 
 		auto dir = Mod::get()->getConfigDir() / "pending_install" / (script ? "scripts" : "plugins");
