@@ -120,7 +120,7 @@ void ServerManager::authenticate(argon::AccountData data) {
 			if (response.ok() && response.string().isOk()) {
 				ServerManager::get()->setSessionToken(response.string().unwrap());
 				auto err = co_await ServerManager::get()->setStatus();
-				log::warn("Unable to get user status, plugins cannot be uploaded/updated.");
+				if (!err.empty()) log::warn("Unable to get user status, plugins cannot be uploaded/updated.\nError: {}", err);
 				geode::queueInMainThread([](){ Notification::create("SerpentLua: Authenticated successfully!", NotificationIcon::Success)->show(); });
 			} else {
 				geode::queueInMainThread([](){ Notification::create("SerpentLua: Server Authentication failed.", NotificationIcon::Error)->show(); });
