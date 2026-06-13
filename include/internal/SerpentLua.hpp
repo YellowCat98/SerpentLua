@@ -73,7 +73,8 @@ namespace SerpentLua::internal {
 
 		std::string getEndpoint(const std::string& path);
 		bool isAuthenticated();
-		arc::Future<std::pair<std::string, ServerManager::Status>> getStatus(bool cached); // the argument just does whether to refetch the status or to just return the cached one (its ignored and just fetches anyway when status is unknown)
+		arc::Future<std::string> setStatus();
+		ServerManager::Status getStatusCached();
 
 		geode::utils::web::WebRequest createReq(bool withAuth = false); // withAuth just passes in the session token as Authorization lol!
 

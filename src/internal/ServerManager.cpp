@@ -121,6 +121,8 @@ void ServerManager::authenticate(argon::AccountData data) {
 
 			if (response.ok() && response.string().isOk()) {
 				ServerManager::get()->setSessionToken(response.string().unwrap());
+				auto err = co_await ServerManager::get()->setStatus();
+				log::warn("Unable to get user status, plugins cannot be uploaded/updated.");
 				geode::queueInMainThread([](){ Notification::create("SerpentLua: Authenticated successfully!", NotificationIcon::Success)->show(); });
 			} else {
 				geode::queueInMainThread([](){ Notification::create("SerpentLua: Server Authentication failed.", NotificationIcon::Error)->show(); });
@@ -147,19 +149,18 @@ ServerManager::Status statusFromString(const std::string& str) {
 	return ServerManager::Status::Unknown;
 }
 
-arc::Future<std::pair<std::string, ServerManager::Status>> ServerManager::getStatus(bool cached) {
+arc::Future<std::string> ServerManager::setStatus() {
 	using FUCKINGPAIR = std::pair<std::string, ServerManager::Status>;
-	if (cached && status != ServerManager::Status::Unknown) co_return FUCKINGPAIR{"", status};
 
 	auto req = this->createReq(false);
 	req.param("account_id", GJAccountManager::get()->m_accountID);
 
 	auto resp = co_await this->sendReq("GET", "/api/v1/user/status", req);
 
-	if (!(resp.code() >= 200 && resp.code() < 300)) co_return FUCKINGPAIR{resp.string().unwrap(), ServerManager::Status::Unknown};
+	if (!(resp.code() >= 200 && resp.code() < 300)) co_return resp.string().unwrap();
 
 	auto jsonRes = resp.json();
-	if (jsonRes.isErr()) co_return FUCKINGPAIR{jsonRes.unwrapErr(), ServerManager::Status::Unknown};
+	if (jsonRes.isErr()) co_return jsonRes.unwrapErr();
 
 	auto json = jsonRes.unwrap();
 	// ok got it
@@ -175,5 +176,9 @@ arc::Future<std::pair<std::string, ServerManager::Status>> ServerManager::getSta
 		}
 	}
 
-	co_return FUCKINGPAIR{"", status};
+	co_return "";
+}
+
+ServerManager::Status ServerManager::getStatusCached() {
+	return status;
 }
