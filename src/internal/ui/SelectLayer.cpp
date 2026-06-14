@@ -1,7 +1,5 @@
-#include "Geode/ui/General.hpp"
-#include "Geode/ui/Layout.hpp"
-#include "ui/ScriptsLayer.hpp"
-#include <Geode/binding/CCMenuItemSpriteExtra.hpp>
+#include <internal/ui/ScriptsLayer.hpp>
+#include <internal/ui/PluginUploader.hpp>
 #include <internal/ui/SelectLayer.hpp>
 
 using namespace geode::prelude;
@@ -40,7 +38,7 @@ bool SelectLayer::init(bool adminPanel) {
 	buttonMenu->setID("button-menu");
 
 	infoMenu = CCMenu::create();
-	infoMenu->setID("safe-menu");
+	infoMenu->setID("actions-menu");
 
 	if (adminPanel && ServerManager::get()->isAuthenticated()) {
 		createAdminPanel();
@@ -80,6 +78,7 @@ void SelectLayer::createPeasantPanel() {
 	auto scriptsBtn = CCMenuItemExt::createSpriteExtra(scriptsSpr, [](CCMenuItemSpriteExtra* sender) {
 		CCDirector::get()->pushScene(CCTransitionFade::create(0.5f, ui::ScriptsLayer::scene(Source::Scripts)));
 	});
+	scriptsBtn->setID("scripts-btn");
 
 	buttonMenu->addChild(scriptsBtn);
 
@@ -87,6 +86,7 @@ void SelectLayer::createPeasantPanel() {
 	auto pluginsBtn = CCMenuItemExt::createSpriteExtra(pluginsSpr, [](CCMenuItemSpriteExtra* sender) {
 		CCDirector::get()->pushScene(CCTransitionFade::create(0.5f, ui::ScriptsLayer::scene(Source::Plugins)));
 	});
+	pluginsBtn->setID("plugins-btn");
 
 	buttonMenu->addChild(pluginsBtn);
 
@@ -106,11 +106,40 @@ void SelectLayer::createPeasantPanel() {
 
 		CCDirector::get()->pushScene(CCTransitionFade::create(0.5f, SelectLayer::scene(true)));
 	});
+	safeBtn->setID("actions-btn");
 	infoMenu->addChild(safeBtn);
 }
 
 void SelectLayer::createAdminPanel() {
-	
+	auto uploadSpr = CategoryButtonSprite::createWithSprite("upload_select.png"_spr);
+	auto uploadBtn = CCMenuItemExt::createSpriteExtra(uploadSpr, [](CCMenuItemSpriteExtra*) {
+		PluginUploader::create()->show();
+	});
+	buttonMenu->addChild(uploadBtn);
+
+	auto validateSpr = CategoryButtonSprite::createWithSprite("validate_select.png"_spr);
+	auto validateBtn = CCMenuItemExt::createSpriteExtra(validateSpr, [](CCMenuItemSpriteExtra*) {
+		// i will define this later
+	});
+	buttonMenu->addChild(validateBtn);
+
+	auto infoSpr = CCSprite::createWithSpriteFrameName("GJ_infoIcon_001.png");
+	auto infoBtn = CCMenuItemExt::createSpriteExtra(infoSpr, [this](CCMenuItemSpriteExtra*) {
+		auto alert = FLAlertLayer::create(
+			"Info",
+			"Welcome to the <ca>dashboard</c>!\n"
+			"You may upload or publish plugins here. More tools may be unlocked if you have permission.\n",
+			"OK"
+		);
+		alert->m_scene = this;
+		alert->show();
+	});
+	infoBtn->setID("actions-btn");
+	infoMenu->addChild(infoBtn);
+
+	if (!Mod::get()->setSavedValue("shown-dashboard-info", true)) {
+		infoBtn->activate();
+	}
 }
 
 void SelectLayer::keyBackClicked() {
