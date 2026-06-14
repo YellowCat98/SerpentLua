@@ -101,7 +101,7 @@ arc::Future<std::pair<web::WebResponse, std::string>> ServerManager::downloadPlu
 }
 
 void ServerManager::authenticate(argon::AccountData data) {
-	Notification::create("SerpentLua: Authentication Started", NotificationIcon::Info)->show();
+	log::info("Authentication started.");
 
 	async::spawn([data = std::move(data)]() -> arc::Future<> {
 		auto res = co_await argon::startAuth(data);
@@ -120,13 +120,14 @@ void ServerManager::authenticate(argon::AccountData data) {
 			if (response.ok() && response.string().isOk()) {
 				ServerManager::get()->setSessionToken(response.string().unwrap());
 				auto err = co_await ServerManager::get()->setStatus();
-				if (!err.empty()) log::warn("Unable to get user status, plugins cannot be uploaded/updated.\nError: {}", err);
+				if (!err.empty()) log::warn("Unable to get user status, Dashboard cannot be accessed.\nError: {}", err);
 				geode::queueInMainThread([](){ Notification::create("SerpentLua: Authenticated successfully!", NotificationIcon::Success)->show(); });
 			} else {
 				geode::queueInMainThread([](){ Notification::create("SerpentLua: Server Authentication failed.", NotificationIcon::Error)->show(); });
 			}
 			co_return;
 		} else {
+			log::error("Failed to authenticate with Argon: {}", res.unwrapErr());
 			geode::queueInMainThread([]() { Notification::create("SerpentLua: Argon Authentication failed", NotificationIcon::Error)->show(); });
 		}
 	});
