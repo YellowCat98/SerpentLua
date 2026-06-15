@@ -34,15 +34,32 @@ bool PluginInfoPopup::init(const DisplayInfo& info) {
 	top->setID("top");
 	top->setContentSize({details->getContentWidth() + 2.2f, details->getContentHeight() / 2});
 	top->setLayout(ColumnLayout::create()
-		->setCrossAxisAlignment(AxisAlignment::End)
+		->setCrossAxisAlignment(AxisAlignment::Start)
 		->setAutoScale(false)
 		->setAxisReverse(true)
+		->setGap(2.0f)
 	);
 
 	auto name = CCLabelBMFont::create(info.name.c_str(), "bigFont.fnt");
 	name->setID("name");
 	name->limitLabelWidth(top->getContentWidth(), 1.0f, 0.1f);
 	top->addChild(name);
+
+	GameLevelManager::get()->m_userInfoDelegate = this;
+	GameLevelManager::get()->getGJUserInfo(info.accountId);
+
+	auto dev = CCLabelBMFont::create(fmt::format("By {}", info.accountId).c_str(), "goldFont.fnt");
+	dev->limitLabelWidth(top->getContentWidth() / 2, 0.5f, 0.1f);
+	devBtn = CCMenuItemExt::createSpriteExtra(dev, [info](CCMenuItemSpriteExtra*) {
+		ProfilePage::create(info.accountId, GJAccountManager::get()->m_accountID == info.accountId)->show();
+	});
+	devBtn->setID("developer");
+	devBtn->setLayoutOptions(
+		AxisLayoutOptions::create()
+		->setNextGap(-2.0f)
+	);
+	devBtn->updateLayout();
+	top->addChild(devBtn);
 
 	auto breakLine = BreakLine::create(top->getContentWidth());
 	top->addChild(breakLine);
@@ -181,6 +198,17 @@ bool PluginInfoPopup::init(const DisplayInfo& info) {
 	m_mainLayer->addChild(ID);
 
 	return true;
+}
+
+void PluginInfoPopup::getUserInfoFinished(GJUserScore* score) {
+	auto baby = static_cast<CCLabelBMFont*>(devBtn->getNormalImage());
+	baby->setString(fmt::format("By {}", score->m_userName).c_str());
+}
+
+void PluginInfoPopup::getUserInfoFailed(int id) {
+	auto baby = static_cast<CCLabelBMFont*>(devBtn->getNormalImage());
+	baby->setString("By ???");
+	devBtn->setEnabled(false);
 }
 
 PluginInfoPopup* PluginInfoPopup::create(const DisplayInfo& info) {
