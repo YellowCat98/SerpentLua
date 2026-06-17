@@ -185,3 +185,22 @@ ServerManager::Status ServerManager::getStatusCached() {
 std::string ServerManager::getBanReason() {
 	return banReason;
 }
+
+bool ServerManager::resolveStatus(const ServerManager::Status& other) {
+	int numStatus = static_cast<int>(status);
+	int numOther = static_cast<int>(other);
+
+	return numStatus >= numOther;
+}
+
+std::string ServerManager::statusString() {
+	switch (status) {
+		case ServerManager::Status::Unknown: return "Unknown";
+		case ServerManager::Status::Banned: return "Banned";
+		case ServerManager::Status::Peasant: return "User"; // i dont think i should really do that
+		case ServerManager::Status::Verified: return "Verified";
+		case ServerManager::Status::Staff: return "Staff";
+		case ServerManager::Status::Admin: return "Admin";
+		case ServerManager::Status::Owner: return "Owner";
+	}
+}

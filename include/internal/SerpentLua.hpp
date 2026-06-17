@@ -72,10 +72,14 @@ namespace SerpentLua::internal {
 		void setSessionToken(const std::string& token);
 
 		std::string getEndpoint(const std::string& path);
+
 		bool isAuthenticated();
+
 		arc::Future<std::string> setStatus();
 		ServerManager::Status getStatusCached();
 		std::string getBanReason();
+		bool resolveStatus(const ServerManager::Status& other);
+		std::string statusString();
 
 		geode::utils::web::WebRequest createReq(bool withAuth = false); // withAuth just passes in the session token as Authorization lol!
 

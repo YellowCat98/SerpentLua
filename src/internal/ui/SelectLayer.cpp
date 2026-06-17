@@ -111,24 +111,32 @@ void SelectLayer::createPeasantPanel() {
 }
 
 void SelectLayer::createAdminPanel() {
+	if (ServerManager::get()->resolveStatus(ServerManager::Status::Staff)) {
+		auto reviewSpr = CategoryButtonSprite::createWithSpriteFrameName("review_select.png"_spr);
+		auto reviewBtn = CCMenuItemExt::createSpriteExtra(reviewSpr, [](CCMenuItemSpriteExtra*) {
+			// i will define this later
+		});
+		reviewBtn->setID("review-btn");
+		buttonMenu->addChild(reviewBtn);
+	}
+
 	auto manageSpr = CategoryButtonSprite::createWithSpriteFrameName("manage_select.png"_spr);
 	auto manageBtn = CCMenuItemExt::createSpriteExtra(manageSpr, [](CCMenuItemSpriteExtra*) {
 		OwnPluginManager::create()->show();
 	});
+	manageBtn->setID("manage-btn");
 	buttonMenu->addChild(manageBtn);
-
-	auto reviewSpr = CategoryButtonSprite::createWithSpriteFrameName("review_select.png"_spr);
-	auto reviewBtn = CCMenuItemExt::createSpriteExtra(reviewSpr, [](CCMenuItemSpriteExtra*) {
-		// i will define this later
-	});
-	buttonMenu->addChild(reviewBtn);
 
 	auto infoSpr = CCSprite::createWithSpriteFrameName("GJ_infoIcon_001.png");
 	auto infoBtn = CCMenuItemExt::createSpriteExtra(infoSpr, [this](CCMenuItemSpriteExtra*) {
 		auto alert = FLAlertLayer::create(
 			"Info",
-			"Welcome to the <ca>dashboard</c>!\n"
-			"You may upload or publish plugins here. More tools may be unlocked if you have permission.\n",
+			fmt::format(
+				"Welcome to the <ca>dashboard</c>!\n"
+				"You may upload or publish plugins here. More tools may be unlocked if your status allows.\n"
+				"You are of status: {}\n",
+				ServerManager::get()->statusString()
+			).c_str(),
 			"OK"
 		);
 		alert->m_scene = this;
