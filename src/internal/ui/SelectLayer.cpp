@@ -1,5 +1,5 @@
 #include <internal/ui/ScriptsLayer.hpp>
-#include <internal/ui/PluginUploader.hpp>
+#include <internal/ui/OwnPluginManager.hpp>
 #include <internal/ui/SelectLayer.hpp>
 
 using namespace geode::prelude;
@@ -74,7 +74,7 @@ bool SelectLayer::init(bool adminPanel) {
 }
 
 void SelectLayer::createPeasantPanel() {
-	auto scriptsSpr = CategoryButtonSprite::createWithSprite("script_select.png"_spr);
+	auto scriptsSpr = CategoryButtonSprite::createWithSpriteFrameName("script_select.png"_spr);
 	auto scriptsBtn = CCMenuItemExt::createSpriteExtra(scriptsSpr, [](CCMenuItemSpriteExtra* sender) {
 		CCDirector::get()->pushScene(CCTransitionFade::create(0.5f, ui::ScriptsLayer::scene(Source::Scripts)));
 	});
@@ -82,7 +82,7 @@ void SelectLayer::createPeasantPanel() {
 
 	buttonMenu->addChild(scriptsBtn);
 
-	auto pluginsSpr = CategoryButtonSprite::createWithSprite("plugin_select.png"_spr);
+	auto pluginsSpr = CategoryButtonSprite::createWithSpriteFrameName("plugin_select.png"_spr);
 	auto pluginsBtn = CCMenuItemExt::createSpriteExtra(pluginsSpr, [](CCMenuItemSpriteExtra* sender) {
 		CCDirector::get()->pushScene(CCTransitionFade::create(0.5f, ui::ScriptsLayer::scene(Source::Plugins)));
 	});
@@ -111,17 +111,17 @@ void SelectLayer::createPeasantPanel() {
 }
 
 void SelectLayer::createAdminPanel() {
-	auto uploadSpr = CategoryButtonSprite::createWithSprite("upload_select.png"_spr);
-	auto uploadBtn = CCMenuItemExt::createSpriteExtra(uploadSpr, [](CCMenuItemSpriteExtra*) {
-		PluginUploader::create()->show();
+	auto manageSpr = CategoryButtonSprite::createWithSpriteFrameName("manage_select.png"_spr);
+	auto manageBtn = CCMenuItemExt::createSpriteExtra(manageSpr, [](CCMenuItemSpriteExtra*) {
+		OwnPluginManager::create()->show();
 	});
-	buttonMenu->addChild(uploadBtn);
+	buttonMenu->addChild(manageBtn);
 
-	auto validateSpr = CategoryButtonSprite::createWithSprite("validate_select.png"_spr);
-	auto validateBtn = CCMenuItemExt::createSpriteExtra(validateSpr, [](CCMenuItemSpriteExtra*) {
+	auto reviewSpr = CategoryButtonSprite::createWithSpriteFrameName("review_select.png"_spr);
+	auto reviewBtn = CCMenuItemExt::createSpriteExtra(reviewSpr, [](CCMenuItemSpriteExtra*) {
 		// i will define this later
 	});
-	buttonMenu->addChild(validateBtn);
+	buttonMenu->addChild(reviewBtn);
 
 	auto infoSpr = CCSprite::createWithSpriteFrameName("GJ_infoIcon_001.png");
 	auto infoBtn = CCMenuItemExt::createSpriteExtra(infoSpr, [this](CCMenuItemSpriteExtra*) {

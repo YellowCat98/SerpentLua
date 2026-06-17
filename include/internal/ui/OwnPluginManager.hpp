@@ -4,7 +4,7 @@
 #include <internal/ui/ScriptsLayer.hpp>
 
 namespace SerpentLua::internal::ui {
-	class PluginUploader : public geode::Popup {
+	class OwnPluginManager : public geode::Popup {
 	protected:
 		geode::async::TaskHolder<geode::utils::web::WebResponse> m_Listener;
 		bool init();
@@ -15,6 +15,6 @@ namespace SerpentLua::internal::ui {
 		void onImportDesc(cocos2d::CCObject*);
 		// unfortunately youll have to import your description.md file because i am NOT going to use imgui so you can write multiline
 	public:
-		static PluginUploader* create();
+		static OwnPluginManager* create();
 	};
 };

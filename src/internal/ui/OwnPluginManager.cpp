@@ -1,16 +1,16 @@
-#include <internal/ui/PluginUploader.hpp>
+#include <internal/ui/OwnPluginManager.hpp>
 
 using namespace SerpentLua::internal::ui;
 using namespace geode::prelude;
 
-bool PluginUploader::init() {
+bool OwnPluginManager::init() {
 	if (!Popup::init({300.0f, 200.0f})) return false;
 
 	return true;
 }
 
-PluginUploader* PluginUploader::create() {
-	auto ret = new PluginUploader();
+OwnPluginManager* OwnPluginManager::create() {
+	auto ret = new OwnPluginManager();
 	if (ret && ret->init()) {
 		ret->autorelease();
 		return ret;

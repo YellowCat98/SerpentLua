@@ -25,7 +25,12 @@
 	"resources": {
 		"sprites": [
 			"resources/*.png"
-		]
+		],
+		"spritesheets": {
+			"SelectSheet": [
+				"resources/SelectSheet/*.png"
+			]
+		}
 	},
 	"settings": {
 		"open-scripts-btn": {
