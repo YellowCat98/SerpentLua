@@ -1,7 +1,8 @@
-#include <SerpentLua.hpp>
+#include <internal/SerpentLua.hpp>
 
 using namespace geode::prelude;
 using namespace SerpentLua;
+using namespace SerpentLua::internal;
 
 // gonna need createFromSLP for plugin uploading
 geode::Result<PluginMetadata*, std::string> PluginMetadata::createFromSLP(const std::filesystem::path& path, HMODULE module) {

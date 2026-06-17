@@ -1,8 +1,9 @@
 #include <internal/SerpentLua.hpp>
 
+using namespace SerpentLua::internal;
 using namespace geode::prelude;
 
-void SerpentLua::internal::StartupOperations::installPending(bool scripts) {
+void StartupOperations::installPending(bool scripts) {
 	auto configDir = Mod::get()->getConfigDir();
 	std::string where = scripts ? "scripts" : "plugins";
 
@@ -27,7 +28,7 @@ void SerpentLua::internal::StartupOperations::installPending(bool scripts) {
 	}
 }
 
-void SerpentLua::internal::StartupOperations::loadNativePlugins() {
+void StartupOperations::loadNativePlugins() {
 	auto configDir = Mod::get()->getConfigDir();
 	for (const auto& file : std::filesystem::directory_iterator(configDir/"plugins")) {
 
@@ -53,7 +54,7 @@ void SerpentLua::internal::StartupOperations::loadNativePlugins() {
 			log::error("Plugin {} could not parse serpent-version: {}", unwrapped->metadata->id, *(version.err()));
 			continue;
 		}
-		if (!SerpentLua::utility::versionInfoCompare(version.unwrap(), Mod::get()->getVersion())) {
+		if (!utility::versionInfoCompare(version.unwrap(), Mod::get()->getVersion())) {
 			log::error("Plugin {} was made for serpent version {} but you are on {}", unwrapped->metadata->id, unwrapped->metadata->serpentVersion, Mod::get()->getVersion().toNonVString());
 			continue;
 		}
@@ -62,7 +63,7 @@ void SerpentLua::internal::StartupOperations::loadNativePlugins() {
 	}
 }
 
-void SerpentLua::internal::StartupOperations::loadScripts() {
+void StartupOperations::loadScripts() {
 	auto configDir = Mod::get()->getConfigDir();
 	// setup metadata first
 	for (const auto& file : std::filesystem::directory_iterator(configDir/"scripts")) {
@@ -88,7 +89,7 @@ void SerpentLua::internal::StartupOperations::loadScripts() {
 				log::error("{}", err);
 				continue;
 			}
-			if (!SerpentLua::utility::versionInfoCompare(version.unwrap(), Mod::get()->getVersion())) {
+			if (!utility::versionInfoCompare(version.unwrap(), Mod::get()->getVersion())) {
 				auto err = fmt::format("Script {} was made for serpent version {} but you are on {}", pair.first, pair.second->serpentVersion, Mod::get()->getVersion().toNonVString());
 				pair.second->errors.push_back(err);
 				log::error("{}", err);
@@ -122,7 +123,7 @@ void SerpentLua::internal::StartupOperations::loadScripts() {
 	}
 }
 
-void SerpentLua::internal::StartupOperations::unfortunatelyDeleteTheUnfortunates() {
+void StartupOperations::unfortunatelyDeleteTheUnfortunates() {
 	std::vector<std::string> theUnfortunates;
 
 	for (const auto& [key, value] : RuntimeManager::get()->getAllLoadedPlugins()) {

@@ -1,6 +1,6 @@
-#include <SerpentLua.hpp>
+#include <internal/SerpentLua.hpp>
 
-using namespace SerpentLua;
+using namespace SerpentLua::internal;
 using namespace geode::prelude;
 
 bool utility::versionInfoCompare(const geode::VersionInfo& first, const geode::VersionInfo& second) {

@@ -166,4 +166,9 @@ namespace SerpentLua::internal {
 		bool hasUncommittedChanges() const override;
 		bool hasNonDefaultValue() const override;
 	};
+
+	struct utility {
+		static bool versionInfoCompare(const geode::VersionInfo& first, const geode::VersionInfo& second);
+		static geode::Result<std::string, std::string> handleVersion(const std::string& version); // parses version and adds a leading V
+	};
 };
