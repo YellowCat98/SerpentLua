@@ -109,7 +109,6 @@ Modify.createHook("hello-hook", "MenuLayer", "init", function(self)
 	end)
 	rightSideMenu:addChild(awesomeAlertButton)
 	rightSideMenu:method("updateLayout")() -- This menu requires updateLayout to be called to position the button accordingly.
-	rightSideMenu:method("yooooooo")()
 
 	return true
 end)
