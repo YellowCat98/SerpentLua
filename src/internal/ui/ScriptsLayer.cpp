@@ -299,8 +299,6 @@ bool ScriptsLayer::init(Source source) {
 	this->infoMenu = CCMenu::create();
 	this->spinner = LoadingSpinner::create(100.0f);
 
-	//this->infoLabel->setAnchorPoint({0.5f, 1.0f});
-
 	// https://github.com/geode-sdk/geode/blob/c1f1bba4ef1f6689f4d81e49bd32692a9740eee3/loader/src/ui/mods/ModsLayer.cpp#L632
 	infoMenu->setContentSize({200.0f, 16.0f});
 	infoMenu->setAnchorPoint({1.0f, 1.0f});
@@ -335,6 +333,18 @@ bool ScriptsLayer::init(Source source) {
 	auto array = CCArray::create();
 
 	geode::addSideArt(this);
+
+	if (source == Source::Index) {
+		auto alert = FLAlertLayer::create(
+			"Modified SerpentLua",
+			"It appears you are using a modified version of SerpentLua.\n"
+			"The plugin explorer is scrapped and will not be finished due to Geode Index rules.\n"
+			"The plugin explorer should (hopefully) work without crashes, though it is very lacking of features.",
+			"OK"
+		);
+		alert->m_scene = this;
+		alert->show();
+	}
 
 	auto backMenu = CCMenu::create();
 	backMenu->setID("back-menu");
