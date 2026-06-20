@@ -6,14 +6,12 @@
 namespace SerpentLua::internal::ui {
 	class OwnPluginManager : public geode::Popup {
 	protected:
-		geode::async::TaskHolder<geode::utils::web::WebResponse> m_Listener;
+		geode::async::TaskHolder<geode::utils::web::WebResponse> m_listener;
 		bool init();
-
-		// i dont think neither of these functions would be small enough to just shove into a lambda with ccmenuitemext
-		void onUpload(cocos2d::CCObject*);
-		void onUploadExample(cocos2d::CCObject*);
-		void onImportDesc(cocos2d::CCObject*);
-		// unfortunately youll have to import your description.md file because i am NOT going to use imgui so you can write multiline
+		geode::MDTextArea* md;
+		std::vector<std::string> prettyStrings;
+		std::string createPrettyPluginInfo(const DisplayInfo& info);
+		void updateMD();
 	public:
 		static OwnPluginManager* create();
 	};

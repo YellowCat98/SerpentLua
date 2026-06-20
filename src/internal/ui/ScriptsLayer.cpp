@@ -25,6 +25,7 @@ DisplayInfo DisplayInfo::create(matjson::Value map) {
 	info.scriptFilename = map["script_filename"].asString().unwrapOr("");
 
     info.source = map["source"].asString().unwrapOr("");
+	info.status = map["status"].asString().unwrapOr("");
 
     info.downloadCount = map["download_count"].asInt().unwrapOr(0);
     info.accountId = map["account_id"].asInt().unwrapOr(0);

@@ -35,6 +35,7 @@ namespace SerpentLua::internal {
 		std::string scriptFilename;
 
 		std::string source;
+		std::string status;
 
 		int downloadCount = 0;
 		int accountId = 0;
