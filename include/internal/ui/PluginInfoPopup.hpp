@@ -6,7 +6,7 @@
 namespace SerpentLua::internal::ui {
 	class PluginInfoPopup : public geode::Popup, public UserInfoDelegate {
 	protected:
-		geode::async::TaskHolder<geode::utils::web::WebResponse> m_listener;
+		geode::async::TaskHolder<std::pair<geode::utils::web::WebResponse, std::string>> m_listener;
 		bool init(const DisplayInfo& info);
 		void getUserInfoFinished(GJUserScore* score) override;
 		void getUserInfoFailed(int id) override;

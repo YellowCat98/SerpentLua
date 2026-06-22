@@ -130,7 +130,7 @@ bool PluginInfoPopup::init(const DisplayInfo& info) {
 		sender->setEnabled(false);
 		auto image = static_cast<ButtonSprite*>(sender->getNormalImage());
 		image->updateBGImage("GJ_button_02.png");
-		async::spawn(ServerManager::get()->downloadPlugin(script, info, static_cast<ButtonSprite*>(sender->getNormalImage())), [this, info, script, image, sender](std::pair<web::WebResponse, std::string> lovelyPair) {
+		m_listener.spawn(ServerManager::get()->downloadPlugin(script, info, static_cast<ButtonSprite*>(sender->getNormalImage())), [this, info, script, image, sender](std::pair<web::WebResponse, std::string> lovelyPair) {
 			auto& err = lovelyPair.second;
 			auto& resp = lovelyPair.first;
 			bool isErr = !err.empty();
@@ -151,16 +151,41 @@ bool PluginInfoPopup::init(const DisplayInfo& info) {
 		});
 	};
 
+	auto downloadLovely = [this, info, download](bool script, CCMenuItemSpriteExtra* sender) {
+		if (info.status != "approved") {
+			std::string warningText;
+			if (info.status == "pending") warningText = "is currently under <cf>review</c>.";
+			if (info.status == "rejected") warningText = "is <cr>rejected</c> from the index.\nThis plugin is not safe to install.";
+			geode::createQuickPopup(
+				"Warning",
+				fmt::format(
+					"This plugin {}\n"
+					"Are you still sure you would like to install this plugin?",
+					warningText
+				),
+				"Cancel", "Install",
+				[download, sender, script](FLAlertLayer*, bool btn2) {
+					if (btn2) {
+						download(script, sender);
+					}
+				}
+			);
+		} else {
+			download(script, sender);
+		}
+	};
+
 	auto get = CCMenuItemExt::createSpriteExtra(
 		ButtonSprite::create("Get", btns->getContentWidth(), btns->getContentWidth(), 1.0f, true, "goldFont.fnt", "GJ_button_01.png"),
-		[download](CCMenuItemSpriteExtra* sender) {
-			download(false, sender);
-	});
+		[downloadLovely](CCMenuItemSpriteExtra* sender) {
+			downloadLovely(false, sender);
+		}
+	);
 	get->setID("get");
 	auto getexple = CCMenuItemExt::createSpriteExtra(
 		ButtonSprite::create("Get Example", btns->getContentWidth(), btns->getContentWidth(), 1.0f, true, "goldFont.fnt", "GJ_button_01.png"),
-		[download](CCMenuItemSpriteExtra* sender) {
-			download(true, sender);
+		[downloadLovely](CCMenuItemSpriteExtra* sender) {
+			downloadLovely(true, sender);
 		}
 	);
 	if (info.scriptExample.empty()) {
