@@ -87,6 +87,8 @@ namespace SerpentLua::internal {
 		arc::Future<geode::utils::web::WebResponse> sendReq(std::string method, std::string path, geode::utils::web::WebRequest req);
 		arc::Future<std::pair<geode::utils::web::WebResponse, std::string>> downloadPlugin(bool script, const DisplayInfo& info, ButtonSprite* button = nullptr);
 		void authenticate(argon::AccountData data);
+
+		arc::Future<std::pair<std::string, bool>> getIndexJSON(std::string repo, std::string tag);
 	private:
 		std::string sessionToken;
 		std::string url;

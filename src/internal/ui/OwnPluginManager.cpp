@@ -93,20 +93,22 @@ bool OwnPluginManager::init() {
 		->setAutoScale(false)
 	);
 
-	repoInput = TextInput::create(details->getContentWidth(), "Enter Owner/Repo");
+	repoInput = TextInput::create(details->getContentWidth(), "Enter Repo");
+	repoInput->setCommonFilter(CommonFilter::Any);
 	tagInput = TextInput::create(details->getContentWidth(), "Enter Release");
+	tagInput->setCommonFilter(CommonFilter::Any);
 
 	textinputs->addChild(repoInput);
 	textinputs->addChild(tagInput);
 
-	auto upload = CCMenuItemSpriteExtra::create(
+	uploadBtn = CCMenuItemSpriteExtra::create(
 		ButtonSprite::create("Upload/Update", bottom->getContentWidth() - 15.0f, bottom->getContentWidth() - 15.0f, 1.0f, true, "goldFont.fnt", "GJ_button_01.png"),
 		this,
 		menu_selector(OwnPluginManager::uploadPlugin)
 	);
-	upload->setID("upload-btn");
+	uploadBtn->setID("upload-btn");
 
-	bottom->addChild(upload);
+	bottom->addChild(uploadBtn);
 
 	bottom->addChild(textinputs);
 
@@ -203,7 +205,28 @@ void OwnPluginManager::movePage(CCObject* sender) {
 }
 
 void OwnPluginManager::uploadPlugin(CCObject* sender) {
-	
+	repoInput->setEnabled(false);
+	tagInput->setEnabled(false);
+	uploadBtn->setEnabled(false);
+
+	std::string repo = repoInput->getString();
+	std::string tag = tagInput->getString();
+
+	m_uploadListener.spawn(ServerManager::get()->getIndexJSON(repo, tag), [this](std::pair<std::string, bool> resp) {
+		repoInput->setEnabled(true);
+		tagInput->setEnabled(true);
+		uploadBtn->setEnabled(true);
+
+		bool err = resp.second;
+		if (err) {
+			MDPopup::create("Error", resp.first, "OK")->show();
+			return;
+		}
+
+		auto url = resp.first;
+
+		log::info("{}", url);
+	});
 }
 
 OwnPluginManager* OwnPluginManager::create() {

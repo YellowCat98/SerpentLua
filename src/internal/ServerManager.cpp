@@ -204,3 +204,43 @@ std::string ServerManager::statusString() {
 		case ServerManager::Status::Owner: return "Owner";
 	}
 }
+
+arc::Future<std::pair<std::string, bool>> ServerManager::getIndexJSON(std::string repo, std::string tag) {
+	using GreatPair = std::pair<std::string, bool>; // the first one is either a url or an error, the second one is whether its an error or not!
+	auto req = web::WebRequest();
+	req.userAgent("cpp-client");
+	req.header("Accept", "application/vnd.github+json");
+	req.header("X-GitHub-Api-Version", "2026-03-10");
+
+	std::string apiUrl = fmt::format("https://api.github.com/repos/{}/releases/tags/{}", repo, tag);
+	// really didnt want to force github but eh who cares
+
+	auto resp = co_await req.get(apiUrl);
+
+	auto jsonRes = resp.json();
+	if (jsonRes.isErr()) {
+		co_return GreatPair{jsonRes.unwrapErr(), true};
+	}
+
+	auto json = jsonRes.unwrap();
+
+	if (!resp.ok()) {
+		co_return GreatPair{json["message"].asString().unwrap(), true};
+	}
+
+	auto assets = json["assets"].asArray().unwrap();
+
+	std::string downloadUrl;
+	for (const auto& index : assets) {
+		if (index["name"].asString().unwrap() == "index.json") {
+			downloadUrl = index["browser_download_url"].asString().unwrap();
+			break;
+		}
+	}
+
+	if (downloadUrl.empty()) {
+		co_return GreatPair{"Unable to find asset `index.json`.", true};
+	}
+
+	co_return GreatPair{downloadUrl, false};
+}
