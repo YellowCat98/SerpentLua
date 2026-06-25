@@ -197,7 +197,7 @@ std::string ServerManager::statusString() {
 	switch (status) {
 		case ServerManager::Status::Unknown: return "Unknown";
 		case ServerManager::Status::Banned: return "Banned";
-		case ServerManager::Status::Peasant: return "User"; // i dont think i should really do that
+		case ServerManager::Status::Peasant: return "User"; // i dont think i should really make the average user named Peasant
 		case ServerManager::Status::Verified: return "Verified";
 		case ServerManager::Status::Staff: return "Staff";
 		case ServerManager::Status::Admin: return "Admin";
