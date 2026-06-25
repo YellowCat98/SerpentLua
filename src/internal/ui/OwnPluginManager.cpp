@@ -3,6 +3,8 @@
 using namespace SerpentLua::internal::ui;
 using namespace geode::prelude;
 
+// this is obviously based on my PluginInfoPopup code
+
 bool OwnPluginManager::init() {
 	if (!Popup::init({300.0f, 200.0f})) return false;
 
@@ -26,7 +28,7 @@ bool OwnPluginManager::init() {
 
 	backBtn = CCMenuItemSpriteExtra::create(CCSprite::createWithSpriteFrameName("GJ_arrow_01_001.png"), this, menu_selector(OwnPluginManager::movePage));
 	backBtn->setTag(-1);
-	backBtn->setID("arrow-next");
+	backBtn->setID("arrow-back");
 
 	arrowMenu->addChild(nextBtn);
 	arrowMenu->addChild(backBtn);
@@ -39,10 +41,11 @@ bool OwnPluginManager::init() {
 		->setAxisReverse(true)
 		->setAxisAlignment(AxisAlignment::Center)
 		->setAutoScale(false)
-		->setGap(5)
+		->setGap(20)
 	);
 
 	md = MDTextArea::create("Loading...", {(layoutMenu->getContentSize().width / 2.0f) - 10.0f, layoutMenu->getContentSize().height - 15.0f});
+	md->setID("description");
 	layoutMenu->addChild(md);
 
 	auto details = CCMenu::create();
@@ -54,14 +57,72 @@ bool OwnPluginManager::init() {
 		->setGap(15)
 	);
 
+	auto top = CCMenu::create();
+	top->setID("top");
+	top->setContentSize({details->getContentWidth() + 2.2f, details->getContentHeight() / 2});
+	top->setLayout(ColumnLayout::create()
+		->setCrossAxisAlignment(AxisAlignment::Start)
+		->setAutoScale(false)
+		->setAxisReverse(true)
+		->setGap(2.0f)
+	);
+
+	auto name = CCLabelBMFont::create("Plugin Uploader", "bigFont.fnt");
+	name->setID("name");
+	name->limitLabelWidth(top->getContentWidth(), 1.0f, 0.1f);
+	top->addChild(name);
+
+	auto breakLine = BreakLine::create(top->getContentWidth());
+	top->addChild(breakLine);
+
+	details->addChild(top);
+
+	auto bottom = CCMenu::create();
+	bottom->setID("bottom");
+	bottom->setContentSize({details->getContentWidth(), (details->getContentHeight() / 2) + 10.0f});
+	bottom->setLayout(ColumnLayout::create()
+		->setAutoScale(false)
+		->setGap(65)
+	);
+
+	auto textinputs = CCMenu::create();
+	textinputs->setID("text-inputs");
+	textinputs->setContentSize({bottom->getContentWidth(), bottom->getContentHeight() / 2});
+	textinputs->setLayout(ColumnLayout::create()
+		->setAxisReverse(true)
+		->setAutoScale(false)
+	);
+
+	repoInput = TextInput::create(details->getContentWidth(), "Enter Owner/Repo");
+	tagInput = TextInput::create(details->getContentWidth(), "Enter Release");
+
+	textinputs->addChild(repoInput);
+	textinputs->addChild(tagInput);
+
+	auto upload = CCMenuItemSpriteExtra::create(
+		ButtonSprite::create("Upload/Update", bottom->getContentWidth() - 15.0f, bottom->getContentWidth() - 15.0f, 1.0f, true, "goldFont.fnt", "GJ_button_01.png"),
+		this,
+		menu_selector(OwnPluginManager::uploadPlugin)
+	);
+	upload->setID("upload-btn");
+
+	bottom->addChild(upload);
+
+	bottom->addChild(textinputs);
+
+	details->addChild(bottom);
+
 	layoutMenu->addChild(details);
 
-	arrowMenu->updateLayout();
-	layoutMenu->updateLayout();
+	top->updateLayout();
+	bottom->updateLayout();
+	textinputs->updateLayout();
 	details->updateLayout();
+	layoutMenu->updateLayout();
+	arrowMenu->updateLayout();
 
-	m_mainLayer->addChild(arrowMenu);
 	m_mainLayer->addChild(layoutMenu);
+	m_mainLayer->addChild(arrowMenu);
 
 	loadPage(1);
 	return true;
@@ -139,6 +200,10 @@ void OwnPluginManager::loadPage(int page) {
 
 void OwnPluginManager::movePage(CCObject* sender) {
 	this->loadPage(currentPage + sender->getTag());
+}
+
+void OwnPluginManager::uploadPlugin(CCObject* sender) {
+	
 }
 
 OwnPluginManager* OwnPluginManager::create() {

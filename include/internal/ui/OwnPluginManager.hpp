@@ -12,11 +12,14 @@ namespace SerpentLua::internal::ui {
 		CCMenuItemSpriteExtra* backBtn;
 		std::vector<std::string> prettyStrings;
 		int currentPage;
+		geode::TextInput* repoInput;
+		geode::TextInput* tagInput;
 		bool init();
 		std::string createPrettyPluginInfo(const DisplayInfo& info);
 		void updateMD();
 		void loadPage(int page);
 		void movePage(cocos2d::CCObject*);
+		void uploadPlugin(cocos2d::CCObject*);
 	public:
 		static OwnPluginManager* create();
 	};
