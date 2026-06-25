@@ -16,17 +16,17 @@ See the next sections for more information.
 - A plugin extends what a script can do on its own.
 - Scripts cannot do anything meaningful without plugins. This includes even stuff as simple as printing to the console.
 
-## There are two types of plugins
-### Native plugins:
+## Types of plugins
+### Native plugins
 - Plugins that are in the form of .slp files, developed specifically for this mod.
 - They are not sandboxed.
 - They run with the same privileges that GD is given.
 
-### Non-native Plugins:
+### Non-native Plugins
 - Plugins that are created directly using the SerpentLua API.
 - These plugins are just Geode mods, nothing else.
-- If they're in the Geode Index (meaning downloaded from the Geode Loader directly), they are likely safe.
-- Non-native plugins are meant for Geode developers who wish to integrate their mods within SerpentLua.
+- If they're in the Geode Index (meaning downloaded from the Geode Loader directly), they are safe to install.
+- Non-native plugins can be used by Geode developers who wish to integrate their mods within SerpentLua.
 - Creating plugins as non-native plugins is generally recommended more than creating them as native plugins.
 
 ## Disclaimer!!
@@ -35,7 +35,7 @@ See the next sections for more information.
 - Using non-approved native plugins is risky.
 - Native plugins are in the form of DLLs (just with the .slp extension instead), they are not sandboxed.
 - If you're using a non-approved native plugin, **MAKE SURE** you know what you're doing.
-- If you aren't sure what a plugin, immediately delete it.
+- If you aren't sure if a plugin is safe or not, it is better to just delete it.
 - You can view the next section (after the disclaimer) if you want to verify if a plugin is safe, though most of the time it's better to just delete it.
 ### Scripts
 - The only risk with running scripts is the risk of it abusing a plugin that allows it to break out of the sandbox.
@@ -49,7 +49,7 @@ See the next sections for more information.
 ### If you don't have the source code:
 Do not install unless you trust the source.
 
-## Documentation
+## Setup
 - Check out the README at the [GitHub Repository](https://github.com/yellowcat98/SerpentLua) for setting up SerpentLua and documentation.
 
 ## Possible questions:
@@ -70,11 +70,10 @@ Do not install unless you trust the source.
 - The SerpentLua plugin uses a separate version from SerpentLua itself.
 
 ## Repositories of interest:
-- [Modify plugin](https://github.com/yellowcat98/serpentlua-modify): A plugin which allows modifying GD internal functions.
 - [SerpentLua Plugin Index](https://github.com/yellowcat98/serpentlua-server): The source code of the SerpentLua server.
 
-## Discord
-- If you have any questions or would like to share a script/plugin you created, join the [Discord](https://discord.gg/qnPgmUVZsV)!
+## Community
+- The [SerpentLua Discord server](https://discord.gg/qnPgmUVZsV) is where you can find more plugins, share your own scripts, or ask any questions you might have.
 
 ## By installing this mod, you acknowledge:
 - The disclaimer above.

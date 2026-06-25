@@ -12,6 +12,7 @@
 - SL Plugin v1.2.1: Fixed issue with createFromCCNode not allowing calling non-Node exclusive methods when type is provided.
 - Error handling: Made lua panic popup more detailed.
 - Native Plugins: Add deprecation warning for dynamic libraries.
+- Metadata: Fixed description grammar and removed `offline` tag.
 
 ## 1.3.0
 - SL Plugin v1.2.0: Add new `Alert` node type.

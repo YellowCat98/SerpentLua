@@ -12,7 +12,7 @@
 	"developer": "YellowCat98",
 	"description": "Make your own mods in Lua.",
 	"early-load": true,
-	"tags": ["developer", "api", "universal", "offline", "utility"],
+	"tags": ["developer", "api", "universal", "utility"],
 	"links": {
 		"source": "https://github.com/YellowCat98/SerpentLua",
 		"community": "https://discord.com/invite/qnPgmUVZsV"
