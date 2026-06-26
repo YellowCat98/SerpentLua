@@ -130,17 +130,13 @@ bool PluginInfoPopup::init(const DisplayInfo& info) {
 		sender->setEnabled(false);
 		auto image = static_cast<ButtonSprite*>(sender->getNormalImage());
 		image->updateBGImage("GJ_button_02.png");
-		m_listener.spawn(ServerManager::get()->downloadPlugin(script, info, static_cast<ButtonSprite*>(sender->getNormalImage())), [this, info, script, image, sender](std::pair<web::WebResponse, std::string> lovelyPair) {
-			auto& err = lovelyPair.second;
-			auto& resp = lovelyPair.first;
-			bool isErr = !err.empty();
-
+		m_listener.spawn(std::move(ServerManager::get()->downloadPlugin(script, info, static_cast<ButtonSprite*>(sender->getNormalImage()))), [this, info, script, image, sender](geode::Result<geode::utils::web::WebResponse> resp) {
 			image->updateBGImage("GJ_button_01.png");
 			sender->setEnabled(true);
 			static_cast<ButtonSprite*>(sender->getNormalImage())->setString("Installed");
 
-			if (isErr) {
-				auto alert = MDPopup::create("Error", err, "OK");
+			if (resp.isErr()) {
+				auto alert = MDPopup::create("Error", resp.unwrapErr(), "OK");
 				alert->m_scene = this;
 				alert->show();
 				return;

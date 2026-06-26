@@ -10,6 +10,11 @@ bool OwnPluginManager::init() {
 
 	// oh COME ON i dont want to do layout bs again
 
+	statusLabel = CCLabelBMFont::create("", "bigFont.fnt");
+	statusLabel->setID("status");
+	statusLabel->setScale(0.5f);
+	m_mainLayer->addChildAtPosition(statusLabel, Anchor::Bottom, {0.0f, -10.0f});
+
 	auto arrowMenu = CCMenu::create();
 	arrowMenu->setID("arrow-menu");
 	arrowMenu->setContentSize({m_size.width + 100.0f, m_size.height});
@@ -104,7 +109,7 @@ bool OwnPluginManager::init() {
 	uploadBtn = CCMenuItemSpriteExtra::create(
 		ButtonSprite::create("Upload/Update", bottom->getContentWidth() - 15.0f, bottom->getContentWidth() - 15.0f, 1.0f, true, "goldFont.fnt", "GJ_button_01.png"),
 		this,
-		menu_selector(OwnPluginManager::uploadPlugin)
+		menu_selector(OwnPluginManager::beginUpload)
 	);
 	uploadBtn->setID("upload-btn");
 
@@ -128,6 +133,11 @@ bool OwnPluginManager::init() {
 
 	loadPage(1);
 	return true;
+}
+
+void OwnPluginManager::setStatusLabel(const std::string& text) {
+	statusLabel->setString(text.c_str());
+	statusLabel->limitLabelWidth(m_mainLayer->getContentWidth() + 50.0f, 0.5f, 0.01f);
 }
 
 std::string OwnPluginManager::createPrettyPluginInfo(const DisplayInfo& info) {
@@ -170,7 +180,7 @@ void OwnPluginManager::loadPage(int page) {
 	req.param("account_id", 67);
 	req.param("page", currentPage);
 
-	m_listener.spawn(ServerManager::get()->sendReq("GET", "/api/v1/plugin/fetch/bulk", req), [this](web::WebResponse resp) {
+	m_listener.spawn(std::move(ServerManager::get()->sendReq("GET", "/api/v1/plugin/fetch/bulk", req)), [this](web::WebResponse resp) {
 		if (!(resp.code() >= 200 && resp.code() < 300)) {
 			this->md->setString(fmt::format("Error: {} (Code {})", resp.string().unwrap(), resp.code()).c_str());
 			return;
@@ -204,29 +214,106 @@ void OwnPluginManager::movePage(CCObject* sender) {
 	this->loadPage(currentPage + sender->getTag());
 }
 
-void OwnPluginManager::uploadPlugin(CCObject* sender) {
+void OwnPluginManager::beginUpload(CCObject* sender) {
 	repoInput->setEnabled(false);
 	tagInput->setEnabled(false);
 	uploadBtn->setEnabled(false);
+	this->setStatusLabel("Getting index.json...");
 
 	std::string repo = repoInput->getString();
 	std::string tag = tagInput->getString();
 
-	m_uploadListener.spawn(ServerManager::get()->getIndexJSON(repo, tag), [this](std::pair<matjson::Value, bool> resp) {
+	m_beginListener.spawn(std::move(ServerManager::get()->getIndexJSON(repo, tag)), [this, repo, tag](geode::Result<matjson::Value> resp) {
 		repoInput->setEnabled(true);
 		tagInput->setEnabled(true);
 		uploadBtn->setEnabled(true);
 
-		bool err = resp.second;
-		if (err) {
-			MDPopup::create("Error", resp.first["error"].asString().unwrap(), "OK")->show();
+		if (resp.isErr()) {
+			MDPopup::create("Error", resp.unwrapErr(), "OK")->show();
 			return;
 		}
 
-		auto url = resp.first;
+		auto json = resp.unwrap();
 
 		// ok i have to check every single thing i access in that url please wish me luck
+
+		auto idRes = json["owned_by"].asInt();
+		if (idRes.isErr()) {
+			MDPopup::create("Error", fmt::format("Unable to get accountID from index.json: {}", idRes.unwrapErr()), "OK")->show();
+			this->setStatusLabel("");
+			return;
+		}
+
+		int id = idRes.unwrap();
+		if (GJAccountManager::get()->m_accountID != id) {
+			MDPopup::create("Error", "You don't own this plugin.", "OK")->show();
+			this->setStatusLabel("");
+			return;
+		}
+
+		// first ill just verify if they all exist or not
+		auto pluginRes = json["plugin"].asString();
+		if (pluginRes.isErr()) {
+			MDPopup::create("Error", fmt::format("Unable to get plugin from index.json: {}", pluginRes.unwrapErr()), "OK")->show();
+			this->setStatusLabel("");
+			return;
+		}
+
+		auto descRes = json["desc"].asString();
+		if (descRes.isErr()) {
+			MDPopup::create("Error", fmt::format("Unable to get description from index.json: {}", idRes.unwrapErr()), "OK")->show();
+			this->setStatusLabel("");
+			return;
+		}
+
+		this->setStatusLabel("Got index.json, creating request body...");
+
+		setDownloadLinks(json, repo, tag);
 	});
+}
+
+void OwnPluginManager::setDownloadLinks(const matjson::Value& indexJson, const std::string& repo, const std::string& tag) {
+	this->setStatusLabel("Setting download links in body...");
+
+	body["download_link"] = constructUrl(repo, tag, indexJson["plugin"].asString().unwrap());
+
+	auto example = indexJson["example"].asString();
+	if (example.isOk()) {
+		body["script_download_link"] = example.unwrap();
+	}
+
+	setDescription(indexJson, repo, tag);
+}
+
+void OwnPluginManager::setDescription(const matjson::Value& indexJson, const std::string& repo, const std::string& tag) {
+	this->setStatusLabel("Getting/Setting description...");
+
+	auto req = web::WebRequest();
+	
+	auto descUrl = constructUrl(repo, tag, indexJson["desc"].asString().unwrap());
+
+	m_bodyListener.spawn(std::move(req.get(descUrl)), [this, indexJson, repo, tag](web::WebResponse resp) {
+		if (!resp.ok()) {
+			MDPopup::create("Error", fmt::format("Unable to download file (Code {})", resp.code()), "OK")->show();
+			this->setStatusLabel("");
+			return;
+		}
+
+		this->body["description"] = resp.string().unwrap();
+
+		this->setBasicMetadata(indexJson, repo, tag);
+
+	});
+}
+
+void OwnPluginManager::setBasicMetadata(const matjson::Value& indexJson, const std::string& repo, const std::string& tag) {
+	this->setStatusLabel("Setting metadata...");
+
+	
+}
+
+std::string OwnPluginManager::constructUrl(std::string repo, std::string tag, std::string filename) {
+	return fmt::format("https://github.com/{}/releases/download/{}/{}", repo, tag, filename);
 }
 
 OwnPluginManager* OwnPluginManager::create() {

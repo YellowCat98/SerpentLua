@@ -51,9 +51,9 @@ arc::Future<web::WebResponse> ServerManager::sendReq(std::string method, std::st
 	co_return co_await req.send(method, url);
 }
 
-arc::Future<std::pair<web::WebResponse, std::string>> ServerManager::downloadPlugin(bool script, const DisplayInfo& info, ButtonSprite* button) {
+arc::Future<geode::Result<geode::utils::web::WebResponse>> ServerManager::downloadPlugin(bool script, const DisplayInfo& info, ButtonSprite* button) {
 	using FuckassPair = std::pair<web::WebResponse, std::string>;
-	if (info.scriptExample.empty() && script) co_return FuckassPair();
+	if (info.scriptExample.empty() && script) co_return Err("Plugin has no example.");
 
 	auto req = this->createReq(false);
 	req.param("id", info.id);
@@ -78,12 +78,12 @@ arc::Future<std::pair<web::WebResponse, std::string>> ServerManager::downloadPlu
 		std::vector<uint8_t> hashVec(picosha2::k_digest_size);
 		picosha2::hash256(resp.data().begin(), resp.data().end(), hashVec);
 		auto hash = fmt::format("sha256:{}", picosha2::bytes_to_hex_string(hashVec.begin(), hashVec.end()));
-		if (originalHash != hash) co_return FuckassPair{resp, "Hash mismatch"};
+		if (originalHash != hash) Err("Hash mismatch");
 
 		auto dir = Mod::get()->getConfigDir() / "pending_install" / (script ? "scripts" : "plugins");
 		auto createdRes = file::createDirectoryAll(dir);
 		if (createdRes.isErr()) {
-			co_return FuckassPair{resp, createdRes.unwrapErr()};
+			co_return Err(createdRes.unwrapErr());
 		}
 		auto final = dir / (script ? info.scriptFilename : info.filename);
 		if (std::filesystem::exists(final)) {
@@ -91,13 +91,13 @@ arc::Future<std::pair<web::WebResponse, std::string>> ServerManager::downloadPlu
 		}
 		auto res = resp.into(final);
 		if (res.isErr()) {
-			co_return FuckassPair{resp, res.unwrapErr()};
+			co_return Err(res.unwrapErr());
 		}
 
-		co_return FuckassPair({resp, ""});
+		co_return Ok(resp);
 	}
 	
-	co_return FuckassPair{resp, resp.string().unwrapOr("")};
+	co_return Err(resp.string().unwrapOr("Unknown Error."));
 }
 
 void ServerManager::authenticate(argon::AccountData data) {
@@ -205,8 +205,7 @@ std::string ServerManager::statusString() {
 	}
 }
 
-arc::Future<std::pair<matjson::Value, bool>> ServerManager::getIndexJSON(std::string repo, std::string tag) {
-	using GreatPair = std::pair<matjson::Value, bool>; // the first one is either a url or an error, the second one is whether its an error or not!
+arc::Future<geode::Result<matjson::Value>> ServerManager::getIndexJSON(std::string repo, std::string tag) {
 	auto req = web::WebRequest();
 	req.userAgent("cpp-client");
 	req.header("Accept", "application/vnd.github+json");
@@ -219,9 +218,7 @@ arc::Future<std::pair<matjson::Value, bool>> ServerManager::getIndexJSON(std::st
 
 	auto jsonRes = resp.json();
 	if (jsonRes.isErr()) {
-		co_return GreatPair{matjson::makeObject({
-			{"error", jsonRes.unwrapErr()}
-		}), true};
+		Err(jsonRes.unwrapErr());
 	}
 
 	auto json = jsonRes.unwrap();
@@ -230,13 +227,9 @@ arc::Future<std::pair<matjson::Value, bool>> ServerManager::getIndexJSON(std::st
 		auto msgRes = json["message"].asString();
 
 		if (msgRes.isOk()) {
-			co_return GreatPair{matjson::makeObject({
-				{"error", json["message"].asString().unwrap()}
-			}), true};
+			Err(json["message"].asString().unwrap());
 		} else {
-			co_return GreatPair{matjson::makeObject({
-				{"error", "Unknown error."}
-			}), true};
+			Err("Unknown error.");
 		}
 	}
 
@@ -251,9 +244,7 @@ arc::Future<std::pair<matjson::Value, bool>> ServerManager::getIndexJSON(std::st
 	}
 
 	if (downloadUrl.empty()) {
-		co_return GreatPair{matjson::makeObject({
-			{"error", "Unable to find asset `index.json`."}
-		}), true};
+		Err("Unable to find asset `index.json`.");
 	}
 
 	auto downReq = web::WebRequest();
@@ -261,18 +252,33 @@ arc::Future<std::pair<matjson::Value, bool>> ServerManager::getIndexJSON(std::st
 	auto downResp = co_await downReq.get(downloadUrl);
 
 	if (!downResp.ok()) {
-		co_return GreatPair{matjson::makeObject({
-			{"error", fmt::format("index.json download failed (Code {})", downResp.code())}
-		}), true};
+		Err("index.json download failed (Code {})", downResp.code());
 	}
 
 	auto indexJSON = downResp.json();
 
 	if (indexJSON.isErr()) {
-		co_return GreatPair{matjson::makeObject({
-			{"error", indexJSON.unwrapErr()}
-		}), true};
+		Err(indexJSON.unwrapErr());
 	}
 
-	co_return GreatPair{indexJSON.unwrap(), false};
+	co_return Ok(indexJSON.unwrap());
+}
+
+arc::Future<geode::Result<std::string>> ServerManager::getDownloadHashByUrl(std::string url) {
+	auto req = web::WebRequest();
+
+	auto resp = co_await req.get(url);
+	if (!resp.ok()) {
+		co_return Err("Unable to download file (Code {})", resp.code());
+	}
+
+	std::vector<uint8_t> hashVec(picosha2::k_digest_size);
+	picosha2::hash256(resp.data().begin(), resp.data().end(), hashVec);
+	co_return Ok(fmt::format("sha256:{}", picosha2::bytes_to_hex_string(hashVec.begin(), hashVec.end())));
+}
+
+std::string ServerManager::getDownloadHashByData(std::vector<uint8_t> data) {
+	std::vector<uint8_t> hashVec(picosha2::k_digest_size);
+	picosha2::hash256(data.begin(), data.end(), hashVec);
+	return fmt::format("sha256:{}", picosha2::bytes_to_hex_string(hashVec.begin(), hashVec.end()));
 }
