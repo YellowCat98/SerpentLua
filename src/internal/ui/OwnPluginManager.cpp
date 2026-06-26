@@ -238,7 +238,6 @@ void OwnPluginManager::beginUpload(CCObject* sender) {
 		if (idRes.isErr()) {
 			MDPopup::create("Error", fmt::format("Unable to get accountID from index.json: {}", idRes.unwrapErr()), "OK")->show();
 			onFinishedUploading();
-			this->setStatusLabel("");
 			return;
 		}
 
@@ -246,7 +245,6 @@ void OwnPluginManager::beginUpload(CCObject* sender) {
 		if (GJAccountManager::get()->m_accountID != id) {
 			MDPopup::create("Error", "You don't own this plugin.", "OK")->show();
 			onFinishedUploading();
-			this->setStatusLabel("");
 			return;
 		}
 
@@ -255,7 +253,6 @@ void OwnPluginManager::beginUpload(CCObject* sender) {
 		if (pluginRes.isErr()) {
 			MDPopup::create("Error", fmt::format("Unable to get plugin from index.json: {}", pluginRes.unwrapErr()), "OK")->show();
 			onFinishedUploading();
-			this->setStatusLabel("");
 			return;
 		}
 
@@ -263,7 +260,6 @@ void OwnPluginManager::beginUpload(CCObject* sender) {
 		if (descRes.isErr()) {
 			MDPopup::create("Error", fmt::format("Unable to get description from index.json: {}", descRes.unwrapErr()), "OK")->show();
 			onFinishedUploading();
-			this->setStatusLabel("");
 			return;
 		}
 
@@ -295,7 +291,6 @@ void OwnPluginManager::setDescription(const matjson::Value& indexJson, const std
 		if (!resp.ok()) {
 			MDPopup::create("Error", fmt::format("Unable to download file (Code {})", resp.code()), "OK")->show();
 			onFinishedUploading();
-			this->setStatusLabel("");
 			return;
 		}
 
@@ -321,7 +316,6 @@ void OwnPluginManager::setBasicMetadata(const matjson::Value& indexJson, const s
 		if (pairRes.isErr()) {
 			MDPopup::create("Error", fmt::format("Unable to get plugin metadata: {}", pairRes.unwrapErr()), "OK")->show();
 			onFinishedUploading();
-			this->setStatusLabel("");
 			return;
 		}
 		auto pair = pairRes.unwrap();
@@ -397,13 +391,14 @@ void OwnPluginManager::uploadOrUpdate(const matjson::Value& indexJson, const std
 		auto url = fmt::format("/api/v1/plugin/{}", endpoint);
 
 		m_bodyListener.spawn(std::move(ServerManager::get()->sendReq(method, url, newReq)), [this, exists](web::WebResponse resp) {
-			onFinishedUploading();
 			if (!resp.ok()) {
 				MDPopup::create("Error", fmt::format("Unable to upload/update plugin: {}", resp.string().unwrap()), "OK")->show();
+				onFinishedUploading();
 				return;
 			}
 
 			FLAlertLayer::create(fmt::format("{}!", exists ? "Updated!" : "Uploaded!").c_str(), fmt::format("Your plugin \"{}\" has been {} <cg>successfully!</c>", body["name"].asString().unwrap(), exists ? "updated" : "uploaded").c_str(), "OK")->show();
+			onFinishedUploading();
 		});
 	});
 }
@@ -416,6 +411,7 @@ void OwnPluginManager::onFinishedUploading() {
 	repoInput->setEnabled(true);
 	tagInput->setEnabled(true);
 	uploadBtn->setEnabled(true);
+	setStatusLabel("");
 	body = {};
 	pluginMetaFinished = false;
 	scriptHashFinished = false;
