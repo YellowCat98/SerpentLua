@@ -44,6 +44,8 @@ namespace SerpentLua::internal::ui {
 		void uploadOrUpdate(const matjson::Value& indexJson, const std::string& repo, const std::string& tag); // by the time this gets called `body` should already have all the data
 
 		void setStatusLabel(const std::string& text);
+
+		void onFinishedUploading();
 	public:
 		static OwnPluginManager* create();
 	};
