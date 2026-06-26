@@ -258,7 +258,7 @@ arc::Future<geode::Result<matjson::Value>> ServerManager::getIndexJSON(std::stri
 	auto indexJSON = downResp.json();
 
 	if (indexJSON.isErr()) {
-		Err(indexJSON.unwrapErr());
+		co_return Err(indexJSON.unwrapErr());
 	}
 
 	co_return Ok(indexJSON.unwrap());

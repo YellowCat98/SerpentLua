@@ -277,7 +277,7 @@ void OwnPluginManager::setDownloadLinks(const matjson::Value& indexJson, const s
 
 	auto example = indexJson["example"].asString();
 	if (example.isOk()) {
-		body["script_download_link"] = example.unwrap();
+		body["script_example"] = constructUrl(repo, tag, example.unwrap());
 	}
 
 	setDescription(indexJson, repo, tag);
@@ -308,8 +308,16 @@ void OwnPluginManager::setBasicMetadata(const matjson::Value& indexJson, const s
 	this->setStatusLabel("Setting metadata...");
 
 	auto pluginUrl = constructUrl(repo, tag, indexJson["plugin"].asString().unwrap());
+	auto scriptUrl = constructUrl(repo, tag, indexJson["example"].asString().unwrap());
 
-	m_metaListener.spawn(std::move(ServerManager::get()->getPluginMetadataByUrl(pluginUrl)), [this](geode::Result<std::pair<PluginMetadata*, geode::utils::web::WebResponse>> pairRes) {
+	auto callIfReady = [this, indexJson, repo, tag]() {
+		if (pluginMetaFinished && scriptHashFinished) {
+			this->uploadOrUpdate(indexJson, repo, tag);
+		}
+	};
+
+	m_pluginMetaListener.spawn(std::move(ServerManager::get()->getPluginMetadataByUrl(pluginUrl)), [this, repo, callIfReady](geode::Result<std::pair<PluginMetadata*, geode::utils::web::WebResponse>> pairRes) {
+		pluginMetaFinished = true;
 		if (pairRes.isErr()) {
 			MDPopup::create("Error", fmt::format("Unable to get plugin metadata: {}", pairRes.unwrapErr()), "OK")->show();
 			this->setStatusLabel("");
@@ -320,11 +328,54 @@ void OwnPluginManager::setBasicMetadata(const matjson::Value& indexJson, const s
 		auto md = pair.first;
 		auto resp = pair.second;
 
-		log::info("name: {}", md->name);
-		log::info("dev: {}", md->developer);
-		log::info("id: {}", md->id);
-		log::info("version: {}", md->version);
+		auto hash = ServerManager::get()->getDownloadHashByData(resp.data());
 
+		body["name"] = md->name;
+		body["id"] = md->id;
+		body["version"] = md->version;
+		body["serpent_version"] = md->serpentVersion;
+		body["download_hash"] = hash;
+		body["source"] = fmt::format("https://github.com/{}", repo);
+
+		callIfReady();
+	});
+
+	m_scriptHashListener.spawn(std::move(ServerManager::get()->getDownloadHashByUrl(scriptUrl)), [this, callIfReady](geode::Result<std::string> res) {
+		scriptHashFinished = true;
+		if (res.isErr()) {
+			MDPopup::create("Error", fmt::format("Unable to get script download hash: {}", res.unwrapErr()), "OK")->show();
+			return;
+		}
+
+		body["script_download_hash"] = res.unwrap();
+		callIfReady();
+	});
+}
+
+void OwnPluginManager::uploadOrUpdate(const matjson::Value& indexJson, const std::string& repo, const std::string& tag) {
+	log::debug("Starting request with body:\n{}", body.dump());
+	this->setStatusLabel("Determining update or upload...");
+
+	auto req = ServerManager::get()->createReq();
+	req.param("id", body["id"].asString().unwrap());
+
+	m_bodyListener.spawn(std::move(ServerManager::get()->sendReq("GET", "/api/v1/plugin/exists", req)), [this](web::WebResponse resp) {
+		if (!resp.ok()) {
+			MDPopup::create("Error", fmt::format("Unable to verify upload or update: {}", resp.string().unwrap()), "OK")->show();
+			return;
+		}
+
+		auto existsRes = utils::numFromString<int>(resp.string().unwrap());
+		if (existsRes.isErr()) {
+			MDPopup::create("Error", existsRes.unwrapErr(), "OK")->show();
+			return;
+		}
+
+		bool exists = existsRes.unwrap();
+		std::string endpoint = exists ? "update" : "publish";
+		std::string prettifiedEndpoint = exists ? "Updating" : "Publishing";
+		
+		this->setStatusLabel(fmt::format("{} Plugin...", prettifiedEndpoint));
 	});
 }
 
