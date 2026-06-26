@@ -36,7 +36,7 @@ bool PluginFetcherPopup::init() {
 		auto req = ServerManager::get()->createReq(false);
 		req.param("id", textInput->getString());
 
-		listener.spawn(ServerManager::get()->sendReq("GET", "/api/v1/plugin/fetch", std::move(req)), [this, sender](web::WebResponse resp) {
+		listener.spawn(std::move(ServerManager::get()->sendReq("GET", "/api/v1/plugin/fetch", std::move(req))), [this, sender](web::WebResponse resp) {
 			sender->setEnabled(true);
 			setStatusLabel("");
 			this->textInput->setEnabled(true);
