@@ -5,7 +5,7 @@ using namespace SerpentLua;
 using namespace SerpentLua::internal;
 
 // gonna need createFromSLP for plugin uploading
-geode::Result<PluginMetadata*, std::string> PluginMetadata::createFromSLP(const std::filesystem::path& path, HMODULE module) {
+geode::Result<PluginMetadata*, std::string> PluginMetadata::createFromSLP(const std::filesystem::path& path, HMODULE module, bool enforceSameID) {
 	HRSRC res = FindResource(module, "SERPENTLUA_METADATA", RT_RCDATA);
 	if (!res) {
 		FreeLibrary(module);
@@ -62,7 +62,7 @@ geode::Result<PluginMetadata*, std::string> PluginMetadata::createFromSLP(const 
 		if (it == requiredKeys.end()) return Err("Plugin {}: Unknown Metadata key: {}", path.filename(), key);
 	}
 
-	if (string::pathToString(path.stem()) != metadataMap.at("id")) return Err("Plugin {}: ID must match the plugin file name without the `.slp` extension.", path.filename());
+	if ((string::pathToString(path.stem()) != metadataMap.at("id")) && enforceSameID) return Err("Plugin {}: ID must match the plugin file name without the `.slp` extension.", path.filename());
 
 	auto verRes = utility::handleVersion(metadataMap.at("version"));
 	if (verRes.isErr()) return Err("Plugin {}: Version cannot be parsed: {}", metadataMap.at("id"), *(verRes.err()));

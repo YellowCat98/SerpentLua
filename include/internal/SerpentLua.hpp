@@ -91,6 +91,8 @@ namespace SerpentLua::internal {
 		arc::Future<geode::Result<matjson::Value>> getIndexJSON(std::string repo, std::string tag);
 		arc::Future<geode::Result<std::string>> getDownloadHashByUrl(std::string url);
 		std::string getDownloadHashByData(std::vector<uint8_t> data);
+
+		arc::Future<geode::Result<std::pair<PluginMetadata*, geode::utils::web::WebResponse>>> getPluginMetadataByUrl(std::string url);
 	private:
 		std::string sessionToken;
 		std::string url;

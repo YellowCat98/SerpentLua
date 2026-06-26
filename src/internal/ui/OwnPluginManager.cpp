@@ -224,9 +224,9 @@ void OwnPluginManager::beginUpload(CCObject* sender) {
 	std::string tag = tagInput->getString();
 
 	m_beginListener.spawn(std::move(ServerManager::get()->getIndexJSON(repo, tag)), [this, repo, tag](geode::Result<matjson::Value> resp) {
-		repoInput->setEnabled(true);
-		tagInput->setEnabled(true);
-		uploadBtn->setEnabled(true);
+		//repoInput->setEnabled(true);
+		//tagInput->setEnabled(true);
+		//uploadBtn->setEnabled(true);
 
 		if (resp.isErr()) {
 			MDPopup::create("Error", resp.unwrapErr(), "OK")->show();
@@ -266,15 +266,13 @@ void OwnPluginManager::beginUpload(CCObject* sender) {
 			return;
 		}
 
-		this->setStatusLabel("Got index.json, creating request body...");
+		this->setStatusLabel("Got index.json, creating request body.");
 
 		setDownloadLinks(json, repo, tag);
 	});
 }
 
 void OwnPluginManager::setDownloadLinks(const matjson::Value& indexJson, const std::string& repo, const std::string& tag) {
-	this->setStatusLabel("Setting download links in body...");
-
 	body["download_link"] = constructUrl(repo, tag, indexJson["plugin"].asString().unwrap());
 
 	auto example = indexJson["example"].asString();
@@ -309,7 +307,25 @@ void OwnPluginManager::setDescription(const matjson::Value& indexJson, const std
 void OwnPluginManager::setBasicMetadata(const matjson::Value& indexJson, const std::string& repo, const std::string& tag) {
 	this->setStatusLabel("Setting metadata...");
 
-	
+	auto pluginUrl = constructUrl(repo, tag, indexJson["plugin"].asString().unwrap());
+
+	m_metaListener.spawn(std::move(ServerManager::get()->getPluginMetadataByUrl(pluginUrl)), [this](geode::Result<std::pair<PluginMetadata*, geode::utils::web::WebResponse>> pairRes) {
+		if (pairRes.isErr()) {
+			MDPopup::create("Error", fmt::format("Unable to get plugin metadata: {}", pairRes.unwrapErr()), "OK")->show();
+			this->setStatusLabel("");
+			return;
+		}
+		auto pair = pairRes.unwrap();
+
+		auto md = pair.first;
+		auto resp = pair.second;
+
+		log::info("name: {}", md->name);
+		log::info("dev: {}", md->developer);
+		log::info("id: {}", md->id);
+		log::info("version: {}", md->version);
+
+	});
 }
 
 std::string OwnPluginManager::constructUrl(std::string repo, std::string tag, std::string filename) {

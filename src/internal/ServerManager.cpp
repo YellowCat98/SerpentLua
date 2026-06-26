@@ -282,3 +282,37 @@ std::string ServerManager::getDownloadHashByData(std::vector<uint8_t> data) {
 	picosha2::hash256(data.begin(), data.end(), hashVec);
 	return fmt::format("sha256:{}", picosha2::bytes_to_hex_string(hashVec.begin(), hashVec.end()));
 }
+
+arc::Future<geode::Result<std::pair<PluginMetadata*, geode::utils::web::WebResponse>>> ServerManager::getPluginMetadataByUrl(std::string url) {
+	auto req = web::WebRequest();
+
+	auto resp = co_await req.get(url);
+	if (!resp.ok()) {
+		co_return Err("Unable to download file (Code {})", resp.code());
+	}
+
+	auto path = Mod::get()->getConfigDir()/"temp"/"__tempPulgin.boobies";
+
+	auto moveIntoRes = resp.into(path);
+
+	if (moveIntoRes.isErr()) {
+		co_return Err(moveIntoRes.unwrapErr());
+	}
+
+	auto hDll = LoadLibraryExW(path.c_str(), NULL, LOAD_LIBRARY_AS_DATAFILE);
+	if (!hDll) {
+		std::filesystem::remove(path);
+		co_return Err("Failed to get metadata: Couldn't load plugin");
+	}
+
+	auto metaRes = PluginMetadata::createFromSLP(path, hDll, false);
+
+	if (metaRes.isErr()) {
+		std::filesystem::remove(path);
+		co_return Err(metaRes.unwrapErr());
+	}
+
+	std::filesystem::remove(path);
+
+	co_return Ok(std::pair<PluginMetadata*, geode::utils::web::WebResponse>{metaRes.unwrap(), resp});
+}

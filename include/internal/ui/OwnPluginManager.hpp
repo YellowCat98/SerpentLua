@@ -9,6 +9,7 @@ namespace SerpentLua::internal::ui {
 		geode::async::TaskHolder<geode::utils::web::WebResponse> m_listener;
 		geode::async::TaskHolder<geode::Result<matjson::Value>> m_beginListener;
 		geode::async::TaskHolder<geode::utils::web::WebResponse> m_bodyListener;
+		geode::async::TaskHolder<geode::Result<std::pair<PluginMetadata*, geode::utils::web::WebResponse>>> m_metaListener;
 
 		geode::MDTextArea* md;
 		CCMenuItemSpriteExtra* nextBtn;
