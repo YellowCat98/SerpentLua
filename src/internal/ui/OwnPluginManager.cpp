@@ -373,9 +373,24 @@ void OwnPluginManager::uploadOrUpdate(const matjson::Value& indexJson, const std
 
 		bool exists = existsRes.unwrap();
 		std::string endpoint = exists ? "update" : "publish";
-		std::string prettifiedEndpoint = exists ? "Updating" : "Publishing";
+		std::string epPrettified = exists ? "Updating" : "Publishing";
+		std::string method = exists ? "PATCH" : "POST";
 		
-		this->setStatusLabel(fmt::format("{} Plugin...", prettifiedEndpoint));
+		this->setStatusLabel(fmt::format("{} Plugin...", epPrettified));
+
+		auto newReq = ServerManager::get()->createReq(true); // the FIRST ever withAuth = true createReq call EVER someone document this
+		newReq.bodyJSON(body);
+
+		auto url = fmt::format("/api/v1/plugin/{}", endpoint);
+
+		m_bodyListener.spawn(std::move(ServerManager::get()->sendReq(method, url, newReq)), [this, exists](web::WebResponse resp) {
+			if (!resp.ok()) {
+				MDPopup::create("Error", fmt::format("Unable to upload/update plugin: {}", resp.string().unwrap()), "OK")->show();
+				return;
+			}
+
+			FLAlertLayer::create(fmt::format("{}!", exists ? "Updated!" : "Uploaded!").c_str(), fmt::format("Your plugin \"{}\" has been {} <cg>successfully!</c>", body["name"].asString().unwrap(), exists ? "updated" : "uploaded").c_str(), "OK")->show();
+		});
 	});
 }
 
