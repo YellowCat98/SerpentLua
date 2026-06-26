@@ -205,8 +205,8 @@ std::string ServerManager::statusString() {
 	}
 }
 
-arc::Future<std::pair<std::string, bool>> ServerManager::getIndexJSON(std::string repo, std::string tag) {
-	using GreatPair = std::pair<std::string, bool>; // the first one is either a url or an error, the second one is whether its an error or not!
+arc::Future<std::pair<matjson::Value, bool>> ServerManager::getIndexJSON(std::string repo, std::string tag) {
+	using GreatPair = std::pair<matjson::Value, bool>; // the first one is either a url or an error, the second one is whether its an error or not!
 	auto req = web::WebRequest();
 	req.userAgent("cpp-client");
 	req.header("Accept", "application/vnd.github+json");
@@ -219,13 +219,25 @@ arc::Future<std::pair<std::string, bool>> ServerManager::getIndexJSON(std::strin
 
 	auto jsonRes = resp.json();
 	if (jsonRes.isErr()) {
-		co_return GreatPair{jsonRes.unwrapErr(), true};
+		co_return GreatPair{matjson::makeObject({
+			{"error", jsonRes.unwrapErr()}
+		}), true};
 	}
 
 	auto json = jsonRes.unwrap();
 
 	if (!resp.ok()) {
-		co_return GreatPair{json["message"].asString().unwrap(), true};
+		auto msgRes = json["message"].asString();
+
+		if (msgRes.isOk()) {
+			co_return GreatPair{matjson::makeObject({
+				{"error", json["message"].asString().unwrap()}
+			}), true};
+		} else {
+			co_return GreatPair{matjson::makeObject({
+				{"error", "Unknown error."}
+			}), true};
+		}
 	}
 
 	auto assets = json["assets"].asArray().unwrap();
@@ -239,8 +251,28 @@ arc::Future<std::pair<std::string, bool>> ServerManager::getIndexJSON(std::strin
 	}
 
 	if (downloadUrl.empty()) {
-		co_return GreatPair{"Unable to find asset `index.json`.", true};
+		co_return GreatPair{matjson::makeObject({
+			{"error", "Unable to find asset `index.json`."}
+		}), true};
 	}
 
-	co_return GreatPair{downloadUrl, false};
+	auto downReq = web::WebRequest();
+
+	auto downResp = co_await downReq.get(downloadUrl);
+
+	if (!downResp.ok()) {
+		co_return GreatPair{matjson::makeObject({
+			{"error", fmt::format("index.json download failed (Code {})", downResp.code())}
+		}), true};
+	}
+
+	auto indexJSON = downResp.json();
+
+	if (indexJSON.isErr()) {
+		co_return GreatPair{matjson::makeObject({
+			{"error", indexJSON.unwrapErr()}
+		}), true};
+	}
+
+	co_return GreatPair{indexJSON.unwrap(), false};
 }

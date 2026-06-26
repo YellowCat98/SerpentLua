@@ -7,7 +7,7 @@ namespace SerpentLua::internal::ui {
 	class OwnPluginManager : public geode::Popup {
 	protected:
 		geode::async::TaskHolder<geode::utils::web::WebResponse> m_listener;
-		geode::async::TaskHolder<std::pair<std::string, bool>> m_uploadListener;
+		geode::async::TaskHolder<std::pair<matjson::Value, bool>> m_uploadListener;
 		geode::MDTextArea* md;
 		CCMenuItemSpriteExtra* nextBtn;
 		CCMenuItemSpriteExtra* backBtn;

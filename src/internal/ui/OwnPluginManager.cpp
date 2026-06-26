@@ -212,20 +212,20 @@ void OwnPluginManager::uploadPlugin(CCObject* sender) {
 	std::string repo = repoInput->getString();
 	std::string tag = tagInput->getString();
 
-	m_uploadListener.spawn(ServerManager::get()->getIndexJSON(repo, tag), [this](std::pair<std::string, bool> resp) {
+	m_uploadListener.spawn(ServerManager::get()->getIndexJSON(repo, tag), [this](std::pair<matjson::Value, bool> resp) {
 		repoInput->setEnabled(true);
 		tagInput->setEnabled(true);
 		uploadBtn->setEnabled(true);
 
 		bool err = resp.second;
 		if (err) {
-			MDPopup::create("Error", resp.first, "OK")->show();
+			MDPopup::create("Error", resp.first["error"].asString().unwrap(), "OK")->show();
 			return;
 		}
 
 		auto url = resp.first;
 
-		log::info("{}", url);
+		// ok i have to check every single thing i access in that url please wish me luck
 	});
 }
 
