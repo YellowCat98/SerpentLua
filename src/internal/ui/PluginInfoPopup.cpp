@@ -148,6 +148,20 @@ bool PluginInfoPopup::init(const DisplayInfo& info) {
 	};
 
 	auto downloadLovely = [this, info, download](bool script, CCMenuItemSpriteExtra* sender) {
+		auto serpVerRes = VersionInfo::parse(info.serpentVersion);
+
+		if (serpVerRes.isErr()) {
+			FLAlertLayer::create("Error", fmt::format("Couldn't parse SerpentLua Version: {}", serpVerRes.unwrapErr()), "OK")->show();
+			return;
+		}
+
+		auto serpVer = serpVerRes.unwrap();
+
+		if (!utility::versionInfoCompare(Mod::get()->getVersion(), serpVer)) {
+			FLAlertLayer::create("Cannot Install", fmt::format("This plugin is made for <cj>SerpentLua</c> version <cb>{}</c>\nYou are on <cy>{}</c>.", serpVer.toVString(), Mod::get()->getVersion().toVString()), "OK")->show();
+			return;
+		}
+
 		if (info.status != "approved") {
 			std::string warningText;
 			if (info.status == "pending") warningText = "is currently under <cf>review</c>.";
@@ -210,7 +224,7 @@ bool PluginInfoPopup::init(const DisplayInfo& info) {
 
 	m_mainLayer->addChild(layoutMenu);
 
-	auto ID = CCLabelBMFont::create(fmt::format("ID: {}", info.id).c_str(), "chatFont.fnt");
+	auto ID = CCLabelBMFont::create(fmt::format("ID: {} | Version: {} | Made for SerpentLua {}", info.id, info.version, info.serpentVersion).c_str(), "chatFont.fnt");
 	ID->setID("id");
 	ID->setOpacity(200);
 	ID->setScale(0.7f);
