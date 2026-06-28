@@ -45,8 +45,7 @@ bool PluginInfoPopup::init(const DisplayInfo& info) {
 	name->limitLabelWidth(top->getContentWidth(), 1.0f, 0.1f);
 	top->addChild(name);
 
-	GameLevelManager::get()->m_userInfoDelegate = this;
-	GameLevelManager::get()->getGJUserInfo(info.accountId);
+
 
 	auto dev = CCLabelBMFont::create(fmt::format("By {}", info.accountId).c_str(), "goldFont.fnt");
 	dev->limitLabelWidth(top->getContentWidth() / 2, 0.5f, 0.1f);
@@ -65,6 +64,9 @@ bool PluginInfoPopup::init(const DisplayInfo& info) {
 	top->addChild(breakLine);
 
 	details->addChild(top);
+
+	GameLevelManager::get()->m_userInfoDelegate = this;
+	GameLevelManager::get()->getGJUserInfo(info.accountId);
 
 	auto bottom = CCMenu::create();
 	bottom->setID("bottom");
