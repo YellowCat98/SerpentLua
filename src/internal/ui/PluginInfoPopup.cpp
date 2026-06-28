@@ -115,6 +115,11 @@ bool PluginInfoPopup::init(const DisplayInfo& info) {
 		->setAxisReverse(true)
 	);
 
+	auto miniBtnMenu = CCMenu::create();
+	miniBtnMenu->setID("mini-btns");
+	miniBtnMenu->setContentWidth(btns->getContentWidth());
+	miniBtnMenu->setLayout(RowLayout::create());
+
 	auto source = CCMenuItemExt::createSpriteExtraWithFrameName("geode.loader/source_generic.png", 0.8f, [info](CCMenuItemSpriteExtra*) {
 		geode::createQuickPopup(
 			"Confirm",
@@ -126,6 +131,17 @@ bool PluginInfoPopup::init(const DisplayInfo& info) {
 		);
 	});
 	source->setID("source");
+
+	if (ServerManager::get()->resolveStatus(ServerManager::Status::Staff)) {
+		auto moderate = CCMenuItemExt::createSpriteExtraWithFilename("plugin_moderate.png"_spr, 0.8f, [](CCMenuItemSpriteExtra*) {
+			log::info("moderate");
+		});
+		moderate->setID("moderate");
+
+		miniBtnMenu->addChild(moderate);
+	}
+
+	miniBtnMenu->addChild(source);
 
 	auto download = [this, info](bool script, CCMenuItemSpriteExtra* sender) {
 		Notification::create("SerpentLua: Starting download...", NotificationIcon::Info)->show();
@@ -206,7 +222,7 @@ bool PluginInfoPopup::init(const DisplayInfo& info) {
 	}
 	getexple->setID("get-example");
 
-	btns->addChild(source);
+	btns->addChild(miniBtnMenu);
 	btns->addChild(get);
 	btns->addChild(getexple);
 
@@ -218,6 +234,7 @@ bool PluginInfoPopup::init(const DisplayInfo& info) {
 	layoutMenu->addChild(details);
 
 	top->updateLayout();
+	miniBtnMenu->updateLayout();
 	bottom->updateLayout();
 	extras->updateLayout();
 	btns->updateLayout();
