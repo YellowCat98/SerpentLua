@@ -29,7 +29,7 @@ DisplayInfo DisplayInfo::create(matjson::Value map) {
     info.releaseDate = map["release_date"].asInt().unwrapOr(0);
     info.lastUpdateDate = map["last_update_date"].asInt().unwrapOr(0);
 
-    info.featured = map["featured"].asBool().unwrapOr(false);
+    info.featured = static_cast<bool>(map["featured"].asInt().unwrapOr(0));
 
     info.native = false; // you arent really meant to use this to construct local plugins/scripts
     info.loaded = false;
