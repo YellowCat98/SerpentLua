@@ -40,10 +40,20 @@ bool PluginInfoPopup::init(const DisplayInfo& info) {
 		->setGap(2.0f)
 	);
 
-	auto name = CCLabelBMFont::create(info.name.c_str(), "bigFont.fnt");
-	name->setID("name");
+	auto name = CCLabelBMFont::create(info.name.c_str(), info.featured ? "goldFont.fnt" : "bigFont.fnt");
 	name->limitLabelWidth(top->getContentWidth(), 1.0f, 0.1f);
-	top->addChild(name);
+
+	auto nameBtn = CCMenuItemExt::createSpriteExtra(name, [info](CCMenuItemSpriteExtra*) {
+		if (!info.featured) {
+			FLAlertLayer::create("Hello.", "the.", "???")->show();
+		} else {
+			FLAlertLayer::create("Featured", "This plugin is <cy>featured</c>.", "OK")->show();
+		}
+	});
+	nameBtn->setEnabled(info.featured);
+	nameBtn->setID("name");
+
+	top->addChild(nameBtn);
 
 
 
