@@ -74,7 +74,7 @@ class $modify(SexyMenuLayer, MenuLayer) {
 
 		auto bottomMenu = static_cast<CCMenu*>(this->getChildByID("bottom-menu"));
 		auto btn = CCMenuItemExt::createSpriteExtra(CircleButtonSprite::create(CCSprite::create("serpentluaButton.png"_spr), CircleBaseColor::Green, CircleBaseSize::MediumAlt), [](CCObject*) {
-			CCDirector::get()->pushScene(CCTransitionFade::create(0.5f, ui::SelectLayer::scene(false)));
+			CCDirector::get()->pushScene(CCTransitionFade::create(0.5f, ui::SelectLayer::scene()));
 		});
 		btn->setID("serpentlua-btn"_spr);
 		bottomMenu->addChild(btn);

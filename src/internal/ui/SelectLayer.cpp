@@ -5,7 +5,7 @@
 using namespace geode::prelude;
 using namespace SerpentLua::internal::ui;
 
-bool SelectLayer::init(bool adminPanel) {
+bool SelectLayer::init() {
 	if (!CCLayer::init()) return false;
 	this->setKeypadEnabled(true);
 
@@ -40,11 +40,7 @@ bool SelectLayer::init(bool adminPanel) {
 	infoMenu = CCMenu::create();
 	infoMenu->setID("actions-menu");
 
-	if (adminPanel && ServerManager::get()->isAuthenticated()) {
-		createAdminPanel();
-	} else {
-		createPeasantPanel();
-	}
+	this->createButtons();
 
 	buttonMenu->setLayout(
 		RowLayout::create()
@@ -73,7 +69,7 @@ bool SelectLayer::init(bool adminPanel) {
 	return true;
 }
 
-void SelectLayer::createPeasantPanel() {
+void SelectLayer::createButtons() {
 	auto scriptsSpr = CategoryButtonSprite::createWithSpriteFrameName("script_select.png"_spr);
 	auto scriptsBtn = CCMenuItemExt::createSpriteExtra(scriptsSpr, [](CCMenuItemSpriteExtra* sender) {
 		CCDirector::get()->pushScene(CCTransitionFade::create(0.5f, ui::ScriptsLayer::scene(Source::Scripts)));
@@ -90,73 +86,44 @@ void SelectLayer::createPeasantPanel() {
 
 	buttonMenu->addChild(pluginsBtn);
 
-	auto safeSpr = CCSprite::createWithSpriteFrameName("GJ_safeBtn_001.png");
-	safeSpr->setScale(0.8f);
-	auto safeBtn = CCMenuItemExt::createSpriteExtra(safeSpr, [](CCMenuItemSpriteExtra*) {
+	auto manageSpr = CategoryButtonSprite::createWithSpriteFrameName("manage_select.png"_spr);
+	auto manageBtn = CCMenuItemExt::createSpriteExtra(manageSpr, [](CCMenuItemSpriteExtra*) {
 		if (!ServerManager::get()->isAuthenticated()) {
-			FLAlertLayer::create("Forbidden", "You must be <cb>authenticated</c> to enter the <ca>dashboard</c>.", "OK")->show();
+			FLAlertLayer::create("Forbidden", "You must be <cb>authenticated</c> to access the <ca>plugin uploader</c>.", "OK")->show();
 			return;
 		} else if (ServerManager::get()->getStatusCached() == ServerManager::Status::Banned) {
-			FLAlertLayer::create("Banned", fmt::format("You are <cr>banned</c> from the dashboard.\n\n<cf>Reason:</c> {}", ServerManager::get()->getBanReason()).c_str(), "OK")->show();
+			FLAlertLayer::create("Banned", fmt::format("You are <cr>banned</c> from uploading plugins.\n\n<cf>Reason:</c> {}", ServerManager::get()->getBanReason()).c_str(), "OK")->show();
 			return;
 		} else if (ServerManager::get()->getStatusCached() == ServerManager::Status::Unknown) {
-			FLAlertLayer::create("Forbidden", "<cb>SerpentLua</c> could not determine your rank.", "OK")->show(); // this will be our lovely secret message because under normal circumstances you should never see this
+			FLAlertLayer::create("Forbidden", "The <cb>SerpentLua</c> client could not determine your rank.\nPlease authenticate in the settings.\nIf this error keeps occurring, report this issue to the maintainers of the server you are using.", "OK")->show(); // this will be our lovely secret message because under normal circumstances you should never see this
 			return;
 		}
 
-		CCDirector::get()->pushScene(CCTransitionFade::create(0.5f, SelectLayer::scene(true)));
-	});
-	safeBtn->setID("actions-btn");
-	infoMenu->addChild(safeBtn);
-}
-
-void SelectLayer::createAdminPanel() {
-	if (ServerManager::get()->resolveStatus(ServerManager::Status::Staff)) {
-		auto reviewSpr = CategoryButtonSprite::createWithSpriteFrameName("review_select.png"_spr);
-		auto reviewBtn = CCMenuItemExt::createSpriteExtra(reviewSpr, [](CCMenuItemSpriteExtra*) {
-			// i will define this later
-		});
-		reviewBtn->setID("review-btn");
-		buttonMenu->addChild(reviewBtn);
-	}
-
-	auto manageSpr = CategoryButtonSprite::createWithSpriteFrameName("manage_select.png"_spr);
-	auto manageBtn = CCMenuItemExt::createSpriteExtra(manageSpr, [](CCMenuItemSpriteExtra*) {
 		OwnPluginManager::create()->show();
 	});
 	manageBtn->setID("manage-btn");
 	buttonMenu->addChild(manageBtn);
 
 	auto infoSpr = CCSprite::createWithSpriteFrameName("GJ_infoIcon_001.png");
-	auto infoBtn = CCMenuItemExt::createSpriteExtra(infoSpr, [this](CCMenuItemSpriteExtra*) {
-		auto alert = FLAlertLayer::create(
+	auto infoBtn = CCMenuItemExt::createSpriteExtra(infoSpr, [](CCMenuItemSpriteExtra*) {
+		FLAlertLayer::create(
 			"Info",
-			fmt::format(
-				"Welcome to the <ca>dashboard</c>!\n"
-				"You may upload or publish plugins here. More tools may be unlocked if your status allows.\n"
-				"You are of status: {}\n",
-				ServerManager::get()->statusString()
-			).c_str(),
+			"This is where you may manage your install <cb>scripts</c> and <cb>plugins</c>.\n"
+			"You may upload your own plugins or view information about them if you are a <cy>plugin developer</c>.",
 			"OK"
-		);
-		alert->m_scene = this;
-		alert->show();
+		)->show();
 	});
 	infoBtn->setID("actions-btn");
 	infoMenu->addChild(infoBtn);
-
-	if (!Mod::get()->setSavedValue("shown-dashboard-info", true)) {
-		infoBtn->activate();
-	}
 }
 
 void SelectLayer::keyBackClicked() {
 	CCDirector::get()->popSceneWithTransition(0.5f, PopTransition::kPopTransitionFade);
 }
 
-SelectLayer* SelectLayer::create(bool adminPanel) {
+SelectLayer* SelectLayer::create() {
 	auto ret = new SelectLayer();
-	if (ret && ret->init(adminPanel)) {
+	if (ret && ret->init()) {
 		ret->autorelease();
 		return ret;
 	}
@@ -164,8 +131,8 @@ SelectLayer* SelectLayer::create(bool adminPanel) {
 	return nullptr;
 }
 
-CCScene* SelectLayer::scene(bool adminPanel) {
+CCScene* SelectLayer::scene() {
 	auto ret = CCScene::create();
-	ret->addChild(SelectLayer::create(adminPanel));
+	ret->addChild(SelectLayer::create());
 	return ret;
 }

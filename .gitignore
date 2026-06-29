@@ -70,5 +70,6 @@ lua
 *.res
 .lua_output
 
-# ignore .temp folder
+# ignore .temp folder and where i keep old resources in case i need them
 .temp/
+.old_resources/
