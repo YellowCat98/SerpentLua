@@ -5,6 +5,7 @@ using namespace geode::prelude;
 
 bool PluginInfoPopup::init(const DisplayInfo& info) {
 	if (!Popup::init({300.0f, 200.0f})) return false;
+	m_closeBtn->setID("close-btn");
 
 	auto layoutMenu = CCMenu::create();
 	layoutMenu->setID("layout-menu");

@@ -7,6 +7,7 @@ using namespace geode::prelude;
 
 bool OwnPluginManager::init() {
 	if (!Popup::init({300.0f, 200.0f})) return false;
+	m_closeBtn->setID("close-btn");
 
 	// oh COME ON i dont want to do layout bs again
 

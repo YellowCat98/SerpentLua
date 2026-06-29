@@ -5,9 +5,10 @@ using namespace geode::prelude;
 
 bool PluginJudgmentPopup::init(const DisplayInfo& info) {
 	if (!Popup::init({200.0f, 115.0f})) return false;
+	m_closeBtn->setID("close-btn");
 	this->setTitle("Plugin Review");
 	this->info = info;
-	featured = info.featured;
+	this->featured = info.featured;
 
 	auto featureSpriteON = CCSprite::createWithSpriteFrameName("GJ_sStarsIcon_001.png");
 	featureSpriteON->setScale(1.8f);
