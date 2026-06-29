@@ -7,7 +7,12 @@
 namespace SerpentLua::internal::ui {
 	class PluginJudgmentPopup : public geode::Popup {
 	protected:
-		geode::async::TaskHolder<geode::utils::web::WebResponse> listener;
+		geode::async::TaskHolder<geode::utils::web::WebResponse> m_listener;
+		DisplayInfo info;
+		bool featured = false;
+		CCMenuItemSpriteExtra* approve;
+		CCMenuItemSpriteExtra* reject;
+		CCMenuItemToggler* feature;
 		bool init(const DisplayInfo& info);
 		void startOperation(CCObject*);
 	public:
