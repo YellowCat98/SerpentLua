@@ -9,7 +9,7 @@ namespace SerpentLua::internal::ui {
 	protected:
 		geode::async::TaskHolder<geode::utils::web::WebResponse> listener;
 		bool init(const DisplayInfo& info);
-		void startOperation();
+		void startOperation(CCObject*);
 	public:
 		static PluginJudgmentPopup* create(const DisplayInfo& info);
 	};

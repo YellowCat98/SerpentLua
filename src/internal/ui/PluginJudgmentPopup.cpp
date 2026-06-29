@@ -21,15 +21,15 @@ bool PluginJudgmentPopup::init(const DisplayInfo& info) {
 
 	auto approveSprite = CCSprite::createWithSpriteFrameName("GJ_likeBtn_001.png");
 	approveSprite->setScale(1.2f);
-	auto approve = CCMenuItemExt::createSpriteExtra(approveSprite, [](CCMenuItemSpriteExtra*) {
-
-	});
+	auto approve = CCMenuItemSpriteExtra::create(approveSprite, this, menu_selector(PluginJudgmentPopup::startOperation));
+	approve->setID("approve");
+	approve->setTag(1);
 
 	auto rejectSprite = CCSprite::createWithSpriteFrameName("GJ_dislikeBtn_001.png");
 	rejectSprite->setScale(1.2f);
-	auto reject = CCMenuItemExt::createSpriteExtra(rejectSprite, [](CCMenuItemSpriteExtra*) {
-
-	});
+	auto reject = CCMenuItemSpriteExtra::create(rejectSprite, this, menu_selector(PluginJudgmentPopup::startOperation));
+	reject->setID("reject");
+	reject->setTag(0);
 
 	actionsMenu->addChild(approve);
 	actionsMenu->addChild(reject);
@@ -38,6 +38,12 @@ bool PluginJudgmentPopup::init(const DisplayInfo& info) {
 	m_mainLayer->addChild(actionsMenu);
 
 	return true;
+}
+
+void PluginJudgmentPopup::startOperation(CCObject* sender) {
+	std::string op = sender->getTag() ? "approved" : "rejected";
+
+	log::info("Shall be {}.", op);
 }
 
 PluginJudgmentPopup* PluginJudgmentPopup::create(const DisplayInfo& info) {
