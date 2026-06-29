@@ -312,24 +312,34 @@ bool ScriptsLayer::init(Source source) {
 	if (source != Source::Index) {
 		CCMenuItemSpriteExtra* JeomETRYdASH;
 
-		if (source == Source::Plugins) {
-			JeomETRYdASH = CCMenuItemExt::createSpriteExtra(CircleButtonSprite::create(CCSprite::create("plugin_import.png"_spr), CircleBaseColor::Green, CircleBaseSize::Small), [this](CCObject* sender) {
-				geode::createQuickPopup(
-					"Choose Method",
-					"What method would you like to use to import?",
-					"From Disk", "From Server",
-					[this, sender](FLAlertLayer*, bool btn2) {
-						if (btn2) {
-							PluginFetcherPopup::create()->show();
-						} else {
-							this->importPlugin(sender);
-						}
+		JeomETRYdASH = CCMenuItemExt::createSpriteExtra(CircleButtonSprite::create(CCSprite::create(this->source == Source::Plugins ? "plugin_import.png"_spr : "script_import.png"_spr), CircleBaseColor::Green, CircleBaseSize::Small), [this](CCObject* sender) {
+			geode::createQuickPopup(
+				"Confirm",
+				fmt::format("Would you like to import a {}?", this->source == Source::Plugins ? "plugin" : "script"),
+				"Cancel", "Confirm",
+				[this, sender](FLAlertLayer*, bool btn2) {
+					if (!btn2) return;
+
+					if (this->source == Source::Scripts) {
+						this->importPlugin(sender);
+						return;
 					}
-				);
-			});
-		} else {
-			JeomETRYdASH = CCMenuItemSpriteExtra::create(CircleButtonSprite::create(CCSprite::create("script_import.png"_spr), CircleBaseColor::Green, CircleBaseSize::Small), this, menu_selector(ScriptsLayer::importPlugin));
-		}
+
+					geode::createQuickPopup(
+						"Choose Method",
+						"What method would you like to use to import?",
+						"From disk", "From server",
+						[this, sender](FLAlertLayer*, bool btn2) {
+							if (btn2) {
+								PluginFetcherPopup::create()->show();
+							} else {
+								this->importPlugin(sender);
+							}
+						}
+					);
+				}
+			);
+		});
 
 		JeomETRYdASH->setID("import-btn");
 
@@ -443,65 +453,57 @@ void ScriptsLayer::startImport(std::filesystem::path path, std::filesystem::path
 }
 
 void ScriptsLayer::importPlugin(CCObject*) {
-	geode::createQuickPopup(
-		"Import",
-		fmt::format("Would you like to import a {}?", this->source == Source::Plugins ? "plugin" : "script"),
-		"Cancel", "Import",
-		[this](FLAlertLayer*, bool btn2) {
-			if (btn2) {
-				async::spawn(file::pick(file::PickMode::OpenFile, file::FilePickOptions {
-					.filters = { file::FilePickOptions::Filter {
-						.description = this->source == Source::Plugins ? "SerpentLua Plugins" : "Lua Scripts",
-						.files = { this->source == Source::Plugins ? "*.slp" : "*.lua"}
-					}}
-				}), ([this](geode::Result<std::optional<std::filesystem::path>> result) {
-					if (result.isErr()) {
-						FLAlertLayer::create(
-							"Error",
-							fmt::format("An error occurred importing: \n", *(result.err())).c_str(),
-							"OK"
-						)->show();
+	async::spawn(file::pick(file::PickMode::OpenFile, file::FilePickOptions {
+		.filters = { file::FilePickOptions::Filter {
+			.description = this->source == Source::Plugins ? "SerpentLua Plugins" : "Lua Scripts",
+			.files = { this->source == Source::Plugins ? "*.slp" : "*.lua"}
+		}}
+	}), ([this](geode::Result<std::optional<std::filesystem::path>> result) {
+		if (result.isErr()) {
+			FLAlertLayer::create(
+				"Error",
+				fmt::format("An error occurred importing: \n", *(result.err())).c_str(),
+				"OK"
+			)->show();
+			return;
+		}
+
+		auto opt = result.unwrap();
+
+		if (!opt) return; // cancelled
+		auto path = *opt;
+		geode::createQuickPopup(
+			"Confirm",
+			fmt::format("Are you sure you want to import {}?", path.filename()),
+			"Cancel", "Confirm",
+			[=, this](FLAlertLayer*, bool btn2) {
+				if (btn2) {
+					auto dest = Mod::get()->getConfigDir()/(this->source == Source::Plugins ? "plugins" : "scripts")/path.filename();
+
+					std::error_code ec;
+					if (Mod::get()->getSettingValue<bool>("overwrite")) {
+						this->startImport(path, dest, std::filesystem::copy_options::overwrite_existing);
 						return;
 					}
+					if (std::filesystem::exists(dest)) {
+						std::string tip = !Mod::get()->setSavedValue<bool>("show-overwrite-tip", true) ? "\n<cy>Tip</c>: Enabling the <cr>\"Skip Overwrite Confirmation\"</c> setting will skip overwrite confirmation in the future." : "";
+						geode::createQuickPopup(
+							"File Exists",
+							fmt::format("{} already exists! would you like to overwrite it?{}", path.filename(), tip),
+							"Cancel", "Overwrite",
+							[path, dest, this](FLAlertLayer*, bool btn2) {
+								if (!btn2) return;
 
-					auto opt = result.unwrap();
-
-					if (!opt) return; // cancelled
-					auto path = *opt;
-					geode::createQuickPopup(
-						"Confirm",
-						fmt::format("Are you sure you want to import {}?", path.filename()),
-						"Cancel", "Confirm",
-						[=, this](FLAlertLayer*, bool btn2) {
-							if (btn2) {
-								auto dest = Mod::get()->getConfigDir()/(this->source == Source::Plugins ? "plugins" : "scripts")/path.filename();
-
-								std::error_code ec;
-								if (Mod::get()->getSettingValue<bool>("overwrite")) {
-									this->startImport(path, dest, std::filesystem::copy_options::overwrite_existing);
-									return;
-								}
-								if (std::filesystem::exists(dest)) {
-									std::string tip = !Mod::get()->setSavedValue<bool>("show-overwrite-tip", true) ? "\n<cy>Tip</c>: Enabling the <cr>\"Skip Overwrite Confirmation\"</c> setting will skip overwrite confirmation in the future." : "";
-									geode::createQuickPopup(
-										"File Exists",
-										fmt::format("{} already exists! would you like to overwrite it?{}", path.filename(), tip),
-										"Cancel", "Overwrite",
-										[path, dest, this](FLAlertLayer*, bool btn2) {
-											if (!btn2) return;
-
-											this->startImport(path, dest, std::filesystem::copy_options::overwrite_existing);
-										}
-									);
-								} else {
-									this->startImport(path, dest, std::filesystem::copy_options::none);
-								}
+								this->startImport(path, dest, std::filesystem::copy_options::overwrite_existing);
 							}
-						}
-					);
-				}));
+						);
+					} else {
+						this->startImport(path, dest, std::filesystem::copy_options::none);
+					}
+				}
 			}
-		});
+		);
+	}));
 }
 
 void ScriptsLayer::setIDPopupClosed(SetIDPopup* popup, int num) {
