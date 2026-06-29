@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Geode/Geode.hpp>
-#include <internal/ui/ScriptsLayer.hpp>
+#include <internal/SerpentLua.hpp>
 
 // i couldve just derived likeitempopup but eh
 namespace SerpentLua::internal::ui {

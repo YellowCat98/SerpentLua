@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Geode/Geode.hpp>
+#include <internal/SerpentLua.hpp>
 #include <internal/ui/ScriptsLayer.hpp>
 #include <internal/ui/PluginJudgmentPopup.hpp>
 

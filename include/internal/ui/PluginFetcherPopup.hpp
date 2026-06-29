@@ -1,8 +1,7 @@
 #pragma once
 
 #include <Geode/Geode.hpp>
-#include <internal/ui/ScriptsLayer.hpp>
-#include <internal/ui/ScriptItem.hpp>
+#include <internal/SerpentLua.hpp>
 
 namespace SerpentLua::internal::ui {
 	class PluginFetcherPopup : public geode::Popup {
