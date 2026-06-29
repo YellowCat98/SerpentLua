@@ -3,6 +3,7 @@
 #include <Geode/Geode.hpp>
 #include <internal/ui/ScriptsLayer.hpp>
 
+// i couldve just derived likeitempopup but eh
 namespace SerpentLua::internal::ui {
 	class PluginJudgmentPopup : public geode::Popup {
 	protected:
