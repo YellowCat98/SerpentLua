@@ -2,6 +2,7 @@
 
 #include <Geode/Geode.hpp>
 #include <internal/ui/ScriptsLayer.hpp>
+#include <internal/ui/PluginJudgmentPopup.hpp>
 
 namespace SerpentLua::internal::ui {
 	class PluginInfoPopup : public geode::Popup, public UserInfoDelegate {

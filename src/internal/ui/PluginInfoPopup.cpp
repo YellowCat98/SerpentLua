@@ -133,8 +133,8 @@ bool PluginInfoPopup::init(const DisplayInfo& info) {
 	source->setID("source");
 
 	if (ServerManager::get()->resolveStatus(ServerManager::Status::Staff)) {
-		auto moderate = CCMenuItemExt::createSpriteExtraWithFilename("plugin_moderate.png"_spr, 0.8f, [](CCMenuItemSpriteExtra*) {
-			log::info("moderate");
+		auto moderate = CCMenuItemExt::createSpriteExtraWithFilename("plugin_moderate.png"_spr, 0.8f, [info](CCMenuItemSpriteExtra*) {
+			PluginJudgmentPopup::create(info)->show();
 		});
 		moderate->setID("moderate");
 
