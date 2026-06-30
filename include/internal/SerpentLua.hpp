@@ -78,6 +78,7 @@ namespace SerpentLua::internal {
 
 		arc::Future<std::string> setStatus();
 		ServerManager::Status getStatusCached();
+		std::vector<ServerManager::Status> getStatusSettables();
 		std::string getBanReason();
 		bool resolveStatus(const ServerManager::Status& other);
 		std::string statusString();

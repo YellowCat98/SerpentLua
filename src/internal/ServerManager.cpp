@@ -205,6 +205,39 @@ std::string ServerManager::statusString() {
 	}
 }
 
+
+std::vector<ServerManager::Status> ServerManager::getStatusSettables() {
+    switch (status) {
+        case ServerManager::Status::Owner:
+            return {
+                ServerManager::Status::Peasant,
+                ServerManager::Status::Verified,
+                ServerManager::Status::Banned,
+                ServerManager::Status::Staff,
+                ServerManager::Status::Admin,
+                ServerManager::Status::Owner
+            };
+
+        case ServerManager::Status::Admin:
+            return {
+                ServerManager::Status::Banned,
+                ServerManager::Status::Verified
+            };
+
+        case ServerManager::Status::Staff:
+            return {
+                ServerManager::Status::Banned
+            };
+
+        case ServerManager::Status::Unknown:
+        case ServerManager::Status::Peasant:
+        case ServerManager::Status::Verified:
+        case ServerManager::Status::Banned:
+        default:
+            return {};
+    }
+}
+
 arc::Future<geode::Result<matjson::Value>> ServerManager::getIndexJSON(std::string repo, std::string tag) {
 	auto req = web::WebRequest();
 	req.userAgent("cpp-client");
