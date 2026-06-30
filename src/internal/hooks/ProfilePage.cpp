@@ -8,6 +8,7 @@ class $modify(ProfilePage) {
 	void loadPageFromUserInfo(GJUserScore* score) {
 		ProfilePage::loadPageFromUserInfo(score);
 		if (m_ownProfile) return;
+		if (!ServerManager::get()->resolveStatus(ServerManager::Status::Staff)) return;
 
 		auto bottomMenu = m_mainLayer->getChildByID("bottom-menu"); // i wake up everyday thankful for node ids
 
