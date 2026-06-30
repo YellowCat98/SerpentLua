@@ -41,13 +41,17 @@ bool PluginFetcherPopup::init() {
 			setStatusLabel("");
 			this->textInput->setEnabled(true);
 			if (!(resp.code() >= 200 && resp.code() < 300)) {
-				auto msg = fmt::format("Error: {} (Code {})", resp.string().unwrapOr("unknown error"), resp.code());
-				setStatusLabel(msg);
+				this->setStatusLabel(fmt::format("Error: {} (Code {})", resp.string().unwrap(), resp.code()));
 				this->statusLabel->setColor({255, 0, 0});
 				return;
 			}
 
-			auto json = resp.json().unwrapOr(matjson::Value());
+			auto jsonRes = resp.json();
+			if (jsonRes.isErr()) {
+				this->setStatusLabel(fmt::format("Failed to unwrap JSON result: {} (Code {})", jsonRes.unwrapErr(), resp.code()));
+				this->statusLabel->setColor({255, 0, 0});
+			}
+			auto json = jsonRes.unwrap();
 			
 			PluginInfoPopup::create(DisplayInfo::create(json))->show();
 			textInput->setString("");
