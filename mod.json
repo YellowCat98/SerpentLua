@@ -57,7 +57,7 @@
 		},
 		"custom-servers": {
 			"name": "Allow custom servers",
-			"description": "Allows you to use a different version plugin index server.",
+			"description": "Allows you to use a different version plugin index server.\nWarning: SerpentLua is built against the main plugin index server, using other servers that modified/forked the server may cause issues.",
 			"type": "bool",
 			"default": false
 		},
