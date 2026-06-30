@@ -1,5 +1,6 @@
 #include <internal/SerpentLua.hpp>
 #include <Geode/modify/ProfilePage.hpp>
+#include <internal/ui/SetUserStatusPopup.hpp>
 
 using namespace SerpentLua::internal;
 using namespace geode::prelude;
@@ -14,8 +15,8 @@ class $modify(ProfilePage) {
 
 		auto sprite = CCSprite::create("user_status.png"_spr);
 		sprite->setScale(0.75f);
-		auto button = CCMenuItemExt::createSpriteExtra(sprite, [](CCMenuItemSpriteExtra*) {
-
+		auto button = CCMenuItemExt::createSpriteExtra(sprite, [score](CCMenuItemSpriteExtra*) {
+			ui::SetUserStatusPopup::create(score)->show();
 		});
 		button->setID("set-status-button"_spr);
 

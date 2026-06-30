@@ -221,9 +221,9 @@ std::vector<ServerManager::Status> ServerManager::getStatusSettables(ServerManag
 	switch (status) {
 		case ServerManager::Status::Owner:
 			return {
+				ServerManager::Status::Banned,
 				ServerManager::Status::Peasant,
 				ServerManager::Status::Verified,
-				ServerManager::Status::Banned,
 				ServerManager::Status::Staff,
 				ServerManager::Status::Admin,
 				ServerManager::Status::Owner
