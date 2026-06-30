@@ -7,7 +7,7 @@ bool SetUserStatusPopup::init(GJUserScore* score) {
 	if (!Popup::init({200.0f, 115.0f})) return false;\
 	m_closeBtn->setID("close-btn");
 	this->setTitle(fmt::format("Set User Rank for {}", score->m_userName));
-	statuses = {"Banned", "", "Verified", "Staff", "Admin", "Owner"};
+	statuses = ServerManager::get()->getStatusSettables();
 
 	auto actionsMenu = CCMenu::create();
 	actionsMenu->setID("actions-menu");

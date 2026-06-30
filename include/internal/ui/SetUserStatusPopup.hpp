@@ -16,7 +16,7 @@ namespace SerpentLua::internal::ui {
 		void startOperation();
 		void movePage(cocos2d::CCObject*);
 		void loadPage(int page);
-		std::vector<std::string> statuses;
+		std::vector<ServerManager::Status> statuses;
 		ServerManager::Status currentStatus;
 	public:
 		static SetUserStatusPopup* create(GJUserScore* score);
