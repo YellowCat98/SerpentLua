@@ -78,9 +78,12 @@ namespace SerpentLua::internal {
 
 		arc::Future<std::string> setStatus();
 		ServerManager::Status getStatusCached();
+		std::vector<ServerManager::Status> getStatusSettables(ServerManager::Status status);
 		std::vector<ServerManager::Status> getStatusSettables();
 		std::string getBanReason();
+		bool resolveStatus(ServerManager::Status status, const ServerManager::Status& other);
 		bool resolveStatus(const ServerManager::Status& other);
+		std::string statusString(ServerManager::Status status);
 		std::string statusString();
 
 		geode::utils::web::WebRequest createReq(bool withAuth = false); // withAuth just passes in the session token as Authorization lol!

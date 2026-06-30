@@ -187,6 +187,10 @@ std::string ServerManager::getBanReason() {
 }
 
 bool ServerManager::resolveStatus(const ServerManager::Status& other) {
+	return this->resolveStatus(status, other);
+}
+
+bool ServerManager::resolveStatus(ServerManager::Status status, const ServerManager::Status& other) {
 	int numStatus = static_cast<int>(status);
 	int numOther = static_cast<int>(other);
 
@@ -194,6 +198,10 @@ bool ServerManager::resolveStatus(const ServerManager::Status& other) {
 }
 
 std::string ServerManager::statusString() {
+	return this->statusString(this->status);
+}
+
+std::string ServerManager::statusString(ServerManager::Status status) {
 	switch (status) {
 		case ServerManager::Status::Unknown: return "Unknown";
 		case ServerManager::Status::Banned: return "Banned";
@@ -205,8 +213,11 @@ std::string ServerManager::statusString() {
 	}
 }
 
-
 std::vector<ServerManager::Status> ServerManager::getStatusSettables() {
+	return getStatusSettables(this->status);
+}
+
+std::vector<ServerManager::Status> ServerManager::getStatusSettables(ServerManager::Status status) {
 	switch (status) {
 		case ServerManager::Status::Owner:
 			return {

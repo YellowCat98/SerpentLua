@@ -50,5 +50,5 @@ void SetUserStatusPopup::movePage(CCObject* sender) {
 void SetUserStatusPopup::loadPage(int page) {
 	currentPage = page - 1; // we are using vectors and i would like a super clear front
 
-
+	status->setString(ServerManager::get()->statusString(statuses[currentPage]).c_str());
 }
