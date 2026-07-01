@@ -3,7 +3,7 @@
 - (the top most unchecked todos are for the next SerpentLua update, the ones at the very bottom (marked Unrecognized) are unplanned for next update but still in mind. It mostly has breaking changes and stuff i dont want to deal with now)
 
 ## 1.4.0
-- Plugins: Plugin repository.
+- ~~Plugins: Plugin repository.~~ ✓
 
 ## 1.3.0
 - ~~SL Plugin (1.2.0): Add FLAlertLayer utilities.~~ ✓
