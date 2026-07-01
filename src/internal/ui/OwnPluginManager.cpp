@@ -327,6 +327,7 @@ void OwnPluginManager::setBasicMetadata(const matjson::Value& indexJson, const s
 		auto hash = ServerManager::get()->getDownloadHashByData(resp.data());
 
 		body["name"] = mdPlugin->name;
+		body["developer"] = mdPlugin->developer;
 		body["id"] = mdPlugin->id;
 		body["version"] = mdPlugin->version;
 		body["serpent_version"] = mdPlugin->serpentVersion;
