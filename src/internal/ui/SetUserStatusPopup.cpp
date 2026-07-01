@@ -4,7 +4,7 @@ using namespace SerpentLua::internal::ui;
 using namespace geode::prelude;
 
 bool SetUserStatusPopup::init(GJUserScore* score) {
-	if (!Popup::init({200.0f, 125.0f})) return false;
+	if (!Popup::init({225.0f, 150.0f})) return false;
 	m_closeBtn->setID("close-btn");
 	this->setTitle(fmt::format("Set Rank for {}", score->m_userName));
 	this->statuses = ServerManager::get()->getStatusSettables();
@@ -20,7 +20,7 @@ bool SetUserStatusPopup::init(GJUserScore* score) {
 		->setGap(5)
 	);
 	actionsMenu->setContentSize({m_size.width - 50.0f, m_size.height / 2});
-	actionsMenu->setPosition({m_size.width / 2, (m_size.height / 2) + 7.0f});
+	actionsMenu->setPosition({m_size.width / 2, (m_size.height / 2) + 20.0f});
 	actionsMenu->setAnchorPoint({0.5f, 0.5f});
 
 	right = CCMenuItemSpriteExtra::create(CCSprite::createWithSpriteFrameName("GJ_arrow_01_001.png"), this, menu_selector(SetUserStatusPopup::movePage));
@@ -38,6 +38,11 @@ bool SetUserStatusPopup::init(GJUserScore* score) {
 	actionsMenu->addChild(right);
 	actionsMenu->addChild(status);
 	actionsMenu->addChild(left);
+
+	textInput = TextInput::create(actionsMenu->getContentWidth(), "Enter Ban Reason");
+	textInput->setPosition({actionsMenu->getPositionX(), actionsMenu->getPositionY() - 35.0f});
+
+	m_mainLayer->addChild(textInput);
 
 	auto applySpr = ButtonSprite::create("Apply");
 	apply = CCMenuItemSpriteExtra::create(applySpr, this, menu_selector(SetUserStatusPopup::startOperation));
@@ -64,17 +69,22 @@ void SetUserStatusPopup::loadPage(int page) {
 	currentPage = page;
 	currentIndex = currentPage - 1;
 
-	status->setString(ServerManager::get()->statusString(statuses[currentIndex]).c_str());
+	currentStatus = statuses[currentIndex];
+	textInput->setVisible(currentStatus == ServerManager::Status::Banned);
+
+	status->setString(ServerManager::get()->statusString(currentStatus).c_str());
 }
 
 void SetUserStatusPopup::startOperation(CCObject*) {
 	left->setEnabled(false);
 	right->setEnabled(false);
 	apply->setEnabled(false);
+	textInput->setEnabled(false);
 
 	auto req = ServerManager::get()->createReq(true);
 	req.param("status", ServerManager::get()->statusString(statuses[currentIndex], true));
 	req.param("account_id", score->m_accountID);
+	if (currentStatus == ServerManager::Status::Banned) req.param("ban_reason", textInput->getString());
 
 	m_listener.spawn(std::move(ServerManager::get()->sendReq("PATCH", "/api/v1/moderator/set_user_status", req)), [this](web::WebResponse resp) {
 		if (!resp.ok()) {

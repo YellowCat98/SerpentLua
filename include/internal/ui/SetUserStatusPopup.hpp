@@ -14,6 +14,7 @@ namespace SerpentLua::internal::ui {
 		cocos2d::CCMenu* actionsMenu;
 		CCMenuItemSpriteExtra* apply;
 		GJUserScore* score;
+		geode::TextInput* textInput;
 		int currentPage;
 		int currentIndex;
 		bool init(GJUserScore* score);
