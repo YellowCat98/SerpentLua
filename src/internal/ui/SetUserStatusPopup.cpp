@@ -7,7 +7,8 @@ bool SetUserStatusPopup::init(GJUserScore* score) {
 	if (!Popup::init({200.0f, 125.0f})) return false;
 	m_closeBtn->setID("close-btn");
 	this->setTitle(fmt::format("Set Rank for {}", score->m_userName));
-	statuses = ServerManager::get()->getStatusSettables();
+	this->statuses = ServerManager::get()->getStatusSettables();
+	this->score = score;
 
 	actionsMenu = CCMenu::create();
 	actionsMenu->setID("actions-menu");
@@ -39,9 +40,9 @@ bool SetUserStatusPopup::init(GJUserScore* score) {
 	actionsMenu->addChild(left);
 
 	auto applySpr = ButtonSprite::create("Apply");
-	auto applyBtn = CCMenuItemSpriteExtra::create(applySpr, this, menu_selector(SetUserStatusPopup::startOperation));
+	apply = CCMenuItemSpriteExtra::create(applySpr, this, menu_selector(SetUserStatusPopup::startOperation));
 
-	m_buttonMenu->addChildAtPosition(applyBtn, Anchor::Bottom, {0.0f, 25.0f});
+	m_buttonMenu->addChildAtPosition(apply, Anchor::Bottom, {0.0f, 25.0f});
 
 	actionsMenu->updateLayout();
 
@@ -54,7 +55,7 @@ bool SetUserStatusPopup::init(GJUserScore* score) {
 void SetUserStatusPopup::movePage(CCObject* sender) {
 	auto page = currentPage + sender->getTag();
 	if (page > statuses.size()) page = 1;
-	if (page < 1) page = statuses.size();
+	else if (page < 1) page = statuses.size();
 
 	this->loadPage(page);
 }
@@ -67,7 +68,24 @@ void SetUserStatusPopup::loadPage(int page) {
 }
 
 void SetUserStatusPopup::startOperation(CCObject*) {
+	left->setEnabled(false);
+	right->setEnabled(false);
+	apply->setEnabled(false);
 
+	auto req = ServerManager::get()->createReq(true);
+	req.param("status", ServerManager::get()->statusString(statuses[currentIndex], true));
+	req.param("account_id", score->m_accountID);
+
+	m_listener.spawn(std::move(ServerManager::get()->sendReq("PATCH", "/api/v1/moderator/set_user_status", req)), [this](web::WebResponse resp) {
+		if (!resp.ok()) {
+			MDPopup::create("Error", fmt::format("An error occurred: {}", resp.string().unwrap()), "OK")->show();
+			this->onClose(nullptr);
+			return;
+		}
+
+		FLAlertLayer::create("Success", fmt::format("Set status <cg>{}</c> for user <cy>{}</c>", ServerManager::get()->statusString(statuses[currentIndex]), score->m_userName).c_str(), "OK")->show();
+		this->onClose(nullptr);
+	});
 }
 
 SetUserStatusPopup* SetUserStatusPopup::create(GJUserScore* score) {

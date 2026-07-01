@@ -12,6 +12,8 @@ namespace SerpentLua::internal::ui {
 		CCMenuItemSpriteExtra* right;
 		cocos2d::CCLabelBMFont* status;
 		cocos2d::CCMenu* actionsMenu;
+		CCMenuItemSpriteExtra* apply;
+		GJUserScore* score;
 		int currentPage;
 		int currentIndex;
 		bool init(GJUserScore* score);
