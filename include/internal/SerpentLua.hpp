@@ -83,8 +83,8 @@ namespace SerpentLua::internal {
 		std::string getBanReason();
 		bool resolveStatus(ServerManager::Status status, const ServerManager::Status& other);
 		bool resolveStatus(const ServerManager::Status& other);
-		std::string statusString(ServerManager::Status status);
-		std::string statusString();
+		std::string statusString(ServerManager::Status status, bool technical = false);
+		std::string statusString(bool technical = false);
 
 		geode::utils::web::WebRequest createReq(bool withAuth = false); // withAuth just passes in the session token as Authorization lol!
 

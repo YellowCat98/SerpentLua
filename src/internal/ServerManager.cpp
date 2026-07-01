@@ -197,19 +197,19 @@ bool ServerManager::resolveStatus(ServerManager::Status status, const ServerMana
 	return numStatus >= numOther;
 }
 
-std::string ServerManager::statusString() {
-	return this->statusString(this->status);
+std::string ServerManager::statusString(bool technical) {
+	return this->statusString(this->status, technical);
 }
 
-std::string ServerManager::statusString(ServerManager::Status status) {
+std::string ServerManager::statusString(ServerManager::Status status, bool technical) {
 	switch (status) {
-		case ServerManager::Status::Unknown: return "Unknown";
-		case ServerManager::Status::Banned: return "Banned";
-		case ServerManager::Status::Peasant: return "User"; // i dont think i should really make the average user named Peasant
-		case ServerManager::Status::Verified: return "Verified";
-		case ServerManager::Status::Staff: return "Staff";
-		case ServerManager::Status::Admin: return "Admin";
-		case ServerManager::Status::Owner: return "Owner";
+		case ServerManager::Status::Unknown: return technical ? "unknown" : "Unknown";
+		case ServerManager::Status::Banned: return technical ? "banned" : "Banned";
+		case ServerManager::Status::Peasant: return technical ? "" : "User"; // i dont think i should really make the average user named Peasant
+		case ServerManager::Status::Verified: return technical ? "verified" : "Verified";
+		case ServerManager::Status::Staff: return technical ? "staff" : "Staff";
+		case ServerManager::Status::Admin: return technical ? "admin" : "Admin";
+		case ServerManager::Status::Owner: return technical ? "owner" : "Owner";
 	}
 }
 
