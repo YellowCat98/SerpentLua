@@ -13,8 +13,9 @@ namespace SerpentLua::internal::ui {
 		cocos2d::CCLabelBMFont* status;
 		cocos2d::CCMenu* actionsMenu;
 		int currentPage;
+		int currentIndex;
 		bool init(GJUserScore* score);
-		void startOperation();
+		void startOperation(cocos2d::CCObject*);
 		void movePage(cocos2d::CCObject*);
 		void loadPage(int page);
 		std::vector<ServerManager::Status> statuses;

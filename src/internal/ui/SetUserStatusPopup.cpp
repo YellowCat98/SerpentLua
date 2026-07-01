@@ -4,7 +4,7 @@ using namespace SerpentLua::internal::ui;
 using namespace geode::prelude;
 
 bool SetUserStatusPopup::init(GJUserScore* score) {
-	if (!Popup::init({200.0f, 115.0f})) return false;
+	if (!Popup::init({200.0f, 125.0f})) return false;
 	m_closeBtn->setID("close-btn");
 	this->setTitle(fmt::format("Set Rank for {}", score->m_userName));
 	statuses = ServerManager::get()->getStatusSettables();
@@ -19,7 +19,7 @@ bool SetUserStatusPopup::init(GJUserScore* score) {
 		->setGap(5)
 	);
 	actionsMenu->setContentSize({m_size.width - 50.0f, m_size.height / 2});
-	actionsMenu->setPosition({m_size.width / 2, (m_size.height / 2) + 5.0f});
+	actionsMenu->setPosition({m_size.width / 2, (m_size.height / 2) + 7.0f});
 	actionsMenu->setAnchorPoint({0.5f, 0.5f});
 
 	right = CCMenuItemSpriteExtra::create(CCSprite::createWithSpriteFrameName("GJ_arrow_01_001.png"), this, menu_selector(SetUserStatusPopup::movePage));
@@ -37,6 +37,11 @@ bool SetUserStatusPopup::init(GJUserScore* score) {
 	actionsMenu->addChild(right);
 	actionsMenu->addChild(status);
 	actionsMenu->addChild(left);
+
+	auto applySpr = ButtonSprite::create("Apply");
+	auto applyBtn = CCMenuItemSpriteExtra::create(applySpr, this, menu_selector(SetUserStatusPopup::startOperation));
+
+	m_buttonMenu->addChildAtPosition(applyBtn, Anchor::Bottom, {0.0f, 25.0f});
 
 	actionsMenu->updateLayout();
 
@@ -56,8 +61,13 @@ void SetUserStatusPopup::movePage(CCObject* sender) {
 
 void SetUserStatusPopup::loadPage(int page) {
 	currentPage = page;
+	currentIndex = currentPage - 1;
 
-	status->setString(ServerManager::get()->statusString(statuses[currentPage - 1]).c_str());
+	status->setString(ServerManager::get()->statusString(statuses[currentIndex]).c_str());
+}
+
+void SetUserStatusPopup::startOperation(CCObject*) {
+
 }
 
 SetUserStatusPopup* SetUserStatusPopup::create(GJUserScore* score) {
