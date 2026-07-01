@@ -7,12 +7,16 @@
 - UI: Removed plugin/script button in scripts/plugins UI.
 - UI: Unnoticeably faster plugin/script lookup.
 - Settings: New setting for the plugin index server URL and a setting to authenticate with Argon on startup.
-- Plugins: Install plugin via URL.
+- Plugins: Installs plugin via ID.
+- Server: UI Utilities for SL Index Staff and SL Plugin Developers.
 - Script termination: Log error properly (how did it take me this long to find this)
 - SL Plugin v1.2.1: Fixed issue with createFromCCNode not allowing calling non-Node exclusive methods when type is provided.
 - Error handling: Made lua panic popup more detailed.
 - Native Plugins: Add deprecation warning for dynamic libraries.
 - Metadata: Fixed description grammar and removed `offline` tag.
+- Minecraft: Removed Herobrine.
+
+Dev note #1: "I hate layouts"-me
 
 ## 1.3.0
 - SL Plugin v1.2.0: Add new `Alert` node type.
