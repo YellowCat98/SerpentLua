@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.5.0
+
 ## 1.4.0
 - Internal: Reorganize code.
 - UI: Add a "never show again" option in the `lua.dll` popup.

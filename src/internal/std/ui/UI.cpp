@@ -76,6 +76,22 @@ ScriptBuiltin::ui::Node* ScriptBuiltin::ui::Node::create(sol::this_state state, 
 			ScriptBuiltin::ui::AttributeHandler::populateAttributesAlert(state, ret);
 			break;
 		}
+
+		case ScriptBuiltin::Enums::ui::NodeType::Notification: {
+			auto content = options.get<std::string>("message");
+			sol::object icon = options["icon"];
+			sol::object time = options["time"];
+			if (icon.is<NotificationIcon>()) {
+				ret->node = Notification::create(content, icon.as<NotificationIcon>(), time.is<float>() ? time.as<float>() : NOTIFICATION_DEFAULT_TIME);
+			} else if (icon.is<Node*>()) {
+				ret->node = Notification::create(content, icon.as<Node*>()->getNode(state), time.is<float>() ? time.as<float>() : NOTIFICATION_DEFAULT_TIME);
+			} else {
+				ret->node = Notification::create(content, NotificationIcon::None, time.is<float>() ? time.as<float>() : NOTIFICATION_DEFAULT_TIME);
+			}
+
+			ScriptBuiltin::ui::AttributeHandler::populateAttributesNotification(state, ret);
+			break;
+		}
 	}
 
 	ret->type = type;
@@ -184,6 +200,17 @@ void bindNodeWrappers(sol::state_view state, sol::table table) {
 				"btn1", btn1,
 				"btn2", btn2.is<const char*>() ? btn2.as<const char*>() : nullptr,
 				"callback", function
+			));
+		}
+	);
+
+	table.set_function("createNotification",
+		[](sol::this_state ts, const std::string& message, sol::object icon, sol::object time) {
+			sol::state_view view(ts);
+			return ScriptBuiltin::ui::Node::create(ts, ScriptBuiltin::Enums::ui::NodeType::Notification, view.create_table_with(
+				"message", message,
+				"icon", icon,
+				"time", time
 			));
 		}
 	);

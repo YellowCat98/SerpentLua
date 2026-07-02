@@ -55,6 +55,7 @@ namespace SerpentLua::internal::ScriptBuiltin::ui {
 		static void populateAttributesLabel(sol::state_view state, Node* node);
 		static void populateAttributesMenu(sol::state_view state, Node* node);
 		static void populateAttributesAlert(sol::state_view state, Node* node);
+		static void populateAttributesNotification(sol::state_view state, Node* node);
 
 		static void populateAttributesAccordingly(sol::state_view state, Node* node);
 	};

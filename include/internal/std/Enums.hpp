@@ -10,10 +10,13 @@ namespace SerpentLua::internal::ScriptBuiltin::Enums {
 		enum class NodeType {
 			Node, // CCNode
 			Sprite, // CCSprite
-			Button, // CCMenuItemExt
+			Button, // CCMenuItemSpriteExtra (using CCMenuItemExt::createSpriteExtra method)
 			Label, // CCLabelBMFont
 			Menu, // CCMenu
-			Alert // FLAlertLayer
+			Alert, // FLAlertLayer
+			Notification // Notification
 		};
+
+		// pretend NotificationIcon is here too because it gets bound too
 	};
 };

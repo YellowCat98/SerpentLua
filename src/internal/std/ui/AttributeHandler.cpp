@@ -433,6 +433,74 @@ void ScriptBuiltin::ui::AttributeHandler::populateAttributesAlert(sol::state_vie
 	});
 }
 
+void ScriptBuiltin::ui::AttributeHandler::populateAttributesNotification(sol::state_view state, Node* node) {
+	if (!node) return;
+	DEFINE_ADD_LAMBDA(add);
+	ScriptBuiltin::ui::AttributeHandler::populateAttributesNode(state, node);
+
+	add("show", [state](CCNode* ccnode, std::optional<sol::object> value) {
+		auto notif = static_cast<Notification*>(ccnode);
+		notif->show();
+		return sol::make_object(state, sol::nil);
+	});
+
+	add("hide", [state](CCNode* ccnode, std::optional<sol::object> value) {
+		auto notif = static_cast<Notification*>(ccnode);
+		notif->hide();
+		return sol::make_object(state, sol::nil);
+	});
+
+	add("cancel", [state](CCNode* ccnode, std::optional<sol::object> value) {
+		auto notif = static_cast<Notification*>(ccnode);
+		notif->cancel();
+		return sol::make_object(state, sol::nil);
+	});
+
+
+
+	add("setString", [state](CCNode* ccnode, std::optional<sol::object> value) {
+		if (!typeCheck<std::string>(value, "setString")) return sol::make_object(state, sol::nil);
+		auto notif = static_cast<Notification*>(ccnode);
+		notif->setString((*value).as<std::string>());
+		return sol::make_object(state, sol::nil);
+	});
+
+	add("setIcon", [state](CCNode* ccnode, std::optional<sol::object> value) {
+		if (!typeCheck<NotificationIcon>(value, "setIcon") || !typeCheck<Node*>(value, "setIcon")) return sol::make_object(state, sol::nil);
+		auto notif = static_cast<Notification*>(ccnode);
+		if ((*value).is<NotificationIcon>()) {
+			notif->setIcon((*value).as<NotificationIcon>());
+		} else {
+			notif->setIcon((*value).as<Node*>()->getNode(state));
+		}
+		return sol::make_object(state, sol::nil);
+	});
+
+	add("setTime", [state](CCNode* ccnode, std::optional<sol::object> value) {
+		if (!typeCheck<float>(value, "setTime")) return sol::make_object(state, sol::nil);
+		auto notif = static_cast<Notification*>(ccnode);
+		notif->setTime((*value).as<float>());
+		return sol::make_object(state, sol::nil);
+	});
+
+
+
+	add("getIcon", [state](CCNode* ccnode, std::optional<sol::object> value) {
+		auto notif = static_cast<Notification*>(ccnode);
+		return sol::make_object(state, Node::createFromCCNode(sol::this_state(state), sol::make_object(state, notif->getIcon()), Enums::ui::NodeType::Node));
+	});
+
+	add("getTime", [state](CCNode* ccnode, std::optional<sol::object> value) {
+		auto notif = static_cast<Notification*>(ccnode);
+		return sol::make_object(state, notif->getTime());
+	});
+
+	add("isShowing", [state](CCNode* ccnode, std::optional<sol::object> value) {
+		auto notif = static_cast<Notification*>(ccnode);
+		return sol::make_object(state, notif->isShowing());
+	});
+}
+
 void ScriptBuiltin::ui::AttributeHandler::populateAttributesAccordingly(sol::state_view state, Node* node) {
 	if (!node) return;
 
@@ -449,5 +517,7 @@ void ScriptBuiltin::ui::AttributeHandler::populateAttributesAccordingly(sol::sta
 			ScriptBuiltin::ui::AttributeHandler::populateAttributesMenu(state, node); break;
 		case ScriptBuiltin::Enums::ui::NodeType::Alert:
 			ScriptBuiltin::ui::AttributeHandler::populateAttributesAlert(state, node); break;
+		case ScriptBuiltin::Enums::ui::NodeType::Notification:
+			ScriptBuiltin::ui::AttributeHandler::populateAttributesNotification(state, node); break;
 	}
 }

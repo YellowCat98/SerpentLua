@@ -6,7 +6,7 @@
 --@plugins serpentlua.std yellowcat98.modify
 
 -- Note! This example uses the Modify plugin by YellowCat98.
--- Get the Modify plugin at: https://github.com/YellowCat98/serpentlua-modify/releases/latest to use this example.
+-- Get the Modify plugin from the main SerpentLua plugin index via ID "yellowcat98.modify" to use this example.
 
 -- Basic example for using the UI system that the SerpentLua plugin provides.
 
@@ -59,11 +59,17 @@ Modify.createHook("hello-hook", "MenuLayer", "init", function(self)
 		x=SL.ui.getWinSize().width/2,
 		y=SL.ui.getWinSize().height/2
 	})
-	-- getWinSize is self explanatory. Returns a table {width=width, height=height} containing the width and height of the screen.
+	-- getWinSize is self explanatory. Returns a table {"width"=width, "height"=height} containing the width and height of the screen.
 
 	local node = SL.ui.createButtonWithSprite("GJ_button_01.png", false, function(sender)
 		counter = counter+1
 		label:method("setString")(string.format("Counter: %d", counter))
+
+		local notif = SL.ui.createNotification("Incremented counter by ONE", SL.enums.ui.NotificationIcon.Info, 6.1)
+		notif:method("show")()
+		-- A notification node simply shows a notification for a specified duration of time with an icon.
+		-- There are 6 presets, all in the NotificationIcon enum. None, Loading, Success, Info, Warning, Error
+		-- Setting the time to 0 causes it to show infinitely unless the "hide" method is called.
 	end)
 	-- You may also use SL.ui.createButton to create a button with another Node as its image.
 	-- SL.ui.createButtonWithSprite does the same thing as SL.ui.createButton(SL.ui.createSprite(sprite, framename), function).
@@ -76,7 +82,7 @@ Modify.createHook("hello-hook", "MenuLayer", "init", function(self)
 	-- Self explanatory, adds a node to a child.
 	-- doing addChild on bottom-menu automatically places the button inside it without having to do layout stuff.
 	-- You might need to call bottomMenu:method("updateLayout")() on some menus if the node isn't placed alongside the other buttons. (This method only exists for the `Menu` type.)
-	-- As of 1.3.0 SerpentLua does not have any layout support aside from the updateLayout function.
+	-- As of 1.5.0 SerpentLua does not have any layout support aside from the updateLayout function.
 
 	selfNode:addChild(label)
 
@@ -116,12 +122,13 @@ end)
 Modify.applyHook("hello-hook")
 
 --[[
-	Creating a Node through the manual way:
+	Creating a Node through the manual way: (the || means "or")
 	SL.ui.createNode <=> SL.ui.Node.create(SL.enums.ui.NodeType.Node, {})
 	SL.ui.createSprite <=> SL.ui.Node.create(SL.enums.ui.NodeType.Sprite, {sprite=string, frameName=bool})
 	SL.ui.createButton <=> SL.ui.Node.create(SL.enums.ui.NodeType.Button, {image=Node, callback=function})
 	SL.ui.createLabel <=> SL.ui.Node.create(SL.enums.ui.NodeType.Label, {text=string, font=string})
 	SL.ui.createMenu <=> SL.ui.Node.create(SL.enums.ui.NodeType.Menu, {})
 	SL.ui.createAlert <=> SL.ui.Node.create(SL.enums.ui.NodeType.Alert, {title=string, content=string, btn1=string, btn2=string, callback=function})
+	SL.ui.createNotification <=> SL.ui.Node.create(SL.enums.ui.NodeType.Notification, {message=string, icon=NotificationIcon||Node||none, time=number||none})
 ]]
 -- I personally don't see any use case for these functions, but they're here if you want to use them.
