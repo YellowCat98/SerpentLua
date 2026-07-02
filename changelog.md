@@ -1,6 +1,7 @@
 # Changelog
 
 ## 1.5.0
+- SL Plugin v1.3.0: Add new `Notification` node type.
 
 ## 1.4.0
 - Internal: Reorganize code.
