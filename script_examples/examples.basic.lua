@@ -5,14 +5,13 @@
 --@developer YellowCat98
 --@plugins serpentlua.std
 
--- basic script example for serpentlua, logging.
-
+-- Basic Example for using SerpentLua's standard plugin's most basic features. (Logging, accessing Script/Plugin metadata, string formatting)
 local SL = require("serpentlua.std")
 
 local metadata = SL.ScriptMetadata.get()
 --[[
 	SL.ScriptMetadata: Represents the metadata of a script.
-	keys (self explanatory): name, id, developer, serpent-version, version, nostd, plugins
+	memb: name, id, developer, serpentVersion, version, nostd, plugins
 ]]
 SL.log.info("Hello, World!")
 
@@ -31,7 +30,7 @@ SL.log.trace("This function is very useful.")
 --[[
 SL.log: A table containing 4 logging functions.
 	info: Typical info log, pretty much.
-	debug: Verbose debugging logs. Can only be seen if log level is set to Debug/Trace in Geode settings.
+	debug: Verbose debugging logs. Can only be seen if log level is set to Debug or Trace in Geode settings.
 	warn: A warning message, self explanatory.
 	error: An error message, self explanatory.
 	trace: Highly verbose messages. Can only be seen if log level is set to Trace in Geode settings.
@@ -40,7 +39,8 @@ SL.log: A table containing 4 logging functions.
 local plugin = SL.PluginMetadata.getByID("serpentlua.std")
 --[[
 	SL.PluginMetadata: represents a plugin.
-	keys: name, developer, id, version, serpent-version
+	keys: name, developer, id, version, serpentVersion
+	Note that this is not exclusive to just plugins this script has loaded, but every plugin. Note that plugins that have failed do not get recognized.
 ]]
 
 SL.log.info(string.format("The plugin responsible for logging this message is of ID \"%s\".", plugin.id))
