@@ -1,4 +1,4 @@
---@name SL Example 05
+--@name SL Example 04
 --@id examples.ui
 --@version 1.0.0
 --@serpent-version 1.3.0
