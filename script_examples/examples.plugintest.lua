@@ -6,6 +6,9 @@
 --@plugins serpentlua.std yellowcat98.plugintest yellowcat98.nonative_plugintest
 
 -- Basic example for importing other plugins.
+-- This isn't really an example made for you to run, just shows how you can include plugins and how to expect them to function.
+-- If you are plugin developer, this example is useful in getting to know what script writers expect from your plugin.
+-- Assuming `yellowcat98.plugintest` and `yellowcat98.nonative_plugintest` are plugins built for the SerpentLua version this script is using.
 
 local TestPlugin = require("yellowcat98.plugintest")
 local NoNativeTestPlugin = require("yellowcat98.nonative_plugintest")

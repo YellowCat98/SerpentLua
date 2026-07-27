@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.6.0
+- SL Plugin v1.4.0: Add new `fmt` table.
+- SL Plugin v1.4.0: Reorganized code.
+
 ## 1.5.0
 - SL Plugin v1.3.0: Add new `Notification` node type.
 

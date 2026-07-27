@@ -20,17 +20,18 @@ local counter = 0
 -- Node is simply a class that wraps around a type that lua doesn't understand (CCNode and its derivatives).
 --[[
 	Types that Node wraps around:
-	CCNode (NodeType.Node)
-	CCSprite (NodeType.Sprite)
-	CCMenuItemSpriteExtra (NodeType.Button)
-	CCLabelBMFont (NodeType.Label)
-	CCMenu (NodeType.Menu)
+	cocoso2d::CCNode (NodeType.Node)
+	cocos2d::CCSprite (NodeType.Sprite)
+	cocos2d::CCMenuItemSpriteExtra (NodeType.Button) -- This uses Geode's wrapper `CCMenuItemExt` as it is simpler.
+	cocos2d::CCLabelBMFont (NodeType.Label)
+	cocos2d::CCMenu (NodeType.Menu)
 	FLAlertLayer (NodeType.Alert)
+	geode::Notification (NodeType.Notification) -- Notification is a Geode addition
 ]]
 -- Any other types that aren't bound are registered of type Node.
 -- As long as a type derives from CCNode, it can be registered as Node.
 -- With Node, you can call setters and getters (or any method) of any CCNode derivative easily.
--- NodeType is an enum (which is internally just a table of strings corresponding to numbers.)
+-- NodeType is an enum. (which is internally just a table of strings corresponding to numbers.)
 -- Usage: SL.Enums.ui.NodeType.X
 
 Modify.createHook("hello-hook", "MenuLayer", "init", function(self)
@@ -59,7 +60,7 @@ Modify.createHook("hello-hook", "MenuLayer", "init", function(self)
 		x=SL.ui.getWinSize().width/2,
 		y=SL.ui.getWinSize().height/2
 	})
-	-- getWinSize is self explanatory. Returns a table {"width"=width, "height"=height} containing the width and height of the screen.
+	-- getWinSize is self explanatory. Returns a table {width, height} containing the width and height of the screen.
 
 	local node = SL.ui.createButtonWithSprite("GJ_button_01.png", false, function(sender)
 		counter = counter+1
