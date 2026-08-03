@@ -111,17 +111,29 @@ void script::terminate() {
 }
 
 geode::Result<> script::loadPlugins() {
-	for (auto& pluginID : this->metadata->plugins) {
+	for (const auto& [pluginID, versionString] : this->metadata->pluginsNEW) {
+		auto versionRes = VersionInfo::parse(versionString);
+		if (versionRes.isErr()) {
+			auto err = Err("Script `{}` plugin loading: Plugin `{}` Version cannot be parsed", this->metadata->id, pluginID);
+			this->terminate();
+			return err;
+		}
+		auto version = versionRes.unwrap();
+	
 		auto pluginRes = RuntimeManager::get()->getLoadedPluginByID(pluginID);
 		if (pluginRes.isErr()) {
 			auto err = Err("Script `{}` plugin loading: Plugin getter returned an error:\n\n{}\n\nWill terminate for the rest of this session.", this->metadata->id, pluginRes.err().value());
 			this->terminate();
 			return err;
 		}
-		auto unwrapped = pluginRes.unwrap();
-		unwrapped->getEntry()(this->getLuaState());
+		auto plugin = pluginRes.unwrap();
+		if (utility::versionInfoCompare(version, RuntimeManager::get()->getPluginByID(pluginID).unwrap()->version)) {
 
-		pendingPlugins.push_back(unwrapped);
+		}
+
+		plugin->getEntry()(this->getLuaState());
+
+		pendingPlugins.push_back(plugin);
 	}
 
 	return Ok();
