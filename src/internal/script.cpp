@@ -112,14 +112,6 @@ void script::terminate() {
 
 geode::Result<> script::loadPlugins() {
 	for (const auto& [pluginID, versionString] : this->metadata->pluginsNEW) {
-		auto versionRes = VersionInfo::parse(versionString);
-		if (versionRes.isErr()) {
-			auto err = Err("Script `{}` plugin loading: Plugin `{}` Version cannot be parsed", this->metadata->id, pluginID);
-			this->terminate();
-			return err;
-		}
-		auto version = versionRes.unwrap();
-	
 		auto pluginRes = RuntimeManager::get()->getLoadedPluginByID(pluginID);
 		if (pluginRes.isErr()) {
 			auto err = Err("Script `{}` plugin loading: Plugin getter returned an error:\n\n{}\n\nWill terminate for the rest of this session.", this->metadata->id, pluginRes.err().value());
@@ -127,8 +119,22 @@ geode::Result<> script::loadPlugins() {
 			return err;
 		}
 		auto plugin = pluginRes.unwrap();
-		if (utility::versionInfoCompare(version, RuntimeManager::get()->getPluginByID(pluginID).unwrap()->version)) {
 
+		if (versionString != "*") {
+			auto versionRes = VersionInfo::parse(versionString);
+			if (versionRes.isErr()) {
+				auto err = Err("Script `{}` plugin loading: Plugin `{}` Version cannot be parsed", this->metadata->id, pluginID);
+				this->terminate();
+				return err;
+			}
+			auto version = versionRes.unwrap();
+
+			auto pluginVersion = VersionInfo::parse(plugin->metadata->version).unwrap(); // this cant return err because we already checked when we loaded it
+			if (!utility::versionInfoCompare(version, pluginVersion)) {
+				auto err = Err("Script `{}` plugin loading: The script depends on version {} for plugin {} but you have version {}", this->metadata->id, versionString, pluginID, plugin->metadata->version);
+				this->terminate();
+				return err;
+			}
 		}
 
 		plugin->getEntry()(this->getLuaState());

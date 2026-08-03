@@ -2,8 +2,9 @@
 
 ## 1.7.0
 - Script Metadata: Reorganize code.
+- Script Metadata: New syntax for `plugins` key that describes what version your plugin targets. (read the README in the GitHub repository for details)
 - Internal: Fix Semantic Versioning comparing issue. (If SL v1.8.0 ever gets released, scripts written for it won't work on v1.7.0)
-- Error logging: Clearer errors (that you probably won't see)
+- Error logging: Clearer errors (that you probably won't see unless you have two bits of RAM)
 
 ## 1.6.0
 - SL Plugin v1.4.0: Add new `fmt` table.

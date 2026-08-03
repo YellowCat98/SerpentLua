@@ -66,26 +66,27 @@ jobs:
           path: ${{ steps.build.outputs.build-output }}
 
   # Comment out in non-release commits. (please)
-#  upload:
-#    name: Upload Release (1.6.0)
-#    runs-on: ubuntu-latest
-#    needs: ['package']
+  # int the_number_of_times_i_forgot_to_comment_this_and_broke_SerpentLua = 2;
+  upload:
+    name: Upload Release (1.7.0)
+    runs-on: ubuntu-latest
+    needs: ['package']
 
-#    steps:
-#      - name: Download artifacts
-#        uses: actions/download-artifact@v4
-#        with:
-#          path: artifacts
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
 
-#      - name: Release
-#        uses: softprops/action-gh-release@v2
-#        with:
-#          tag_name: v1.6.0
-#          name: SerpentLua v1.6.0
-#          prerelease: false
-#          body: |
-#            Check CHANGELOG.md for changes.
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.7.0
+          name: SerpentLua v1.7.0
+          prerelease: false
+          body: |
+            Check CHANGELOG.md for changes.
 
-#          files: artifacts/**/*
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          files: artifacts/**/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -23,7 +23,7 @@
       - [The SerpentLua Geode API (for non-native plugins)](#the-serpentlua-geode-api-for-non-native-plugins)
       - [Non-native plugin example worth looking at](#non-native-plugin-example-worth-looking-at)
 
-## Setup:
+## Setup
 - Plugins use a global dependency `lua.dll`. Plugins will not load if this file does not exist.
 1. Open Geometry Dash and press the SerpentLua button.
 ![Visual Step 1](README_resources/sl_btn_pointer.png)
@@ -37,8 +37,8 @@
 6. `lua.dll` can be found [here](https://github.com/YellowCat98/SerpentLua/releases/latest)
 - (or just the release of whatever version of SerpentLua you have.)
 
-## Scripts:
-### Creating your first script:
+## Scripts
+### Creating your first script
 - Simply create a `.lua` file with the ID of your script. (e.g.: `author.script_name.lua` (this is the preferred naming format.))
 - At the first few lines, that is where we insert our metadata.
 - In order for them to not interfere with the Lua interpreter, they are in the form of comments.
@@ -49,15 +49,15 @@
 > --@id author.script_name
 > --@version 1.0.0
 > --@serpent-version 1.0.2
-> --@plugins yellowcat98.plugintest serpentlua.std
+> --@plugins yellowcat98.plugintest@1.0.0 serpentlua.std@1.0.0
 > ```
 - name: The name of the script.
 - developer: The developer of the script.
 - id: internal ID SerpentLua will use to identify this script. (note!!! Scripts will not load if their filename doesn't correspond with their ID!)
-- version: The version of the script.
+- version: The version of the script. (Note that this isn't really used anywhere, but it's still important to increment it when necessary)
 - serpent-version: The version of SerpentLua that the script targets.
-- plugins: The plugins the script relies on. Separated by spaces.
-- nostd (Optional!): Whether to import the Lua standard library or not. This option defaults to true when not provided. (this option really only exists for the sake of existing, really.)
+- plugins: The plugins the script relies on. They are separated by spaces. The version after the `@` is version of the plugin the scripts target. For example `serpentlua.std@1.0.0` means that the script uses the `serpentlua.std` plugin while targeting version v1.0.0. For backwards compatibility purposes with older scripts, you can still not specify any version (`--@plugins serpentlua.std` or `--@plugins serpentlua.std@*`) and SerpentLua will just ignore the version and the script will load regardless of what plugin version you have installed. It is heavily recommended that you specify a target version. Specifying a target version will help prevent scripts from erroring when you update a plugin. Support for this capability will be removed in SerpentLua v2.0.0.
+- nostd (Optional!): Whether to import the Lua standard library or not. This option defaults to true when not provided. (I see no reason why you'd want to use this. Maybe if you're looking to maximize your `sudo apt install opsec` and post it on TikTok)
 
 - The first 7 lines must only contain metadata. SerpentLua rejects any script where the 1st-7th lines aren't metadata.
 - Error examples:
@@ -71,7 +71,7 @@
   - Unknown key `jokes-to-repeat-until-unfunny`
   - Missing keys `id`, `developer`, `version`, `serpent-version`.
 
-### Script examples worth looking at:
+### Script examples worth looking at
 - [Basic Example](script_examples/examples.basic.lua): Example for the SerpentLua plugin's most basic functions.
 
 - [Playground Example](script_examples/examples.playground.lua): Basic example for the playground module in the standard SerpentLua plugin. A module that gives sandboxes access to a directory for each plugin.
@@ -82,10 +82,10 @@
 
 - [UI Example](script_examples/examples.ui.lua): Basic example for the UI module in the standard SerpentLua plugin. A module which allows writing basic UI code. (Though it requires that you use a Plugin like Modify to execute code at the `init` of any CCLayer.)
 
-## Plugins:
+## Plugins
 - Note: this is rather advanced. If you're looking just to create scripts, skip this.
-### Native plugins:
-#### Creating your first native plugin:
+### Native plugins
+#### Creating your first native plugin
 - This will only include how plugins are written. View [this](plugin_examples/yellowcat98.plugintest/README.md) for compilation.
 0. Get `lua.lib` from whatever release of SerpentLua you have installed. As well as the Lua C API version `5.4.6`. (This step was added last and i just wasnt feeling like making it step 1 and incrementing the other steps lol)
 1. Create a `plugin.slm` file inside the root of the project. Inside it, write your plugin metadata. Plugin metadata is written the exact same as Script metadata with the exception of removing the `--@nostd` and `--@plugins` keys.
@@ -131,11 +131,11 @@
 
 - You can use any Lua wrapper you want, as this is just a DLL that links the Lua C API.
 
-#### Native plugin example worth looking at:
+#### Native plugin example worth looking at
 [PluginTest](plugin_examples/yellowcat98.plugintest): A basic plugin example. Exposes a `the_Function` and a `coolVar` variable to Lua.
 
-### Non-native plugins:
-#### Creating your first non-native plugin with the SerpentLua API:
+### Non-native plugins
+#### Creating your first non-native plugin with the SerpentLua API
 - Note: Prior Geode SDK knowledge is highly recommended.
 1. Add `yellowcat98.serpentlua` as a dependency in your `mod.json`.
 2. Enable `early-load` in your `mod.json`. SerpentLua waits for plugins to load, not enabling `early-load` will cause scripts to load too late.
@@ -168,5 +168,5 @@
 
 You may view the [SerpentLua.hpp](include/SerpentLua.hpp) header for all exported classes and extra notes.
 
-#### Non-native plugin example worth looking at:
+#### Non-native plugin example worth looking at
 [Non-native Plugintest](plugin_examples/yellowcat98.nonativeplugintest): This pretty much the same thing as PluginTest.

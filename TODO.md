@@ -42,3 +42,4 @@
 - Lua: Use LuaJIT.
 - Plugins: Rebuild plugins to be a .zip file (keeps the .slp extension though) and use a lua file as an entry point. (While the developer can make the actual plugin a DLL loaded by the lua script via FFI. Metadata will be provided in the plugin script entry like scripts.)
 - Remove `ScriptMetadata::plugins` and rename `ScriptMetadata::pluginsNEW` to `ScriptMetadata::plugins`.
+- Force target plugin version specification.
