@@ -3,6 +3,7 @@
 ## 1.7.0
 - Script Metadata: Reorganize code.
 - Internal: Fix Semantic Versioning comparing issue. (If SL v1.8.0 ever gets released, scripts written for it won't work on v1.7.0)
+- Error logging: Clearer errors (that you probably won't see)
 
 ## 1.6.0
 - SL Plugin v1.4.0: Add new `fmt` table.

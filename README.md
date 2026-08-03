@@ -67,12 +67,12 @@
 > --@jokes-to-repeat-until-unfunny 67
 > ```
 - This will throw:
-  - An invalid metadata syntax error.
+  - Syntax error.
   - Unknown key `jokes-to-repeat-until-unfunny`
   - Missing keys `id`, `developer`, `version`, `serpent-version`.
 
 ### Script examples worth looking at:
-- [Basic Example](script_examples/examples.basic.lua): Basic example for the standard SerpentLua plugin. This script showcases logging capabilities.
+- [Basic Example](script_examples/examples.basic.lua): Example for the SerpentLua plugin's most basic functions.
 
 - [Playground Example](script_examples/examples.playground.lua): Basic example for the playground module in the standard SerpentLua plugin. A module that gives sandboxes access to a directory for each plugin.
 
@@ -138,7 +138,7 @@
 #### Creating your first non-native plugin with the SerpentLua API:
 - Note: Prior Geode SDK knowledge is highly recommended.
 1. Add `yellowcat98.serpentlua` as a dependency in your `mod.json`.
-2. Enable `early-load` in your `mod.json`. This won't cause any issues, though scripts will load too late.
+2. Enable `early-load` in your `mod.json`. SerpentLua waits for plugins to load, not enabling `early-load` will cause scripts to load too late.
 3. Include `<yellowcat98.serpentlua/include/SerpentLua.hpp>`
 4. Define your `entry` function. This function is the same as `entry` in native plugins.
 - (Read ["Creating your first native plugin"](#creating-your-first-native-plugin) steps 10, 11. theyre the exact same i just dont want to rewrite them here)
@@ -165,6 +165,8 @@
 >    // This operation must run regardless of whether the plugin failed to load or not. If not removed, scripts will not load at all.
 > ```
 8. Compile and run your plugin!
+
+You may view the [SerpentLua.hpp](include/SerpentLua.hpp) header for all exported classes and extra notes.
 
 #### Non-native plugin example worth looking at:
 [Non-native Plugintest](plugin_examples/yellowcat98.nonativeplugintest): This pretty much the same thing as PluginTest.

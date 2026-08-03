@@ -112,7 +112,7 @@ namespace SerpentLua {
 		std::string path;
 		bool loaded;
 		std::vector<std::string> plugins; // this is only kept to preserve semver for mods that add SL as an api, will be removed in 2.0.0
-		std::vector<std::pair<std::string, std::string>> pluginsNEW;
+		std::vector<std::pair<std::string, std::string>> pluginsNEW; // please use this one if you're ever accessing a script's plugins.
 		std::string pluginIDstring;
 
 		std::vector<std::string> errors;

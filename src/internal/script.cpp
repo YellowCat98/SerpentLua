@@ -153,11 +153,11 @@ geode::Result<script*, std::string> script::getLoadedScript(const std::string& i
 geode::Result<script*, std::string> script::create(ScriptMetadata* metadata) {
 
 	auto ret = new (std::nothrow) script();
-	if (!ret) return Err("Script `{}` creation: Couldn't create.", metadata->id);
+	if (!ret) return Err("Script `{}` creation: Not enough memory to create script.", metadata->id);
 	ret->metadata = metadata;
 
 	ret->state = ret->createState();
-	if (!ret->state) return Err("Script `{}` creation: Lua State is nullptr.", metadata->id);
+	if (!ret->state) return Err("Script `{}` creation: Not enough memory to create interpreter.", metadata->id);
 
 	log::debug("Script `{}` creation: Created successfully!", metadata->id);
 	return Ok(ret);
