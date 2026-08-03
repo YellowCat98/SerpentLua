@@ -7,17 +7,30 @@ using namespace geode::prelude;
 void SerpentLua::ScriptMetadata::setPlugins() {
 	if (this->pluginIDstring.empty()) return;
 	std::vector<std::string> pluginIDs;
-	size_t start = 0;
-	size_t end = this->pluginIDstring.find(' ');
+	std::vector<std::pair<std::string, std::string>> pluginIDsNEW; // i just want to keep consistency im blowing this up the second i get started on SL v2
 
-	while (end != std::string::npos) {
-		pluginIDs.push_back(this->pluginIDstring.substr(start, end - start));
-		start = end + 1;
-		end = this->pluginIDstring.find(' ', start);
+	std::istringstream iss(this->pluginIDstring);
+	std::string plugin;
+
+	while (iss >> plugin) {
+		std::string before;
+		std::string after;
+
+		auto pos = plugin.find('@');
+		if (pos != std::string::npos) {
+			before = plugin.substr(0, pos);
+			after = plugin.substr(pos + 1);
+		} else {
+			before = plugin;
+			after = "*";
+		}
+
+		pluginIDs.push_back(before);
+		pluginIDsNEW.push_back({before, after});
 	}
-	pluginIDs.push_back(this->pluginIDstring.substr(start));
 
 	this->plugins = pluginIDs; // would be better to use metadata->plugins as pluginIDs from the start but i already wrote everything i do not want to replace the stuff
+	this->pluginsNEW = pluginIDsNEW;
 }
 
 geode::Result<SerpentLua::ScriptMetadata*, std::string> SerpentLua::ScriptMetadata::getScriptByID(const std::string& id) {

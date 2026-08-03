@@ -3,7 +3,7 @@
 --@version 1.0.0
 --@serpent-version 1.3.0
 --@developer YellowCat98
---@plugins serpentlua.std yellowcat98.modify
+--@plugins serpentlua.std@1.1.1 yellowcat98.modify@1.1.4
 
 -- Note! This example uses the Modify plugin by YellowCat98.
 -- Get the Modify plugin from the main SerpentLua plugin index via ID "yellowcat98.modify" to use this example.

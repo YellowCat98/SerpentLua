@@ -3,7 +3,7 @@
 --@version 1.0.0
 --@serpent-version 1.0.0
 --@id examples.plugintest
---@plugins serpentlua.std yellowcat98.plugintest yellowcat98.nonative_plugintest
+--@plugins serpentlua.std@1.0.0 yellowcat98.plugintest@1.0.0 yellowcat98.nonative_plugintest@1.0.0
 
 -- Basic example for importing other plugins.
 -- This isn't really an example made for you to run, just shows how you can include plugins and how to expect them to function.

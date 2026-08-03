@@ -3,7 +3,7 @@
 --@version 1.0.0
 --@serpent-version 1.0.0
 --@developer YellowCat98
---@plugins serpentlua.std
+--@plugins serpentlua.std@1.4.0
 
 -- Basic Example for using SerpentLua's standard plugin's most basic features. (Logging, accessing Script/Plugin metadata, string formatting)
 local SL = require("serpentlua.std")
@@ -43,7 +43,7 @@ local plugin = SL.PluginMetadata.getByID("serpentlua.std")
 --[[
 	SL.PluginMetadata: represents a plugin.
 	keys: name, developer, id, version, serpentVersion
-	Note that this is not exclusive to just plugins this script has loaded, but every plugin. Note that plugins that have failed do not get recognized.
+	Note that this is not exclusive to just plugins this script has loaded, but every plugin. Note that plugins that have failed to run do not get recognized.
 ]]
 
 SL.log.info(SL.fmt.format("The plugin responsible for logging this message is of ID \"{}\".", plugin.id))

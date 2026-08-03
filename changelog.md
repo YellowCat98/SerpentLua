@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.7.0
+- Script Metadata: Reorganize code.
+
 ## 1.6.0
 - SL Plugin v1.4.0: Add new `fmt` table.
 - SL Plugin v1.4.0: Reorganized code.

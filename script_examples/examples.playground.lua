@@ -3,7 +3,7 @@
 --@version 1.0.0
 --@serpent-version 1.0.0
 --@developer YellowCat98
---@plugins serpentlua.std
+--@plugins serpentlua.std@1.0.0
 
 --Script example for using the Playground.
 
