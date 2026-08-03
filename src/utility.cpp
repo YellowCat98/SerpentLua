@@ -4,7 +4,10 @@ using namespace SerpentLua::internal;
 using namespace geode::prelude;
 
 bool utility::versionInfoCompare(const geode::VersionInfo& first, const geode::VersionInfo& second) {
-    return first.getMajor() == second.getMajor();
+    if (first.getMajor() != second.getMajor()) return false;
+    if (second.getMinor() < first.getMinor()) return false;
+
+    return true;
 }
 
 geode::Result<std::string, std::string> utility::handleVersion(const std::string& version) {
