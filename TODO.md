@@ -2,6 +2,13 @@
 
 - The top most unchecked todos are for the next SerpentLua update, the ones at the very bottom are unplanned for future updates.
 
+## 2.0.0:
+- Plugins: Stop supporting dynamic linking.
+- Lua: Use LuaJIT.
+- Plugins: Rebuild plugins to be a .zip file (keeps the .slp extension though) and use a lua file as an entry point. (While the developer can make the actual plugin a DLL loaded by the lua script via FFI. Metadata will be provided in the plugin script entry like scripts.)
+- Remove `ScriptMetadata::plugins` and rename `ScriptMetadata::pluginsNEW` to `ScriptMetadata::plugins`.
+- Force target plugin version specification.
+
 ## 1.4.0
 - ~~Plugins: Plugin repository.~~ ✓
 
@@ -37,9 +44,3 @@
 - ~~UI (1.0.0-alpha.2): Make missing lua.dll popup #Better.~~ ✓
 - ~~UI (1.0.0-alpha.2): Add an indicator when changes have been made~~ ✓
 
-## 2.0.0:
-- Plugins: Stop supporting dynamic linking.
-- Lua: Use LuaJIT.
-- Plugins: Rebuild plugins to be a .zip file (keeps the .slp extension though) and use a lua file as an entry point. (While the developer can make the actual plugin a DLL loaded by the lua script via FFI. Metadata will be provided in the plugin script entry like scripts.)
-- Remove `ScriptMetadata::plugins` and rename `ScriptMetadata::pluginsNEW` to `ScriptMetadata::plugins`.
-- Force target plugin version specification.
