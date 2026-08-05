@@ -29,10 +29,17 @@ endif()
 add_subdirectory($ENV{GEODE_SDK} ${CMAKE_CURRENT_BINARY_DIR}/geode)
 
 CPMAddPackage(
-	NAME lua
-	GITHUB_REPOSITORY lua/lua
-	VERSION 5.4.6
+	NAME luaJIT
+	GITHUB_REPOSITORY LuaJIT/LuaJIT
+	GIT_TAG 1edc3e52b67eaf6ce5f809be8e17d6862594b8bc
 	DOWNLOAD_ONLY TRUE
+)
+
+set(LUAJIT_DIR "${luaJIT_SOURCE_DIR}")
+CPMAddPackage(
+    NAME luajit-cmake
+    GITHUB_REPOSITORY zhaozg/luajit-cmake
+    GIT_TAG bdc1b54d0572e2cc5c3eaa5c1e818d0e0246b9d1
 )
 
 CPMAddPackage(
@@ -49,28 +56,9 @@ CPMAddPackage(
 )
 target_link_libraries(${PROJECT_NAME} argon)
 
-# build lua both statically and dynmamically so you can link against it
+add_dependencies(${PROJECT_NAME} libluajit)
+target_include_directories(${PROJECT_NAME} PRIVATE ${luajit-cmake_BINARY_DIR})
 
-file(GLOB LUA_SRC ${lua_SOURCE_DIR}/*.c)
-list(REMOVE_ITEM LUA_SRC
-	${lua_SOURCE_DIR}/onelua.c
-	${lua_SOURCE_DIR}/lua.c # this is the interpreter cli itself, not needed
-)
-
-# this is the lua interpreter for serpent itself, serpentlua statically links against this to prevent issues with requiring to have lua installed in PATH.
-add_library(lua_for_serpent STATIC ${LUA_SRC})
-target_include_directories(lua_for_serpent PUBLIC ${lua_SOURCE_DIR})
-target_link_libraries(${PROJECT_NAME} lua_for_serpent)
-
-# this is the lua for plugins, this is the lua that plugins dynamically link against, dynamically linking is better than static linking because it allows to use one lua runtime for all plugins.
-add_library(lua SHARED ${LUA_SRC})
-target_include_directories(lua PRIVATE include)
-target_compile_definitions(lua PRIVATE LUA_BUILD_AS_DLL)
-
-set_target_properties(lua PROPERTIES
-	LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/.lua_output"
-	RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/.lua_output"
-	ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/.lua_output"
-)
+target_link_libraries(${PROJECT_NAME} luajit::lib luajit::header)
 
 setup_geode_mod(${PROJECT_NAME})

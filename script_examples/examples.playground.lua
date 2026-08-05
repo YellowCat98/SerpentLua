@@ -1,9 +1,9 @@
 --@name SL Example 02
 --@id examples.playground
 --@version 1.0.0
---@serpent-version 1.0.0
+--@serpent-version 2.0.0
 --@developer YellowCat98
---@plugins serpentlua.std@1.0.0
+--@plugins serpentlua.std@1.4.0
 
 --Script example for using the Playground.
 

@@ -7,11 +7,7 @@
 #include <vector>
 #include <filesystem>
 #include <argon/argon.hpp>
-extern "C" {
-	#include <lua.h>
-	#include <lualib.h>
-	#include <lauxlib.h>
-}
+#include <lua.hpp>
 
 #ifdef GEODE_IS_WINDOWS
 	#ifdef YELLOWCAT98_SERPENTLUA_EXPORTING

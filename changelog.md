@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.x
+
+## 2.0.0
+- Lua: Switched to LuaJIT 2.1
+
 ## 1.7.0
 - Script Metadata: Reorganize code.
 - Script Metadata: New syntax for `plugins` key that describes what version your plugin targets. (read the README in the GitHub repository for details)

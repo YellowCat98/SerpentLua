@@ -1,5 +1,6 @@
 #include <internal/SerpentLua.hpp>
 #include "SerpentLua.hpp"
+#include "lua.h"
 
 using namespace SerpentLua::internal;
 using namespace geode::prelude;
@@ -16,9 +17,15 @@ lua_State* script::getLuaState() {
 lua_State* script::createState() {
 	log::debug("Script {} state creation: Initialized.", this->metadata->id);
 	lua_State* state = luaL_newstate();
+
+	auto openAsGlobal = [](lua_State* L, const char* name, lua_CFunction openf) {
+		openf(L);
+		lua_setglobal(L, name);
+	};
+
 	if (!this->metadata->nostd) {
 
-		luaL_requiref(state, "_G", luaopen_base, 1);
+		openAsGlobal(state, "_G", luaopen_base);
 		// nil out the bad guys from _G before continuing loading!
 
 		lua_pushnil(state); lua_setglobal(state, "dofile");
@@ -27,11 +34,9 @@ lua_State* script::createState() {
 		lua_pushnil(state); lua_setglobal(state, "load");
 
 
-		luaL_requiref(state, LUA_MATHLIBNAME, luaopen_math, 1);
-		luaL_requiref(state, LUA_TABLIBNAME, luaopen_table, 1);
-		luaL_requiref(state, LUA_COLIBNAME, luaopen_coroutine, 1);
-		luaL_requiref(state, LUA_STRLIBNAME, luaopen_string, 1);
-		lua_pop(state, 5);
+		openAsGlobal(state, LUA_MATHLIBNAME, luaopen_math);
+		openAsGlobal(state, LUA_TABLIBNAME, luaopen_table);
+		openAsGlobal(state, LUA_STRLIBNAME, luaopen_string);
 
 		lua_newtable(state);
 		lua_setglobal(state, "serpentlua_modules");
@@ -69,10 +74,14 @@ lua_State* script::createState() {
 		lua_setglobal(state, "require");
 	}
 
-	*static_cast<script**>(lua_getextraspace(state)) = this;
+	lua_pushlightuserdata(state, this);
+	lua_setfield(state, LUA_REGISTRYINDEX, "owner_script");
 
 	lua_atpanic(state, [](lua_State* L) -> int {
-		auto* self = *static_cast<script**>(lua_getextraspace(L));
+		lua_getfield(L, LUA_REGISTRYINDEX, "owner_script");
+		auto* self = static_cast<script*>(lua_touserdata(L, -1));
+		lua_pop(L, 1);
+
 		log::error("[SCRIPT] [{}] LUA PANIC: {}", self->getMetadata()->name, lua_tostring(L, -1));
 		MessageBoxA(
 			nullptr,

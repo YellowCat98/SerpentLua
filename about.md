@@ -4,7 +4,7 @@ A rewrite of [Serpent](mod:yellowcat98.serpent) that uses Lua instead of Python 
 
 A mod that allows you to create your own Lua scripts and run them within the game.
 
-Uses Lua Version: 5.4
+Using LuaJIT 2.1.
 
 See the next sections for more information.
 
