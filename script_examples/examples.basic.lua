@@ -3,7 +3,7 @@
 --@version 1.0.0
 --@serpent-version 2.0.0
 --@developer YellowCat98
---@plugins serpentlua.std@1.4.0
+--@plugins serpentlua.std@2.0.0
 
 -- Basic Example for using SerpentLua's standard plugin's most basic features. (Logging, accessing Script/Plugin metadata, string formatting)
 local SL = require("serpentlua.std")
@@ -48,8 +48,8 @@ local plugin = SL.PluginMetadata.getByID("serpentlua.std")
 
 SL.log.info(SL.fmt.format("The plugin responsible for logging this message is of ID \"{}\".", plugin.id))
 
--- SL.ScriptMetadata.plugins returns an array of strings, not PluginMetadata object, you must get the PluginMetadata yourself through the id.
+-- SL.ScriptMetadata.plugins returns a table where the key is the plugin's ID and the value is its version the script targets, not PluginMetadata object, you must get the PluginMetadata yourself through the id.
 for k, v in pairs(metadata.plugins) do
-	local p = SL.PluginMetadata.getByID(v)
-	-- Do whatever...
+	local p = SL.PluginMetadata.getByID(k)
+	SL.log.info(SL.fmt.format("Script depends on {} with version {}.", k, v))
 end

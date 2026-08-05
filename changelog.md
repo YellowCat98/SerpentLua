@@ -1,9 +1,9 @@
 # Changelog
 
-## 2.x
-
 ## 2.0.0
 - Lua: Switched to LuaJIT 2.1
+- Internal: Removed `ScriptMetadata::plugins` and renamed `ScriptMetadata::pluginsNEW` to `ScriptMetadata::plugins`
+- SL Plugin v2.0.0: Changed `SL.ScriptMetadata.plugins`'s type from an array to a table. (view examples)
 
 ## 1.7.0
 - Script Metadata: Reorganize code.

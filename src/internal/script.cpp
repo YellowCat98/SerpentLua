@@ -120,7 +120,7 @@ void script::terminate() {
 }
 
 geode::Result<> script::loadPlugins() {
-	for (const auto& [pluginID, versionString] : this->metadata->pluginsNEW) {
+	for (const auto& [pluginID, versionString] : this->metadata->plugins) {
 		auto pluginRes = RuntimeManager::get()->getLoadedPluginByID(pluginID);
 		if (pluginRes.isErr()) {
 			auto err = Err("Script `{}` plugin loading: Plugin getter returned an error:\n\n{}\n\nWill terminate for the rest of this session.", this->metadata->id, pluginRes.err().value());

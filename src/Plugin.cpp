@@ -45,8 +45,8 @@ Plugin::__metadata Plugin::SerpentLuaAPIImpl::get_script(lua_State* L) {
 
 	std::vector<const char*> plugins;
 	plugins.reserve(script->plugins.size());
-	for (const auto& buttplug : script->plugins) {
-		plugins.push_back(buttplug.c_str());
+	for (const auto& [butt, plug] : script->plugins) {
+		plugins.push_back(butt.c_str());
 	}
 	ret.pluginsSize = plugins.size();
 	ret.plugins = plugins.data();
@@ -57,15 +57,6 @@ Plugin::__metadata Plugin::SerpentLuaAPIImpl::get_script(lua_State* L) {
 geode::Result<Plugin*, std::string> Plugin::createNative(const std::filesystem::path& path) {
 	log::info("Loading Native Plugin {}: initialized", path.filename());
 	if (!Mod::get()->getSavedValue<bool>(fmt::format("safe-{}", path.stem())) && !Mod::get()->getSettingValue<bool>("dev-mode")) return Err("Native Plugin {} was imported manually.\nThis plugin will not load unless it's imported through the plugin importer in-game.", path.stem());
-	auto configDir = Mod::get()->getConfigDir();
-	bool depsDir = std::filesystem::exists(configDir/"plugin_deps"/path.filename());
-	if (depsDir) {
-		log::warn("Plugin {}: Dynamically linking libraries via the plugin_deps directory is deprecated. This feature will be removed in SerpentLua v2.0.0.", path.filename());
-	}
-	DLL_DIRECTORY_COOKIE cookie1;
-	if (depsDir) cookie1 = AddDllDirectory((configDir/"plugin_deps"/path.filename()).c_str());
-	
-	DLL_DIRECTORY_COOKIE cookie2 = AddDllDirectory((configDir/"plugin_global_deps").c_str());
 
 	auto temphDll = LoadLibraryExW(path.c_str(), NULL, LOAD_LIBRARY_AS_DATAFILE);
 	if (!temphDll) {
@@ -84,9 +75,6 @@ geode::Result<Plugin*, std::string> Plugin::createNative(const std::filesystem::
 
 
 	auto hDll = LoadLibraryExW(path.c_str(), NULL, LOAD_LIBRARY_SEARCH_USER_DIRS);
-
-	if (depsDir) RemoveDllDirectory(cookie1);
-	RemoveDllDirectory(cookie2);
 
 	if (!hDll) return Err("Plugin {}: Failed to load with error {}", path.filename(), GetLastError());
 

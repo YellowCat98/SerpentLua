@@ -62,8 +62,8 @@ sol::table ScriptBuiltin::Metadata::entry(sol::state_view state) {
 		}
 	);
 	_ScriptMetadata["plugins"] = sol::property(
-		[](ScriptMetadata& self) -> std::vector<std::string>& {
-			return self.plugins;
+		[](ScriptMetadata& self) {
+			return sol::as_table(self.plugins);
 		}
 	);
 
