@@ -1,6 +1,7 @@
 #include <internal/SerpentLua.hpp>
 #include "SerpentLua.hpp"
 #include "lua.h"
+#include "lualib.h"
 
 using namespace SerpentLua::internal;
 using namespace geode::prelude;
@@ -32,6 +33,7 @@ lua_State* script::createState() {
 		lua_pushnil(state); lua_setglobal(state, "loadfile");
 		lua_pushnil(state); lua_setglobal(state, "require");
 		lua_pushnil(state); lua_setglobal(state, "load");
+		lua_pushnil(state); lua_setglobal(state, "dostring");
 
 
 		openAsGlobal(state, LUA_MATHLIBNAME, luaopen_math);
@@ -83,7 +85,7 @@ lua_State* script::createState() {
 		lua_pop(L, 1);
 
 		log::error("[SCRIPT] [{}] LUA PANIC: {}", self->getMetadata()->name, lua_tostring(L, -1));
-		MessageBoxA(
+		MessageBoxA( // TODO: nuke this for multiplatform support and have a similar model to geode's crash handling
 			nullptr,
 			fmt::format(
 				"A script has encountered an unrecoverable error and has panicked.\n"
