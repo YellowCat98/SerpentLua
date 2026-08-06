@@ -4,6 +4,8 @@
 - Lua: Switched to LuaJIT 2.1
 - Internal: Removed `ScriptMetadata::plugins` and renamed `ScriptMetadata::pluginsNEW` to `ScriptMetadata::plugins`
 - SL Plugin v2.0.0: Changed `SL.ScriptMetadata.plugins`'s type from an array to a table. (view examples)
+- Plugins: Replaced plugin loading with a better and more portable system.
+- Platform: Added support for all platforms that Geode supports.
 
 ## 1.7.0
 - Script Metadata: Reorganize code.

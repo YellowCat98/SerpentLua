@@ -45,7 +45,7 @@ Result<> ScriptBuiltin::initPlugin() {
 	auto metadata = SerpentLua::PluginMetadata::createFromMod(Mod::get());
 	metadata->id = "serpentlua.std"; // i do not want to use create(std::map<std::string, std::string>) when this is very much simpler
 	metadata->version = "v2.0.0";
-	auto res = SerpentLua::Plugin::create(metadata, ScriptBuiltin::entry);
+	auto res = SerpentLua::Plugin::create(metadata, nullptr, [](){ return true; }, [](lua_State* state) { ScriptBuiltin::entry(state); return true; });
 	if (res.isErr()) return Err("{}", res.err().value());
 
 	ScriptBuiltin::plugin = res.unwrap();

@@ -5,45 +5,25 @@ using namespace SerpentLua;
 using namespace SerpentLua::internal;
 
 // gonna need createFromSLP for plugin uploading
-geode::Result<PluginMetadata*, std::string> PluginMetadata::createFromSLP(const std::filesystem::path& path, HMODULE module, bool enforceSameID) {
-	HRSRC res = FindResource(module, "SERPENTLUA_METADATA", RT_RCDATA);
-	if (!res) {
-		FreeLibrary(module);
-		return Err("Plugin {}: Resource \"SERPENTLUA_METADATA\" was not found.", path.filename());
-	}
-	HGLOBAL hRes = LoadResource(module, res);
-	if (!hRes) {
-		FreeLibrary(module);
-		return Err("Plugin {}: Failed to load resource (err {})", path.filename(), GetLastError());
-	}
-	void* rawMeta = LockResource(hRes);
-	if (!rawMeta) {
-		FreeLibrary(module);
-		return Err("Plugin {}: Failed to lock resource.", path.filename());
-	}
-	DWORD size = SizeofResource(module, res);
-	if (size == 0) {
-		FreeLibrary(module);
-		return Err("Plugin {}: Resource size is equal to 0.", path.filename());
-	}
+geode::Result<PluginMetadata*, std::string> PluginMetadata::createFromScript(const std::filesystem::path& path, bool enforceSameID) {
 
-	std::string metadataMiniRaw(reinterpret_cast<char*>(rawMeta), size); // this means that its a tiny bit raw, not too much raw. (basically meaning that its in a format thats too hard to understand)
+	std::ifstream file(path / "init.lua");
+	if (!file.is_open()) return Err("Plugin `{}`: an error occured opening file.", path.filename());
 
 	std::vector<std::string> lines;
 	std::string line;
-	std::stringstream ss(metadataMiniRaw);
+	size_t count = 0;
+	size_t max = 5;
 
-	while (std::getline(ss, line, '\n')) {
-		if (!line.empty() && line.back() == '\r') {
-			line.pop_back();
-		}
+	while (std::getline(file, line) && count < max) {
 		lines.push_back(line);
+		++count;
 	}
 
 	std::map<std::string, std::string> metadataMap;
 
 	for (auto& line : lines) {
-		auto pair = ScriptMetadata::createPair(line);
+		auto pair = utility::parseMetadataEntry(line);
 		if (pair == std::pair<std::string, std::string>({})) return Err("Plugin {}: Invalid metadata.", path.filename());
 		if (metadataMap.contains(pair.first)) log::warn("Plugin {}: Metadata already contains {}, skipping.", path.filename(), pair.first);
 		metadataMap.insert(pair);
@@ -62,7 +42,7 @@ geode::Result<PluginMetadata*, std::string> PluginMetadata::createFromSLP(const 
 		if (it == requiredKeys.end()) return Err("Plugin {}: Unknown Metadata key: {}", path.filename(), key);
 	}
 
-	if ((string::pathToString(path.stem()) != metadataMap.at("id")) && enforceSameID) return Err("Plugin {}: ID must match the plugin file name without the `.slp` extension.", path.filename());
+	if ((string::pathToString(path.filename()) != metadataMap.at("id")) && enforceSameID) return Err("Plugin {}: ID must match the plugin file name without the `.slp` extension.", path.filename());
 
 	auto verRes = utility::handleVersion(metadataMap.at("version"));
 	if (verRes.isErr()) return Err("Plugin {}: Version cannot be parsed: {}", metadataMap.at("id"), *(verRes.err()));

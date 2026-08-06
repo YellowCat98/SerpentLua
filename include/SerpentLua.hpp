@@ -29,7 +29,7 @@ namespace SerpentLua {
 		static PluginMetadata* create(std::map<std::string, std::string>& metadata);
 		static PluginMetadata* createFromMod(geode::Mod* mod);
 		#ifdef YELLOWCAT98_SERPENTLUA_EXPORTING
-		static geode::Result<PluginMetadata*, std::string> createFromSLP(const std::filesystem::path& path, HMODULE module, bool enforceSameID = true);
+		static geode::Result<PluginMetadata*, std::string> createFromScript(const std::filesystem::path& path, bool enforceSameID = true);
 		#endif
 		std::string name;
 		std::string developer;
@@ -42,50 +42,25 @@ namespace SerpentLua {
 	};
 	class SERPENTLUA_DLL Plugin final {
 	public:
-		static geode::Result<Plugin*, std::string> create(PluginMetadata* metadata, std::function<void(lua_State*)> entry);
-		std::function<void(lua_State*)> getEntry();
+		static geode::Result<Plugin*, std::string> create(PluginMetadata* metadata, lua_State* state, std::function<bool()> entry, std::function<bool(lua_State*)> onScriptLoaded);
+		std::function<bool()> getEntry();
+		std::function<bool(lua_State*)> getOnScriptLoaded();
+		lua_State* getLuaState();
 		#ifdef YELLOWCAT98_SERPENTLUA_EXPORTING
-		static geode::Result<Plugin*, std::string> createNative(const std::filesystem::path& path); // meant for plugins that are built using dlls explicitly.
+		static geode::Result<Plugin*, std::string> createNative(const std::filesystem::path& path);
 		void terminate();
 		#endif
 
-		//static geode::Result<PluginMetadata*, std::string> getPluginByID(const std::string& id);
-
-		void setPlugin(); // will set the Pulgin.
-		int loadCount; // helps determine whether to terminate the plugin if no script uses it, helps save memory.
-		// instead of a simple `loadedSomewhere` bool, we count how many times a script loaded it!
+		void setPlugin();
+		int loadCount;
 		PluginMetadata* metadata;
 	private:
-		std::function<void(lua_State*)> entry;
+		std::function<bool()> entry;
+		std::function<bool(lua_State*)> onScriptLoaded;
+		lua_State* state;
+		std::string initScript;
+		std::filesystem::path pathToUnzipped;
 		bool native;
-
-
-		std::optional<HMODULE> hDll;
-		// meant for native plugins.
-		#ifdef YELLOWCAT98_SERPENTLUA_EXPORTING
-		// __metadata is used for both plugins and scripts
-		struct __metadata {
-			const char* name;
-			const char* developer;
-			const char* id;
-			const char* version;
-			const char* serpentVersion;
-			const char** plugins;
-			int pluginsSize;
-		};
-
-		struct SerpentLuaAPI {
-			void (*log)(__metadata, const char*, const char*);
-			__metadata (*get_script)(lua_State*);
-			__metadata metadata;
-			HMODULE handle;
-		};
-
-		struct SerpentLuaAPIImpl {
-			static void log(__metadata, const char* msg, const char* type);
-			static __metadata get_script(lua_State* L);
-		};
-		#endif
 	};
 
 	// only exporting this for plugins since its accessible through the serpentlua internal plugin
@@ -93,7 +68,6 @@ namespace SerpentLua {
 		#ifdef YELLOWCAT98_SERPENTLUA_EXPORTING
 			static ScriptMetadata* create(std::map<std::string, std::string>& metadata);
 			static geode::Result<ScriptMetadata*, std::string> createFromScript(const std::filesystem::path& scriptPath);
-			static std::pair<std::string, std::string> createPair(std::string& lines);
 			void setPlugins();
 			ScriptMetadata(){}
 		#endif

@@ -84,18 +84,21 @@ lua_State* script::createState() {
 		auto* self = static_cast<script*>(lua_touserdata(L, -1));
 		lua_pop(L, 1);
 
-		log::error("[SCRIPT] [{}] LUA PANIC: {}", self->getMetadata()->name, lua_tostring(L, -1));
-		MessageBoxA( // TODO: nuke this for multiplatform support and have a similar model to geode's crash handling
+		auto fancyErr = fmt::format(
+			"A script has encountered an unrecoverable error and has panicked.\n"
+			"=======================================\n"
+			"Faulty script: {}\n\n"
+			"=================Error===================\n"
+			"{}",
+			self->getMetadata()->id, lua_tostring(L, -1)
+		);
+		log::error("\n{}", fancyErr);
+		#ifdef GEODE_IS_WINDOWS
+		MessageBoxA(
 			nullptr,
-			fmt::format(
-				"A script has encountered an unrecoverable error and has panicked.\n"
-				"=======================================\n"
-				"Faulty script: {}\n\n"
-				"=================Error===================\n"
-				"{}",
-				self->getMetadata()->id, lua_tostring(L, -1)
-			).c_str(), 
+			fancyErr.c_str(), 
 			"SerpentLua: LUA PANIC!", MB_OK | MB_ICONERROR);
+		#endif
 		return 0;
 	});
 
@@ -149,7 +152,11 @@ geode::Result<> script::loadPlugins() {
 			}
 		}
 
-		plugin->getEntry()(this->getLuaState());
+		if (!plugin->getOnScriptLoaded()(this->getLuaState())) {
+			auto err = Err("Script `{}` plugin loading: Plugin `{}` returned error: {}", this->metadata->id, plugin->metadata->id, lua_tostring(plugin->getLuaState(), -1));
+			this->terminate();
+			return err;
+		}
 
 		pendingPlugins.push_back(plugin);
 	}

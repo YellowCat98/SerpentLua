@@ -349,7 +349,7 @@ arc::Future<geode::Result<std::pair<PluginMetadata*, geode::utils::web::WebRespo
 		co_return Err("Failed to get metadata: Couldn't load plugin");
 	}
 
-	auto metaRes = PluginMetadata::createFromSLP(path, hDll, false);
+	auto metaRes = PluginMetadata::createFromScript(path, false);
 
 	if (metaRes.isErr()) {
 		std::filesystem::remove(path);
