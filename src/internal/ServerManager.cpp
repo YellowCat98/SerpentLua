@@ -343,12 +343,6 @@ arc::Future<geode::Result<std::pair<PluginMetadata*, geode::utils::web::WebRespo
 		co_return Err(moveIntoRes.unwrapErr());
 	}
 
-	auto hDll = LoadLibraryExW(path.c_str(), NULL, LOAD_LIBRARY_AS_DATAFILE);
-	if (!hDll) {
-		std::filesystem::remove(path);
-		co_return Err("Failed to get metadata: Couldn't load plugin");
-	}
-
 	auto metaRes = PluginMetadata::createFromScript(path, false);
 
 	if (metaRes.isErr()) {
