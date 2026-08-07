@@ -27,6 +27,11 @@ std::string utility::sha256(std::vector<uint8_t> data) {
 std::pair<std::string, std::string> utility::parseMetadataEntry(std::string line) {
 	if (line.rfind("--@", 0) != 0) return std::pair<std::string, std::string>({});
 	line.erase(0,3);
+
+	// first tings first remove trailing whitespace
+	while (!line.empty() && std::isspace(static_cast<unsigned char>(line.back()))) {
+		line.pop_back();
+	}
 	
 	std::string key, value; // now we separate the data!
 	
