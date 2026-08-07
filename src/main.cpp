@@ -37,7 +37,6 @@ std::vector<Mod*> getDependants() {
 $on_mod(Loaded) {
 	log::info("SerpentLua loaded!");
 	log::info("Running Lua version: {}", LUA_VERSION);
-	SetDefaultDllDirectories(LOAD_LIBRARY_SEARCH_DEFAULT_DIRS);
 
 	(void)Mod::get()->registerCustomSettingType("open-scripts-btn", &OpenScriptsSettingV3::parse);
 
