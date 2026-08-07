@@ -3,7 +3,6 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 if ("${CMAKE_SYSTEM_NAME}" STREQUAL "iOS" OR IOS)
 	set(CMAKE_OSX_ARCHITECTURES "arm64")
-	include(cmake/ios.toolchain.cmake)
 else()
 	set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64")
 endif()
@@ -30,6 +29,10 @@ else()
 endif()
 
 add_subdirectory($ENV{GEODE_SDK} ${CMAKE_CURRENT_BINARY_DIR}/geode)
+
+if("${CMAKE_SYSTEM_NAME}" STREQUAL "iOS" OR IOS)
+	include(cmake/ios.toolchain.cmake) # i think geode does set PLATFORM
+endif()
 
 CPMAddPackage(
 	NAME luaJIT
