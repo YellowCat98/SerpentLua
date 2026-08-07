@@ -40,6 +40,9 @@ CPMAddPackage(
     NAME luajit-cmake
     GITHUB_REPOSITORY zhaozg/luajit-cmake
     GIT_TAG bdc1b54d0572e2cc5c3eaa5c1e818d0e0246b9d1
+	OPTIONS
+		"CMAKE_C_COMPILER clang"
+		"CMAKE_CXX_COMPILER clang++"
 )
 
 CPMAddPackage(
