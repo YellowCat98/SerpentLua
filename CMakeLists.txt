@@ -40,7 +40,7 @@ CPMAddPackage(
 set(LUAJIT_DIR "${luaJIT_SOURCE_DIR}")
 set(LUAJIT_DISABLE_JIT OFF CACHE BOOL "" FORCE)
 set(DISABLE_JIT OFF CACHE BOOL "" FORCE)
-add_compile_definition(LUAJIT_ENABLE_JIT=1)
+add_compile_definitions(LUAJIT_ENABLE_JIT=1)
 CPMAddPackage(
     NAME luajit-cmake
     GITHUB_REPOSITORY zhaozg/luajit-cmake
