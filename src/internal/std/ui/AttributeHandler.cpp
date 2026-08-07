@@ -28,152 +28,152 @@ void ScriptBuiltin::ui::AttributeHandler::populateAttributesNode(sol::state_view
 	DEFINE_ADD_LAMBDA(add);
 
 	add("setPositionX", [state](CCNode* ccnode, std::optional<sol::object> value) {
-		if (!typeCheck<float>(value, "setPositionX")) return sol::make_object(state, sol::nil);
+		if (!typeCheck<float>(value, "setPositionX")) return sol::make_object(state, sol::lua_nil);
 		ccnode->setPositionX((*value).as<float>());
-		return sol::make_object(state, sol::nil);
+		return sol::make_object(state, sol::lua_nil);
 	});
 
 	add("setPositionY", [state](CCNode* ccnode, std::optional<sol::object> value) {
-		if (!typeCheck<float>(value, "setPositionY")) return sol::make_object(state, sol::nil);
+		if (!typeCheck<float>(value, "setPositionY")) return sol::make_object(state, sol::lua_nil);
 		ccnode->setPositionY((*value).as<float>());
-		return sol::make_object(state, sol::nil);
+		return sol::make_object(state, sol::lua_nil);
 	});
 
 	add("setPosition", [state](CCNode* ccnode, std::optional<sol::object> value) {
-		if (!typeCheck<sol::table>(value, "setPosition")) return sol::make_object(state, sol::nil);
+		if (!typeCheck<sol::table>(value, "setPosition")) return sol::make_object(state, sol::lua_nil);
 		auto t = (*value).as<sol::table>();
 
 		if (!t["x"].is<float>() || !t["y"].is<float>()) {
 			log::warn("[UI PLUGIN] setPosition table missing float x/y.");
-			return sol::make_object(state, sol::nil);
+			return sol::make_object(state, sol::lua_nil);
 		}
 
 		ccnode->setPosition(t["x"].get<float>(), t["y"].get<float>());
-		return sol::make_object(state, sol::nil);
+		return sol::make_object(state, sol::lua_nil);
 	});
 
 	add("setScaleX", [state](CCNode* ccnode, std::optional<sol::object> value) {
-		if (!typeCheck<float>(value, "setScaleX")) return sol::make_object(state, sol::nil);
+		if (!typeCheck<float>(value, "setScaleX")) return sol::make_object(state, sol::lua_nil);
 		ccnode->setScaleX((*value).as<float>());
-		return sol::make_object(state, sol::nil);
+		return sol::make_object(state, sol::lua_nil);
 	});
 
 	add("setScaleY", [state](CCNode* ccnode, std::optional<sol::object> value) {
-		if (!typeCheck<float>(value, "setScaleY")) return sol::make_object(state, sol::nil);
+		if (!typeCheck<float>(value, "setScaleY")) return sol::make_object(state, sol::lua_nil);
 		ccnode->setScaleY((*value).as<float>());
-		return sol::make_object(state, sol::nil);
+		return sol::make_object(state, sol::lua_nil);
 	});
 
 	add("setScale", [state](CCNode* ccnode, std::optional<sol::object> value) {
-		if (!typeCheck<sol::table>(value, "setScale")) return sol::make_object(state, sol::nil);
+		if (!typeCheck<sol::table>(value, "setScale")) return sol::make_object(state, sol::lua_nil);
 		auto t = (*value).as<sol::table>();
 
 		if (!t["x"].is<float>() || !t["y"].is<float>()) {
 			log::warn("[UI PLUGIN] setScale table missing float x/y.");
-			return sol::make_object(state, sol::nil);
+			return sol::make_object(state, sol::lua_nil);
 		}
 
 		ccnode->setScaleX(t["x"].get<float>());
 		ccnode->setScaleY(t["y"].get<float>());
-		return sol::make_object(state, sol::nil);
+		return sol::make_object(state, sol::lua_nil);
 	});
 
 	add("setAnchorPointX", [state](CCNode* ccnode, std::optional<sol::object> value) {
-		if (!typeCheck<float>(value, "setAnchorPointX")) return sol::make_object(state, sol::nil);
+		if (!typeCheck<float>(value, "setAnchorPointX")) return sol::make_object(state, sol::lua_nil);
 		auto anchor = ccnode->getAnchorPoint();
 		anchor.x = (*value).as<float>();
 		ccnode->setAnchorPoint(anchor);
-		return sol::make_object(state, sol::nil);
+		return sol::make_object(state, sol::lua_nil);
 	});
 
 	add("setAnchorPointY", [state](CCNode* ccnode, std::optional<sol::object> value) {
-		if (!typeCheck<float>(value, "setAnchorPointY")) return sol::make_object(state, sol::nil);
+		if (!typeCheck<float>(value, "setAnchorPointY")) return sol::make_object(state, sol::lua_nil);
 		auto anchor = ccnode->getAnchorPoint();
 		anchor.y = (*value).as<float>();
 		ccnode->setAnchorPoint(anchor);
-		return sol::make_object(state, sol::nil);
+		return sol::make_object(state, sol::lua_nil);
 	});
 
 	add("setAnchorPoint", [state](CCNode* ccnode, std::optional<sol::object> value) {
-		if (!typeCheck<sol::table>(value, "setAnchorPoint")) return sol::make_object(state, sol::nil);
+		if (!typeCheck<sol::table>(value, "setAnchorPoint")) return sol::make_object(state, sol::lua_nil);
 		auto t = (*value).as<sol::table>();
 
 		if (!t["x"].is<float>() || !t["y"].is<float>()) {
 			log::warn("[UI PLUGIN] setAnchorPoint table missing float x/y.");
-			return sol::make_object(state, sol::nil);
+			return sol::make_object(state, sol::lua_nil);
 		}
 
 		ccnode->setAnchorPoint({ t["x"].get<float>(), t["y"].get<float>() });
-		return sol::make_object(state, sol::nil);
+		return sol::make_object(state, sol::lua_nil);
 	});
 
 	add("setContentWidth", [state](CCNode* ccnode, std::optional<sol::object> value) {
-		if (!typeCheck<float>(value, "setContentWidth")) return sol::make_object(state, sol::nil);
+		if (!typeCheck<float>(value, "setContentWidth")) return sol::make_object(state, sol::lua_nil);
 		ccnode->setContentWidth((*value).as<float>());
-		return sol::make_object(state, sol::nil);
+		return sol::make_object(state, sol::lua_nil);
 	});
 
 	add("setContentHeight", [state](CCNode* ccnode, std::optional<sol::object> value) {
-		if (!typeCheck<float>(value, "setContentHeight")) return sol::make_object(state, sol::nil);
+		if (!typeCheck<float>(value, "setContentHeight")) return sol::make_object(state, sol::lua_nil);
 		ccnode->setContentHeight((*value).as<float>());
-		return sol::make_object(state, sol::nil);
+		return sol::make_object(state, sol::lua_nil);
 	});
 
 	add("setContentSize", [state](CCNode* ccnode, std::optional<sol::object> value) {
-		if (!typeCheck<sol::table>(value, "setContentSize")) return sol::make_object(state, sol::nil);
+		if (!typeCheck<sol::table>(value, "setContentSize")) return sol::make_object(state, sol::lua_nil);
 		auto t = (*value).as<sol::table>();
 
 		if (!t["width"].is<float>() || !t["height"].is<float>()) {
 			log::warn("[UI PLUGIN] setContentSize table missing float width/height.");
-			return sol::make_object(state, sol::nil);
+			return sol::make_object(state, sol::lua_nil);
 		}
 
 		ccnode->setContentSize({ t["width"].get<float>(), t["height"].get<float>() });
-		return sol::make_object(state, sol::nil);
+		return sol::make_object(state, sol::lua_nil);
 	});
 
 	add("setRotationX", [state](CCNode* ccnode, std::optional<sol::object> value) {
-		if (!typeCheck<float>(value, "setRotationX")) return sol::make_object(state, sol::nil);
+		if (!typeCheck<float>(value, "setRotationX")) return sol::make_object(state, sol::lua_nil);
 		ccnode->setRotationX((*value).as<float>());
-		return sol::make_object(state, sol::nil);
+		return sol::make_object(state, sol::lua_nil);
 	});
 
 	add("setRotationY", [state](CCNode* ccnode, std::optional<sol::object> value) {
-		if (!typeCheck<float>(value, "setRotationY")) return sol::make_object(state, sol::nil);
+		if (!typeCheck<float>(value, "setRotationY")) return sol::make_object(state, sol::lua_nil);
 		ccnode->setRotationY((*value).as<float>());
-		return sol::make_object(state, sol::nil);
+		return sol::make_object(state, sol::lua_nil);
 	});
 
 	add("setRotation", [state](CCNode* ccnode, std::optional<sol::object> value) {
-		if (!typeCheck<sol::table>(value, "setRotation")) return sol::make_object(state, sol::nil);
+		if (!typeCheck<sol::table>(value, "setRotation")) return sol::make_object(state, sol::lua_nil);
 		auto t = (*value).as<sol::table>();
 
 		if (!t["x"].is<float>() || !t["y"].is<float>()) {
 			log::warn("[UI PLUGIN] setRotation table missing float x/y.");
-			return sol::make_object(state, sol::nil);
+			return sol::make_object(state, sol::lua_nil);
 		}
 
 		ccnode->setRotationX(t["x"].get<float>());
 		ccnode->setRotationY(t["y"].get<float>());
-		return sol::make_object(state, sol::nil);
+		return sol::make_object(state, sol::lua_nil);
 	});
 
 	add("setVisible", [state](CCNode* ccnode, std::optional<sol::object> value) {
-		if (!typeCheck<bool>(value, "setVisible")) return sol::make_object(state, sol::nil);
+		if (!typeCheck<bool>(value, "setVisible")) return sol::make_object(state, sol::lua_nil);
 		ccnode->setVisible((*value).as<bool>());
-		return sol::make_object(state, sol::nil);
+		return sol::make_object(state, sol::lua_nil);
 	});
 
 	add("setID", [state](CCNode* ccnode, std::optional<sol::object> value) {
-		if (!typeCheck<std::string>(value, "setID")) return sol::make_object(state, sol::nil);
+		if (!typeCheck<std::string>(value, "setID")) return sol::make_object(state, sol::lua_nil);
 		ccnode->setID((*value).as<std::string>());
-		return sol::make_object(state, sol::nil);
+		return sol::make_object(state, sol::lua_nil);
 	});
 
 	add("setZOrder", [state](CCNode* ccnode, std::optional<sol::object> value) {
-		if (!typeCheck<int>(value, "setZOrder")) return sol::make_object(state, sol::nil);
+		if (!typeCheck<int>(value, "setZOrder")) return sol::make_object(state, sol::lua_nil);
 		ccnode->setZOrder((*value).as<int>());
-		return sol::make_object(state, sol::nil);
+		return sol::make_object(state, sol::lua_nil);
 	});
 
 
@@ -275,43 +275,43 @@ void ScriptBuiltin::ui::AttributeHandler::populateAttributesSprite(sol::state_vi
 	ScriptBuiltin::ui::AttributeHandler::populateAttributesNode(state, node);
 
 	add("setColor", [state](CCNode* ccnode, std::optional<sol::object> value) {
-		if (!typeCheck<sol::table>(value, "setColor")) return sol::make_object(state, sol::nil);
+		if (!typeCheck<sol::table>(value, "setColor")) return sol::make_object(state, sol::lua_nil);
 		auto sprite = static_cast<CCSprite*>(ccnode);
 		auto t = (*value).as<sol::table>();
 		if (!t["r"].is<float>() || !t["g"].is<float>() || !t["b"].is<float>()) {
 			log::warn("[UI PLUGIN] setRotation table missing float r/g/b.");
-			return sol::make_object(state, sol::nil);
+			return sol::make_object(state, sol::lua_nil);
 		}
 		sprite->setColor({
 			static_cast<GLubyte>(std::clamp(t["r"].get<float>(), 0.0f, 255.0f)),
 			static_cast<GLubyte>(std::clamp(t["g"].get<float>(), 0.0f, 255.0f)),
 			static_cast<GLubyte>(std::clamp(t["b"].get<float>(), 0.0f, 255.0f))
 		});
-		return sol::make_object(state, sol::nil);
+		return sol::make_object(state, sol::lua_nil);
 	});
 
 	add("setOpacity", [state](CCNode* ccnode, std::optional<sol::object> value) {
-		if (!typeCheck<float>(value, "setOpacity")) return sol::make_object(state, sol::nil);
+		if (!typeCheck<float>(value, "setOpacity")) return sol::make_object(state, sol::lua_nil);
 		auto sprite = static_cast<CCSprite*>(ccnode);
 
 		sprite->setOpacity(static_cast<GLubyte>(std::clamp((*value).as<float>(), 0.0f, 255.0f)));
-		return sol::make_object(state, sol::nil);
+		return sol::make_object(state, sol::lua_nil);
 	});
 
 	add("setFlipX", [state](CCNode* ccnode, std::optional<sol::object> value) {
-		if (!typeCheck<bool>(value, "setFlipX")) return sol::make_object(state, sol::nil);
+		if (!typeCheck<bool>(value, "setFlipX")) return sol::make_object(state, sol::lua_nil);
 		auto sprite = static_cast<CCSprite*>(ccnode);
 
 		sprite->setFlipX((*value).as<bool>());
-		return sol::make_object(state, sol::nil);
+		return sol::make_object(state, sol::lua_nil);
 	});
 
 	add("setFlipY", [state](CCNode* ccnode, std::optional<sol::object> value) {
-		if (!typeCheck<bool>(value, "setFlipY")) return sol::make_object(state, sol::nil);
+		if (!typeCheck<bool>(value, "setFlipY")) return sol::make_object(state, sol::lua_nil);
 		auto sprite = static_cast<CCSprite*>(ccnode);
 
 		sprite->setFlipY((*value).as<bool>());
-		return sol::make_object(state, sol::nil);
+		return sol::make_object(state, sol::lua_nil);
 	});
 
 
@@ -349,27 +349,27 @@ void ScriptBuiltin::ui::AttributeHandler::populateAttributesButton(sol::state_vi
 	ScriptBuiltin::ui::AttributeHandler::populateAttributesNode(state, node);
 
 	add("setNormalImage", [state](CCNode* ccnode, std::optional<sol::object> value) {
-		if (!typeCheck<Node*>(value, "setNormalImage")) return sol::make_object(state, sol::nil);
+		if (!typeCheck<Node*>(value, "setNormalImage")) return sol::make_object(state, sol::lua_nil);
 		auto btn = static_cast<CCMenuItemSpriteExtra*>(ccnode);
 
 		btn->setNormalImage((*value).as<Node*>()->getNode(state));
-		return sol::make_object(state, sol::nil);
+		return sol::make_object(state, sol::lua_nil);
 	});
 
 	add("setSelectedImage", [state](CCNode* ccnode, std::optional<sol::object> value) {
-		if (!typeCheck<Node*>(value, "setSelectedImage")) return sol::make_object(state, sol::nil);
+		if (!typeCheck<Node*>(value, "setSelectedImage")) return sol::make_object(state, sol::lua_nil);
 		auto btn = static_cast<CCMenuItemSpriteExtra*>(ccnode);
 
 		btn->setSelectedImage((*value).as<Node*>()->getNode(state));
-		return sol::make_object(state, sol::nil);
+		return sol::make_object(state, sol::lua_nil);
 	});
 
 	add("setDisabledImage", [state](CCNode* ccnode, std::optional<sol::object> value) {
-		if (!typeCheck<Node*>(value, "setDisabledImage")) return sol::make_object(state, sol::nil);
+		if (!typeCheck<Node*>(value, "setDisabledImage")) return sol::make_object(state, sol::lua_nil);
 		auto btn = static_cast<CCMenuItemSpriteExtra*>(ccnode);
 
 		btn->setDisabledImage((*value).as<Node*>()->getNode(state));
-		return sol::make_object(state, sol::nil);
+		return sol::make_object(state, sol::lua_nil);
 	});
 }
 
@@ -379,21 +379,21 @@ void ScriptBuiltin::ui::AttributeHandler::populateAttributesLabel(sol::state_vie
 	ScriptBuiltin::ui::AttributeHandler::populateAttributesNode(state, node);
 
 	add("setString", [state](CCNode* ccnode, std::optional<sol::object> value) {
-		if (!typeCheck<std::string>(value, "setString")) return sol::make_object(state, sol::nil);
+		if (!typeCheck<std::string>(value, "setString")) return sol::make_object(state, sol::lua_nil);
 		auto label = static_cast<CCLabelBMFont*>(ccnode);
 
 		label->setString((*value).as<std::string>().c_str());
 
-		return sol::make_object(state, sol::nil);
+		return sol::make_object(state, sol::lua_nil);
 	});
 
 	add("setFntFile", [state](CCNode* ccnode, std::optional<sol::object> value) {
-		if (!typeCheck<std::string>(value, "setFntFile")) return sol::make_object(state, sol::nil);
+		if (!typeCheck<std::string>(value, "setFntFile")) return sol::make_object(state, sol::lua_nil);
 		auto label = static_cast<CCLabelBMFont*>(ccnode);
 
 		label->setFntFile((*value).as<std::string>().c_str());
 
-		return sol::make_object(state, sol::nil);
+		return sol::make_object(state, sol::lua_nil);
 	});
 
 
@@ -417,7 +417,7 @@ void ScriptBuiltin::ui::AttributeHandler::populateAttributesMenu(sol::state_view
 	add("updateLayout", [state](CCNode* ccnode, std::optional<sol::object> value) {
 		auto menu = static_cast<CCMenu*>(ccnode);
 		menu->updateLayout();
-		return sol::make_object(state, sol::nil);
+		return sol::make_object(state, sol::lua_nil);
 	});
 }
 
@@ -429,7 +429,7 @@ void ScriptBuiltin::ui::AttributeHandler::populateAttributesAlert(sol::state_vie
 	add("show", [state](CCNode* ccnode, std::optional<sol::object> value) {
 		auto alert = static_cast<FLAlertLayer*>(ccnode);
 		alert->show();
-		return sol::make_object(state, sol::nil);
+		return sol::make_object(state, sol::lua_nil);
 	});
 }
 
@@ -441,46 +441,46 @@ void ScriptBuiltin::ui::AttributeHandler::populateAttributesNotification(sol::st
 	add("show", [state](CCNode* ccnode, std::optional<sol::object> value) {
 		auto notif = static_cast<Notification*>(ccnode);
 		notif->show();
-		return sol::make_object(state, sol::nil);
+		return sol::make_object(state, sol::lua_nil);
 	});
 
 	add("hide", [state](CCNode* ccnode, std::optional<sol::object> value) {
 		auto notif = static_cast<Notification*>(ccnode);
 		notif->hide();
-		return sol::make_object(state, sol::nil);
+		return sol::make_object(state, sol::lua_nil);
 	});
 
 	add("cancel", [state](CCNode* ccnode, std::optional<sol::object> value) {
 		auto notif = static_cast<Notification*>(ccnode);
 		notif->cancel();
-		return sol::make_object(state, sol::nil);
+		return sol::make_object(state, sol::lua_nil);
 	});
 
 
 
 	add("setString", [state](CCNode* ccnode, std::optional<sol::object> value) {
-		if (!typeCheck<std::string>(value, "setString")) return sol::make_object(state, sol::nil);
+		if (!typeCheck<std::string>(value, "setString")) return sol::make_object(state, sol::lua_nil);
 		auto notif = static_cast<Notification*>(ccnode);
 		notif->setString((*value).as<std::string>());
-		return sol::make_object(state, sol::nil);
+		return sol::make_object(state, sol::lua_nil);
 	});
 
 	add("setIcon", [state](CCNode* ccnode, std::optional<sol::object> value) {
-		if (!typeCheck<NotificationIcon>(value, "setIcon") || !typeCheck<Node*>(value, "setIcon")) return sol::make_object(state, sol::nil);
+		if (!typeCheck<NotificationIcon>(value, "setIcon") || !typeCheck<Node*>(value, "setIcon")) return sol::make_object(state, sol::lua_nil);
 		auto notif = static_cast<Notification*>(ccnode);
 		if ((*value).is<NotificationIcon>()) {
 			notif->setIcon((*value).as<NotificationIcon>());
 		} else {
 			notif->setIcon((*value).as<Node*>()->getNode(state));
 		}
-		return sol::make_object(state, sol::nil);
+		return sol::make_object(state, sol::lua_nil);
 	});
 
 	add("setTime", [state](CCNode* ccnode, std::optional<sol::object> value) {
-		if (!typeCheck<float>(value, "setTime")) return sol::make_object(state, sol::nil);
+		if (!typeCheck<float>(value, "setTime")) return sol::make_object(state, sol::lua_nil);
 		auto notif = static_cast<Notification*>(ccnode);
 		notif->setTime((*value).as<float>());
-		return sol::make_object(state, sol::nil);
+		return sol::make_object(state, sol::lua_nil);
 	});
 
 

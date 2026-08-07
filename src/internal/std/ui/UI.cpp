@@ -68,7 +68,7 @@ ScriptBuiltin::ui::Node* ScriptBuiltin::ui::Node::create(sol::this_state state, 
 			sol::function callback = options["callback"];
 
 			ret->node = geode::createQuickPopup(title, content, btn1, btn2, [callback](FLAlertLayer* sender, bool btn2) {
-				if (callback.get_type() != sol::type::nil) {
+				if (callback.get_type() != sol::type::lua_nil) {
 					callback(sender, btn2);
 				}
 			}, false);

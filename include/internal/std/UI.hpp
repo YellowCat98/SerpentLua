@@ -9,7 +9,7 @@ std::function<void(const std::string&, std::function<sol::object(CCNode*, std::o
 	node->methods.insert_or_assign(name, ScriptBuiltin::ui::Attribute{ \
 		[=](ScriptBuiltin::ui::Node* node, std::optional<sol::object> value) { \
 			auto ccnode = getCCNode(state, node); \
-			if (!ccnode) return sol::make_object(state, sol::nil); \
+			if (!ccnode) return sol::make_object(state, sol::lua_nil); \
 			return fn(ccnode, value); \
 		} \
 	}); \

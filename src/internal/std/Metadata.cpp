@@ -15,7 +15,7 @@ sol::table ScriptBuiltin::Metadata::entry(sol::state_view state) {
 
 		auto result = SerpentLua::ScriptMetadata::getScriptByID(id);
 
-		if (result.isErr()) return sol::nil;
+		if (result.isErr()) return sol::lua_nil;
 
 		return sol::make_object(lua, result.unwrap());
 	};
@@ -74,7 +74,7 @@ sol::table ScriptBuiltin::Metadata::entry(sol::state_view state) {
 
 		auto res = RuntimeManager::get()->getPluginByID(id);
 
-		if (res.isErr()) return sol::nil;
+		if (res.isErr()) return sol::lua_nil;
 
 		return sol::make_object(lua, res.unwrap());
 	};
