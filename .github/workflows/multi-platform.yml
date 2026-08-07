@@ -42,8 +42,8 @@ jobs:
           combine: true
           target: ${{ matrix.config.target }}
         env:
-          CC=clang
-          CXX=clang++
+          CC: clang
+          CXX: clang++
 
   package:
     name: Package builds
