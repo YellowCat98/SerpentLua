@@ -335,7 +335,7 @@ arc::Future<geode::Result<std::pair<PluginMetadata*, geode::utils::web::WebRespo
 		co_return Err("Unable to download file (Code {})", resp.code());
 	}
 
-	auto path = Mod::get()->getConfigDir()/"temp"/"__tempPulgin.boobies";
+	auto path = Mod::get()->getConfigDir()/"temp"/"get_plugin_temp.zip";
 
 	auto moveIntoRes = resp.into(path);
 
@@ -343,14 +343,20 @@ arc::Future<geode::Result<std::pair<PluginMetadata*, geode::utils::web::WebRespo
 		co_return Err(moveIntoRes.unwrapErr());
 	}
 
-	auto metaRes = PluginMetadata::createFromScript(path, false);
+	auto unzippedPath = Mod::get()->getConfigDir()/"temp"/"get_plugin_temp";
 
-	if (metaRes.isErr()) {
+	auto unzipRes = utils::file::Unzip::intoDir(path, unzippedPath, true);
+	if (unzipRes.isErr()) {
 		std::filesystem::remove(path);
-		co_return Err(metaRes.unwrapErr());
+		co_return Err(unzipRes.unwrapErr());
 	}
 
-	std::filesystem::remove(path);
+
+	auto metaRes = PluginMetadata::createFromScript(unzippedPath, false);
+
+	if (metaRes.isErr()) {
+		co_return Err(metaRes.unwrapErr());
+	}
 
 	co_return Ok(std::pair<PluginMetadata*, geode::utils::web::WebResponse>{metaRes.unwrap(), resp});
 }
