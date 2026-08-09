@@ -1,9 +1,11 @@
 #include <internal/ui/ScriptsLayer.hpp>
 #include <internal/ui/OwnPluginManager.hpp>
 #include <internal/ui/SelectLayer.hpp>
+#include <internal/ServerManager.hpp>
 
 using namespace geode::prelude;
 using namespace SerpentLua::internal::ui;
+using namespace SerpentLua::internal;
 
 bool SelectLayer::init() {
 	if (!CCLayer::init()) return false;

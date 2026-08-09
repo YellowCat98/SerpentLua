@@ -1,4 +1,5 @@
-#include <internal/SerpentLua.hpp>
+#include <SerpentLua.hpp>
+#include <internal/Utility.hpp>
 
 using namespace geode::prelude;
 using namespace SerpentLua;
@@ -23,7 +24,7 @@ geode::Result<PluginMetadata*, std::string> PluginMetadata::createFromScript(con
 	std::map<std::string, std::string> metadataMap;
 
 	for (auto& line : lines) {
-		auto pair = utility::parseMetadataEntry(line);
+		auto pair = Utility::parseMetadataEntry(line);
 		if (pair == std::pair<std::string, std::string>({})) return Err("Plugin {}: Invalid metadata.", path.filename());
 		if (metadataMap.contains(pair.first)) log::warn("Plugin {}: Metadata already contains {}, skipping.", path.filename(), pair.first);
 		metadataMap.insert(pair);
@@ -44,12 +45,12 @@ geode::Result<PluginMetadata*, std::string> PluginMetadata::createFromScript(con
 
 	if ((string::pathToString(path.filename()) != metadataMap.at("id")) && enforceSameID) return Err("Plugin {}: ID must match the plugin file name without the `.slp` extension.", path.filename());
 
-	auto verRes = utility::handleVersion(metadataMap.at("version"));
+	auto verRes = Utility::handleVersion(metadataMap.at("version"));
 	if (verRes.isErr()) return Err("Plugin {}: Version cannot be parsed: {}", metadataMap.at("id"), *(verRes.err()));
 
 	metadataMap["version"] = verRes.unwrap();
 
-	auto serpVerRes = utility::handleVersion(metadataMap.at("serpent-version"));
+	auto serpVerRes = Utility::handleVersion(metadataMap.at("serpent-version"));
 	if (serpVerRes.isErr()) return Err("Plugin {}: Serpent version cannot be parsed: {}", metadataMap.at("id"), *(serpVerRes.err()));
 
 	metadataMap["serpent-version"] = serpVerRes.unwrap();

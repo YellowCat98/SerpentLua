@@ -1,5 +1,6 @@
 #include <internal/std/Metadata.hpp>
 #include <internal/std/PluginEntry.hpp>
+#include <internal/RuntimeManager.hpp>
 
 using namespace SerpentLua::internal;
 using namespace geode::prelude;

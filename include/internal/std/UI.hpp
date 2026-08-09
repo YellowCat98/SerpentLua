@@ -1,6 +1,5 @@
 #pragma once
 
-#include <internal/SerpentLua.hpp>
 #include <internal/std/Enums.hpp>
 #include <sol/sol.hpp>
 

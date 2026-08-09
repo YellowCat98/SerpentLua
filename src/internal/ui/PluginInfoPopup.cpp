@@ -1,6 +1,9 @@
 #include <internal/ui/PluginInfoPopup.hpp>
+#include <internal/Utility.hpp>
+#include <internal/ServerManager.hpp>
 
 using namespace SerpentLua::internal::ui;
+using namespace SerpentLua::internal;
 using namespace geode::prelude;
 
 bool PluginInfoPopup::init(const DisplayInfo& info) {
@@ -186,7 +189,7 @@ bool PluginInfoPopup::init(const DisplayInfo& info) {
 
 		auto serpVer = serpVerRes.unwrap();
 
-		if (!utility::versionInfoCompare(Mod::get()->getVersion(), serpVer)) {
+		if (!Utility::versionInfoCompare(Mod::get()->getVersion(), serpVer)) {
 			FLAlertLayer::create("Cannot Install", fmt::format("This plugin is made for <cj>SerpentLua</c> version <cb>{}</c>\nYou are on <cy>{}</c>.", serpVer.toVString(), Mod::get()->getVersion().toVString()), "OK")->show();
 			return;
 		}

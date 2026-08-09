@@ -1,4 +1,4 @@
-#include <internal/SerpentLua.hpp>
+#include <internal/DisplayInfo.hpp>
 
 using namespace SerpentLua::internal;
 using namespace geode::prelude;

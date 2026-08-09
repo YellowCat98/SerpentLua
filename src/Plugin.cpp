@@ -1,5 +1,6 @@
-#include "Geode/utils/file.hpp"
-#include <internal/SerpentLua.hpp>
+#include <SerpentLua.hpp>
+#include <internal/RuntimeManager.hpp>
+#include <internal/Utility.hpp>
 
 using namespace geode::prelude;
 using namespace SerpentLua;
@@ -45,7 +46,7 @@ geode::Result<Plugin*, std::string> Plugin::createNative(const std::filesystem::
 			}
 			auto binary = binaryRes.unwrap();
 
-			auto hash = internal::utility::sha256(binary);
+			auto hash = internal::Utility::sha256(binary);
 
 			skipUnzip = hash == originalHash;
 		} else {
@@ -64,7 +65,7 @@ geode::Result<Plugin*, std::string> Plugin::createNative(const std::filesystem::
 		if (unzip.isErr()) return Err("Plugin: Unable to unpack SLP: {}", unzip.unwrapErr());
 
 		auto binary = utils::file::readBinary(path).unwrap(); // if it could unzip then this shouldnt error (hopefully)
-		auto hash = internal::utility::sha256(binary);
+		auto hash = internal::Utility::sha256(binary);
 
 		auto write = utils::file::writeString(unzipped / ".slp_sha256", hash);
 		if (write.isErr()) {

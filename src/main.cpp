@@ -1,6 +1,8 @@
 #include <Geode/Geode.hpp>
 #include <SerpentLua.hpp>
-#include <internal/SerpentLua.hpp>
+#include <internal/StartupOperations.hpp>
+#include <internal/SettingsIdk.hpp>
+#include <internal/ServerManager.hpp>
 #include <internal/ui/ScriptsLayer.hpp>
 #include <internal/std/PluginEntry.hpp>
 #include <Geode/utils/async.hpp>

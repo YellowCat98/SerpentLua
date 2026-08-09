@@ -1,7 +1,7 @@
-#include <internal/SerpentLua.hpp>
-#include "SerpentLua.hpp"
-#include "lua.h"
-#include "lualib.h"
+#include <SerpentLua.hpp>
+#include <internal/script.hpp>
+#include <internal/RuntimeManager.hpp>
+#include <internal/Utility.hpp>
 
 using namespace SerpentLua::internal;
 using namespace geode::prelude;
@@ -145,7 +145,7 @@ geode::Result<> script::loadPlugins() {
 			auto version = versionRes.unwrap();
 
 			auto pluginVersion = VersionInfo::parse(plugin->metadata->version).unwrap(); // this cant return err because we already checked when we loaded it
-			if (!utility::versionInfoCompare(version, pluginVersion)) {
+			if (!Utility::versionInfoCompare(version, pluginVersion)) {
 				auto err = Err("Script `{}` plugin loading: The script depends on version {} for plugin {} but you have version {}", this->metadata->id, versionString, pluginID, plugin->metadata->version);
 				this->terminate();
 				return err;

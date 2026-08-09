@@ -2,6 +2,8 @@
 #include <internal/ui/ScriptsLayer.hpp>
 #include <internal/ui/ScriptItem.hpp>
 #include <internal/ui/PluginFetcherPopup.hpp>
+#include <internal/ServerManager.hpp>
+#include <internal/RuntimeManager.hpp>
 
 using namespace SerpentLua::internal::ui;
 using namespace SerpentLua::internal;

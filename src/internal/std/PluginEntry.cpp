@@ -6,6 +6,7 @@
 #include <internal/std/Metadata.hpp>
 #include <internal/std/Format.hpp>
 #include <sol/sol.hpp>
+#include <internal/RuntimeManager.hpp>
 
 using namespace SerpentLua::internal;
 using namespace geode::prelude;

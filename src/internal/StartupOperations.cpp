@@ -1,4 +1,6 @@
-#include <internal/SerpentLua.hpp>
+#include <internal/StartupOperations.hpp>
+#include <internal/RuntimeManager.hpp>
+#include <internal/Utility.hpp>
 
 using namespace SerpentLua::internal;
 using namespace geode::prelude;
@@ -54,7 +56,7 @@ void StartupOperations::loadNativePlugins() {
 			log::error("Plugin {} could not parse serpent-version: {}", unwrapped->metadata->id, *(version.err()));
 			continue;
 		}
-		if (!utility::versionInfoCompare(version.unwrap(), Mod::get()->getVersion())) {
+		if (!Utility::versionInfoCompare(version.unwrap(), Mod::get()->getVersion())) {
 			log::error("Plugin {} was made for serpent version {} but you are on {}", unwrapped->metadata->id, unwrapped->metadata->serpentVersion, Mod::get()->getVersion().toNonVString());
 			continue;
 		}
@@ -89,7 +91,7 @@ void StartupOperations::loadScripts() {
 				log::error("{}", err);
 				continue;
 			}
-			if (!utility::versionInfoCompare(version.unwrap(), Mod::get()->getVersion())) {
+			if (!Utility::versionInfoCompare(version.unwrap(), Mod::get()->getVersion())) {
 				auto err = fmt::format("Script {} was made for serpent version {} but you are on {}", pair.first, pair.second->serpentVersion, Mod::get()->getVersion().toNonVString());
 				pair.second->errors.push_back(err);
 				log::error("{}", err);

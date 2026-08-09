@@ -1,7 +1,7 @@
 #include <Geode/Geode.hpp>
 #include <SerpentLua.hpp>
 #include <Geode/modify/MenuLayer.hpp>
-#include <internal/SerpentLua.hpp>
+#include <internal/ServerManager.hpp>
 #include <internal/ui/ScriptsLayer.hpp>
 #include <internal/ui/SelectLayer.hpp>
 #include <argon/argon.hpp>

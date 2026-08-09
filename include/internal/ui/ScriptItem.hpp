@@ -1,5 +1,4 @@
 #pragma once
-#include <internal/SerpentLua.hpp>
 #include <internal/ui/ScriptsLayer.hpp>
 
 // i will really only not use this here when theres values that are in this and arent in that, like scriptmetadata::errors

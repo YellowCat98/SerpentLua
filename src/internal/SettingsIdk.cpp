@@ -1,4 +1,5 @@
-#include <internal/SerpentLua.hpp>
+#include <internal/SettingsIdk.hpp>
+#include <internal/ServerManager.hpp>
 
 using namespace geode::prelude;
 using namespace SerpentLua::internal;

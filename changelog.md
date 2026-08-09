@@ -7,6 +7,7 @@
 - SL Plugin v2.0.0: Removed `SL.playground.init` and made it run inside the entry function directly, no need to call it anymore.
 - Plugins: Replaced plugin loading with a better and more portable system.
 - Platform: Added support for all platforms that Geode supports.
+- Internal: Reorganized code. (boy do i have to reorganize code a lot!)
 
 ## 1.7.0
 - Script Metadata: Reorganize code.

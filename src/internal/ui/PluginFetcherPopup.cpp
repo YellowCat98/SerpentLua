@@ -1,5 +1,6 @@
 #include <internal/ui/PluginFetcherPopup.hpp>
 #include <internal/ui/PluginInfoPopup.hpp>
+#include <internal/ServerManager.hpp>
 
 using namespace SerpentLua::internal::ui;
 using namespace geode::prelude;

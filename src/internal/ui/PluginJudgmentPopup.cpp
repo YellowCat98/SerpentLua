@@ -1,4 +1,5 @@
 #include <internal/ui/PluginJudgmentPopup.hpp>
+#include <internal/ServerManager.hpp>
 
 using namespace SerpentLua::internal::ui;
 using namespace geode::prelude;

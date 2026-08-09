@@ -1,6 +1,6 @@
 #pragma once
 #include <Geode/Geode.hpp>
-#include <internal/SerpentLua.hpp>
+#include <internal/DisplayInfo.hpp>
 
 
 namespace SerpentLua::internal::ui {

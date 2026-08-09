@@ -1,4 +1,5 @@
 #include <internal/ui/OwnPluginManager.hpp>
+#include <internal/ServerManager.hpp>
 
 using namespace SerpentLua::internal::ui;
 using namespace geode::prelude;

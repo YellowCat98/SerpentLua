@@ -45,3 +45,5 @@
 - ~~UI (1.0.0-alpha.2): Make missing lua.dll popup #Better.~~ ✓
 - ~~UI (1.0.0-alpha.2): Add an indicator when changes have been made~~ ✓
 
+## idk
+- UI: Add a UI for scripts, ideally the ability to view their contents in-game!

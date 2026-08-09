@@ -1,6 +1,9 @@
-#include <internal/SerpentLua.hpp>
+#include <SerpentLua.hpp>
+#include <internal/Utility.hpp>
+#include <internal/RuntimeManager.hpp>
 #include <Geode/Geode.hpp>
 
+using namespace SerpentLua;
 using namespace SerpentLua::internal;
 using namespace geode::prelude;
 
@@ -60,7 +63,7 @@ geode::Result<SerpentLua::ScriptMetadata*, std::string> SerpentLua::ScriptMetada
 		if (std::all_of(line.begin(), line.end(), [](unsigned char c) {
 			return std::isspace(c);
 		})) continue;
-		auto pair = utility::parseMetadataEntry(line);
+		auto pair = Utility::parseMetadataEntry(line);
 		if (pair == std::pair<std::string, std::string>({})) return Err("Script `{}` metadata: The first {} lines in a script must be metadata.", scriptPath.filename(), max+1);
 
 		if (metadata.contains(pair.first)) return Err("Script `{}` metadata: Metadata already contains key {}", scriptPath.filename(), pair.first);
@@ -89,12 +92,12 @@ geode::Result<SerpentLua::ScriptMetadata*, std::string> SerpentLua::ScriptMetada
 
 	if (scriptPath.stem() != metadata.at("id")) return Err("Script `{}` metadata: Script filename with the extension omitted must match Script ID. ({} != {})", scriptPath.filename(), scriptPath.stem(), metadata.at("id"));
 
-	auto res = utility::handleVersion(metadata.at("version"));
+	auto res = Utility::handleVersion(metadata.at("version"));
 	if (res.isErr()) return Err("Script `{}` metadata: Version cannot be parsed: {}", metadata.at("id"), *(res.err()));
 
 	metadata["version"] = res.unwrap();
 
-	auto serpVerRes = utility::handleVersion(metadata.at("serpent-version"));
+	auto serpVerRes = Utility::handleVersion(metadata.at("serpent-version"));
 	if (serpVerRes.isErr()) return Err("Plugin {}: Serpent version cannot be parsed: {}", metadata.at("id"), *(serpVerRes.err()));
 
 	metadata["serpent-version"] = serpVerRes.unwrap();

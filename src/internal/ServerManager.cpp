@@ -1,5 +1,5 @@
 #include <SerpentLua.hpp>
-#include <internal/SerpentLua.hpp>
+#include <internal/ServerManager.hpp>
 #include <libs/picosha2/picosha2.h>
 
 using namespace geode::prelude;
