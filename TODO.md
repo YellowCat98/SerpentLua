@@ -1,6 +1,7 @@
 # TODO
 
 - The top most unchecked todos are for the next SerpentLua update, the ones at the very bottom are unplanned for future updates.
+- Just because everything in the latest update is crossed out doesn't mean that the update is finished. Updates still need testing and certain bugs are still present.
 
 ## 2.0.0:
 - ~~Plugins: Stop supporting dynamic linking.~~ ✓

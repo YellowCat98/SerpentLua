@@ -3,12 +3,12 @@
 --@version 1.0.0
 --@serpent-version 2.0.0
 --@developer YellowCat98
---@plugins serpentlua.std@1.4.0
+--@plugins serpentlua.std@2.0.0
 
 --Script example for using the Playground.
 
 local SL = require("serpentlua.std")
-SL.playground:init()
+
 local pg = SL.playground
 
 --==== BASIC USAGE ====--

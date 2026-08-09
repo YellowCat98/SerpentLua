@@ -258,11 +258,9 @@ std::string ScriptBuiltin::Playground::Folder::getName() {
 	return utils::string::pathToString(std::filesystem::path(path).filename());
 }
 
-void ScriptBuiltin::Playground::exposedFunctions::init(sol::this_state ts) {
-	sol::state_view state(ts);
-	lua_State* L = ts;
-
-		sol::table table = sol::stack::get<sol::table>(ts, 1);
+sol::table ScriptBuiltin::Playground::entry(sol::state_view state) {
+	auto table = state.create_table();
+	lua_State* L = state;
 
 	auto scriptDir = Mod::get()->getConfigDir() / "playground" / ScriptBuiltin::getMetadata(L)->id;
 	if (!std::filesystem::exists(scriptDir)) {
@@ -284,12 +282,6 @@ void ScriptBuiltin::Playground::exposedFunctions::init(sol::this_state ts) {
 		{"script", scriptDir},
 		{"user", saveDir}
 	};
-} // creates the stuff if they dont exist and initialize variables
-
-sol::table ScriptBuiltin::Playground::entry(sol::state_view state) {
-	auto table = state.create_table();
-
-	table["init"] = ScriptBuiltin::Playground::exposedFunctions::init; 
 
 	table.new_usertype<ScriptBuiltin::Playground::File>("File", sol::no_constructor,
 		"create", &File::create,

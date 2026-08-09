@@ -56,8 +56,4 @@ namespace SerpentLua::internal::ScriptBuiltin::Playground {
 		bool failed;
 		std::string path;
 	};
-
-	struct exposedFunctions {
-		static void init(sol::this_state ts);
-	};
 }
