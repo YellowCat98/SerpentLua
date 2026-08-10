@@ -16,9 +16,8 @@ Result<void, std::vector<std::pair<std::string, std::string>>> createDirs(const 
 	std::vector<std::pair<std::string, std::string>> errs;
 	for (auto& dir : dirs) {
 		if (!std::filesystem::exists(where / dir)) {
-			log::info("Directory {} does not exist, creating it now.", dir);
-			auto createDirRes = utils::file::createDirectoryAll(where / dir);
-			if (createDirRes.isErr()) errs.push_back({dir, createDirRes.err().value()});
+			auto result = utils::file::createDirectoryAll(where / dir);
+			if (result.isErr()) errs.push_back({dir, result.err().value()});
 		}
 	}
 
