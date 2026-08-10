@@ -12,7 +12,7 @@ namespace SerpentLua::internal {
 		lua_State* createState();
 		geode::Result<> execute(); // Executes THE SCRIPT.
 		geode::Result<> loadPlugins();
-	private: 
+	private:
 		ScriptMetadata* metadata;
 		lua_State* state; // each script requires its own lua state for guaranteed isolation. (and also so you can get a script by just a function call!)
 		std::vector<Plugin*> pendingPlugins; // this only exists so a failed script doesnt keep a plugin in use
