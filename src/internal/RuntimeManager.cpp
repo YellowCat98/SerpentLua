@@ -21,7 +21,7 @@ Result<SerpentLua::PluginMetadata*, std::string> RuntimeManager::getPluginByID(c
 	return Ok(plugins[id]);
 }
 
-void RuntimeManager::setLoadedScript(script* script) {
+void RuntimeManager::setLoadedScript(Script* script) {
 	loadedScripts.insert({script->getMetadata()->id, script});
 }
 
@@ -34,7 +34,7 @@ void RuntimeManager::setPlugin(Plugin* plugin) {
 	loadedPlugins.insert({plugin->metadata->id, plugin});
 }
 
-Result<script*, std::string> RuntimeManager::getLoadedScriptByID(const std::string& id) {
+Result<Script*, std::string> RuntimeManager::getLoadedScriptByID(const std::string& id) {
 	if (!loadedScripts.contains(id)) {
 		if (scripts.contains(id)) return Err("Loaded Script Getter: Cannot retrieve script {} as it failed exeuction.", id);
 		return Err("Script Getter: Script {} does not exist.", id);
@@ -47,7 +47,7 @@ Result<SerpentLua::ScriptMetadata*, std::string> RuntimeManager::getScriptByID(c
 	return Ok(scripts[id]);
 }
 
-script* RuntimeManager::getLoadedScriptByState(lua_State* L) {
+Script* RuntimeManager::getLoadedScriptByState(lua_State* L) {
 	for (const auto [k, v] : RuntimeManager::get()->getAllLoadedScripts()) {
 		if (v->getLuaState() != L) continue;
 
@@ -67,7 +67,7 @@ SerpentLua::ScriptMetadata* RuntimeManager::getScriptByState(lua_State* L) {
 	return nullptr;
 }
 
-std::map<std::string, script*> RuntimeManager::getAllLoadedScripts() {
+std::map<std::string, Script*> RuntimeManager::getAllLoadedScripts() {
 	return loadedScripts;
 }
 

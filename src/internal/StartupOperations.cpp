@@ -97,7 +97,7 @@ void StartupOperations::loadScripts() {
 				log::error("{}", err);
 				continue; // why didnt i do this before
 			}
-			auto res = script::create(pair.second);
+			auto res = Script::create(pair.second);
 			if (res.isErr()) {
 				pair.second->errors.push_back(res.err().value());
 				log::error("{}", res.err().value());

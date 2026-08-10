@@ -1,5 +1,5 @@
 #include <SerpentLua.hpp>
-#include <internal/script.hpp>
+#include <internal/Script.hpp>
 #include <internal/RuntimeManager.hpp>
 #include <internal/Utility.hpp>
 
@@ -7,15 +7,15 @@ using namespace SerpentLua::internal;
 using namespace geode::prelude;
 
 
-SerpentLua::ScriptMetadata* script::getMetadata() {
+SerpentLua::ScriptMetadata* Script::getMetadata() {
 	return metadata;
 }
 
-lua_State* script::getLuaState() {
+lua_State* Script::getLuaState() {
 	return state;
 }
 
-lua_State* script::createState() {
+lua_State* Script::createState() {
 	log::debug("Script {} state creation: Initialized.", this->metadata->id);
 	lua_State* state = luaL_newstate();
 
@@ -81,7 +81,7 @@ lua_State* script::createState() {
 
 	lua_atpanic(state, [](lua_State* L) -> int {
 		lua_getfield(L, LUA_REGISTRYINDEX, "owner_script");
-		auto* self = static_cast<script*>(lua_touserdata(L, -1));
+		auto* self = static_cast<Script*>(lua_touserdata(L, -1));
 		lua_pop(L, 1);
 
 		auto fancyErr = fmt::format(
@@ -105,7 +105,7 @@ lua_State* script::createState() {
 	return state;
 }
 
-void script::terminate() {
+void Script::terminate() {
 	log::info("Script {} termination: Initialized.", metadata->id);
 	// this is quite sad
 	// the next thing i will do is script termination
@@ -125,7 +125,7 @@ void script::terminate() {
 	// it compiled!! :D
 }
 
-geode::Result<> script::loadPlugins() {
+geode::Result<> Script::loadPlugins() {
 	for (const auto& [pluginID, versionString] : this->metadata->plugins) {
 		auto pluginRes = RuntimeManager::get()->getLoadedPluginByID(pluginID);
 		if (pluginRes.isErr()) {
@@ -166,7 +166,7 @@ geode::Result<> script::loadPlugins() {
 
 // only terminate when a script fails inital execution, it will crash if anything after initial execution fails, this is to prevent before-the-game-loads crashes!
 // when i said initial execution i meant executing the main chunk
-geode::Result<> script::execute() {
+geode::Result<> Script::execute() {
 	if (luaL_dofile(this->state, this->metadata->path.c_str()) != LUA_OK) {
 		auto err = Err("Script `{}` execution: \n\n{}\n\nScript has failed initial execution, will terminate for the rest of this session.", metadata->id, std::string(lua_tostring(this->state, -1)));
 		this->terminate();
@@ -177,18 +177,18 @@ geode::Result<> script::execute() {
 	return Ok();
 }
 
-void script::commitLoadedPlugins() {
+void Script::commitLoadedPlugins() {
 	for (auto& plugin : pendingPlugins) {
 		plugin->loadCount++;
 	}
 }
 
-geode::Result<script*, std::string> script::getLoadedScript(const std::string& id) {
+geode::Result<Script*, std::string> Script::getLoadedScript(const std::string& id) {
 	return SerpentLua::internal::RuntimeManager::get()->getLoadedScriptByID(id);
 }
 
-geode::Result<script*, std::string> script::create(ScriptMetadata* metadata) {
-	auto ret = new (std::nothrow) script();
+geode::Result<Script*, std::string> Script::create(ScriptMetadata* metadata) {
+	auto ret = new (std::nothrow) Script();
 	if (!ret) return Err("Script `{}` creation: Not enough memory to create script.", metadata->id);
 	ret->metadata = metadata;
 

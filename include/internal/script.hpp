@@ -3,10 +3,10 @@
 #include <SerpentLua.hpp>
 
 namespace SerpentLua::internal {
-	class script {
+	class Script {
 	public:
-		static geode::Result<script*, std::string> create(ScriptMetadata* metadata);
-		static geode::Result<script*, std::string> getLoadedScript(const std::string& id);
+		static geode::Result<Script*, std::string> create(ScriptMetadata* metadata);
+		static geode::Result<Script*, std::string> getLoadedScript(const std::string& id);
 		ScriptMetadata* getMetadata();
 		lua_State* getLuaState();
 		lua_State* createState();

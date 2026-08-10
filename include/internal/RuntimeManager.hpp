@@ -1,26 +1,26 @@
 #pragma once
 
 #include <SerpentLua.hpp>
-#include <internal/script.hpp>
+#include <internal/Script.hpp>
 
 namespace SerpentLua::internal {
 	class RuntimeManager {
 	public:
 		static RuntimeManager* get();
-		geode::Result<script*, std::string> getLoadedScriptByID(const std::string& id); // script::getLoadedScriptByID();
+		geode::Result<Script*, std::string> getLoadedScriptByID(const std::string& id); // Script::getLoadedScriptByID();
 		geode::Result<ScriptMetadata*, std::string> getScriptByID(const std::string& id); // ScriptMetadata::getScriptByID();
 		ScriptMetadata* getScriptByState(lua_State* L); // ScriptMetadata::getScriptByState();
-		script* getLoadedScriptByState(lua_State* L);
+		Script* getLoadedScriptByState(lua_State* L);
 
 		geode::Result<Plugin*, std::string> getLoadedPluginByID(const std::string& id);
 		geode::Result<PluginMetadata*, std::string> getPluginByID(const std::string& id);
 
-		void setLoadedScript(script* script);
+		void setLoadedScript(Script* script);
 		void setScript(ScriptMetadata* script);
 
 		void setPlugin(Plugin* plugin);
 
-		std::map<std::string, script*> getAllLoadedScripts();
+		std::map<std::string, Script*> getAllLoadedScripts();
 		std::map<std::string, ScriptMetadata*> getAllScripts();
 
 		std::map<std::string, SerpentLua::Plugin*> getAllLoadedPlugins();
@@ -32,7 +32,7 @@ namespace SerpentLua::internal {
 	private:
 		// using std::map so i can retrieve a script directly through id
 		std::map<std::string, ScriptMetadata*> scripts;
-		std::map<std::string, script*> loadedScripts;
+		std::map<std::string, Script*> loadedScripts;
 
 		std::map<std::string, SerpentLua::PluginMetadata*> plugins;
 		std::map<std::string, SerpentLua::Plugin*> loadedPlugins;
