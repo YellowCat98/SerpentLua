@@ -45,7 +45,7 @@ $on_mod(Loaded) {
 
 	auto configDir = Mod::get()->getConfigDir();
 	
-	auto res = createDirs(configDir, {"plugins", "scripts", "playground", "pending_install/plugins", "pending_install/scripts", "temp", "unzipped"});
+	auto res = createDirs(configDir, {"scripts", "playground", "pending_install/plugins", "pending_install/scripts", "temp", "unzipped"});
 	if (res.isErr()) {
 		auto errs = *(res.err());
 		for (auto& err : errs) {
@@ -68,8 +68,6 @@ $on_mod(Loaded) {
 	}
 
 	// initialize all the native plugins! (non-native plugins are initialized by the mods themselves)
-
-	SerpentLua::internal::StartupOperations::loadNativePlugins();
 
 	// Assume every dependant of SerpentLua is a native plugin.
 	log::info("Populating list of plugins that are yet to load...");

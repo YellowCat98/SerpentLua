@@ -62,7 +62,6 @@ DisplayInfo DisplayInfo::createFromScript(void* script, bool isScript) {
 		info.serpentVersion = thePlugin->serpentVersion;
 		info.path = thePlugin->path;
 
-		info.native = thePlugin->native;
 		info.loaded = thePlugin->loaded;
 
 		info.internal = static_cast<PluginMetadata*>(script);

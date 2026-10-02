@@ -37,30 +37,18 @@ namespace SerpentLua {
 		std::string version;
 		std::string serpentVersion;
 		std::string path;
-		bool native;
 		bool loaded;
 	};
 	class SERPENTLUA_DLL Plugin final {
 	public:
-		static geode::Result<Plugin*, std::string> create(PluginMetadata* metadata, lua_State* state, std::function<bool()> entry, std::function<bool(lua_State*)> onScriptLoaded);
-		std::function<bool()> getEntry();
-		std::function<bool(lua_State*)> getOnScriptLoaded();
-		lua_State* getLuaState();
-		#ifdef YELLOWCAT98_SERPENTLUA_EXPORTING
-		static geode::Result<Plugin*, std::string> createNative(const std::filesystem::path& path);
-		void terminate();
-		#endif
+		static geode::Result<Plugin*, std::string> create(PluginMetadata* metadata, std::function<void(lua_State*)> onScriptLoaded);
+		std::function<void(lua_State*)> getOnScriptLoaded();
 
 		void setPlugin();
 		int loadCount;
 		PluginMetadata* metadata;
 	private:
-		std::function<bool()> entry;
-		std::function<bool(lua_State*)> onScriptLoaded;
-		lua_State* state;
-		std::string initScript;
-		std::filesystem::path pathToUnzipped;
-		bool native;
+		std::function<void(lua_State*)> onScriptLoaded;
 	};
 
 	// only exporting this for plugins since its accessible through the serpentlua internal plugin

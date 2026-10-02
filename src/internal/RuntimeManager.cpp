@@ -83,16 +83,15 @@ std::map<std::string, SerpentLua::PluginMetadata*> RuntimeManager::getAllPlugins
 	return plugins;
 }
 
-Result<> RuntimeManager::removeLoadedScript(const std::string& id) {
-	if (!loadedScripts.contains(id)) return Err("Loaded Script remover: The unfortunate script was not found.");
-	loadedScripts.erase(id);
-
-	return Ok();
+void RuntimeManager::removeLoadedScript(Script* script) {
+	auto id = script->getMetadata()->id;
+	if (loadedPlugins.contains(script->getMetadata()->id)) loadedPlugins.erase(id);
+	if (script->getLuaState()) lua_close(script->getLuaState());
+	delete script;
 }
 
-Result<> RuntimeManager::removeLoadedPlugin(const std::string& id) {
-	if (!loadedPlugins.contains(id)) return Err("Loaded Plugin remover: The unfortunate plugin was not found.");
-	loadedPlugins.erase(id);
-
-	return Ok();
+void RuntimeManager::removeLoadedPlugin(Plugin* plugin) {
+	auto id = plugin->metadata->id;
+	if (loadedPlugins.contains(plugin->metadata->id)) loadedPlugins.erase(id);
+	delete plugin;
 }

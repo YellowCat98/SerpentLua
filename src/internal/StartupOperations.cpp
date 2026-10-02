@@ -30,41 +30,6 @@ void StartupOperations::installPending(bool scripts) {
 	}
 }
 
-void StartupOperations::loadNativePlugins() {
-	auto configDir = Mod::get()->getConfigDir();
-	for (const auto& file : std::filesystem::directory_iterator(configDir/"plugins")) {
-
-		if (file.path().extension() == ".dll") {
-			log::error("All plugins must have the .slp extension, DLLs will not load.");
-			continue;
-		}
-
-		if (file.path().extension() != ".slp") {
-			log::warn("Found non-slp file in plugins directory, will be ignored.");
-			continue;
-		}
-
-		auto pluginRes = SerpentLua::Plugin::createNative(file.path());
-		if (pluginRes.isErr()) {
-			log::error("{}", pluginRes.err().value());
-			continue;
-		}
-
-		auto unwrapped = pluginRes.unwrap();
-		auto version = VersionInfo::parse(unwrapped->metadata->serpentVersion);
-		if (version.isErr()) {
-			log::error("Plugin {} could not parse serpent-version: {}", unwrapped->metadata->id, *(version.err()));
-			continue;
-		}
-		if (!Utility::versionInfoCompare(version.unwrap(), Mod::get()->getVersion())) {
-			log::error("Plugin {} was made for serpent version {} but you are on {}", unwrapped->metadata->id, unwrapped->metadata->serpentVersion, Mod::get()->getVersion().toNonVString());
-			continue;
-		}
-
-		pluginRes.unwrap()->setPlugin();
-	}
-}
-
 void StartupOperations::loadScripts() {
 	auto configDir = Mod::get()->getConfigDir();
 	// setup metadata first
@@ -137,8 +102,10 @@ void StartupOperations::unfortunatelyDeleteTheUnfortunates() {
 	// the fate has been determined
 
 	for (auto& theUnfortunate : theUnfortunates) {
-		RuntimeManager::get()->getPluginByID(theUnfortunate).unwrap()->loaded = false;
-		RuntimeManager::get()->getLoadedPluginByID(theUnfortunate).unwrap()->terminate();
+		auto mdplugin = RuntimeManager::get()->getPluginByID(theUnfortunate).unwrap();
+		auto plugin = RuntimeManager::get()->getLoadedPluginByID(theUnfortunate).unwrap();
+		mdplugin->loaded = false;
+		RuntimeManager::get()->removeLoadedPlugin(plugin);
 		// imagine this plugin wantign to be used and then getting TERMINATED
 	}
 }

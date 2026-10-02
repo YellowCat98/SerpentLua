@@ -18,7 +18,6 @@ namespace SerpentLua::internal {
 		std::vector<Plugin*> pendingPlugins; // this only exists so a failed script doesnt keep a plugin in use
 		bool executed;
 		bool pluginsInitiated;
-		void terminate(); // currently only used to terminate scripts that failed execution.
 		void commitLoadedPlugins();
 	};
 }

@@ -7,7 +7,6 @@ namespace SerpentLua::internal {
 	struct StartupOperations {
 		static void installPending(bool scripts);
 		static void loadScripts();
-		static void loadNativePlugins();
 		static void unfortunatelyDeleteTheUnfortunates();
 	};
 }

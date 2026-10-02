@@ -26,9 +26,10 @@ namespace SerpentLua::internal {
 		std::map<std::string, SerpentLua::Plugin*> getAllLoadedPlugins();
 		std::map<std::string, SerpentLua::PluginMetadata*> getAllPlugins();
 
-		geode::Result<> removeLoadedScript(const std::string& id);
-
-		geode::Result<> removeLoadedPlugin(const std::string& id);
+		// these two cowboys both terminate the plugin and script
+		// there might also be cases where i'd have to call this function without the plugin/script being registered at all
+		void removeLoadedScript(Script* script);
+		void removeLoadedPlugin(Plugin* plugin);
 	private:
 		// using std::map so i can retrieve a script directly through id
 		std::map<std::string, ScriptMetadata*> scripts;

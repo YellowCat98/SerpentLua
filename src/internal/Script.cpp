@@ -105,32 +105,12 @@ lua_State* Script::createState() {
 	return state;
 }
 
-void Script::terminate() {
-	log::info("Script {} termination: Initialized.", metadata->id);
-	// this is quite sad
-	// the next thing i will do is script termination
-	auto res = RuntimeManager::get()->removeLoadedScript(this->metadata->id); // maybe we should remove it from loaded scripts too!
-	if (res.isErr()) log::error("Script {} termination: {}", this->metadata->id, res.err().value());
-	if (this->getLuaState()) lua_close(this->getLuaState());
-	delete this;
-	// will thi even compiling
-	// ok c/c++ extension thinks it will compile
-	// it did not compile
-	// it turns out it was just a fmt error
-	// in line 21, i forgot the arguments
-	// i will fix and see now.
-	// it did not compile once again, it was main.cpp(62,37)
-	// i will check 
-	// ok now it should compile
-	// it compiled!! :D
-}
-
 geode::Result<> Script::loadPlugins() {
 	for (const auto& [pluginID, versionString] : this->metadata->plugins) {
 		auto pluginRes = RuntimeManager::get()->getLoadedPluginByID(pluginID);
 		if (pluginRes.isErr()) {
 			auto err = Err("Script `{}` plugin loading: Plugin getter returned an error:\n\n{}\n\nWill terminate for the rest of this session.", this->metadata->id, pluginRes.err().value());
-			this->terminate();
+			RuntimeManager::get()->removeLoadedScript(this);
 			return err;
 		}
 		auto plugin = pluginRes.unwrap();
@@ -139,7 +119,7 @@ geode::Result<> Script::loadPlugins() {
 			auto versionRes = VersionInfo::parse(versionString);
 			if (versionRes.isErr()) {
 				auto err = Err("Script `{}` plugin loading: Plugin `{}` Version cannot be parsed", this->metadata->id, pluginID);
-				this->terminate();
+				RuntimeManager::get()->removeLoadedScript(this);
 				return err;
 			}
 			auto version = versionRes.unwrap();
@@ -147,16 +127,12 @@ geode::Result<> Script::loadPlugins() {
 			auto pluginVersion = VersionInfo::parse(plugin->metadata->version).unwrap(); // this cant return err because we already checked when we loaded it
 			if (!Utility::versionInfoCompare(version, pluginVersion)) {
 				auto err = Err("Script `{}` plugin loading: The script depends on version {} for plugin {} but you have version {}", this->metadata->id, versionString, pluginID, plugin->metadata->version);
-				this->terminate();
+				RuntimeManager::get()->removeLoadedScript(this);
 				return err;
 			}
 		}
 
-		if (!plugin->getOnScriptLoaded()(this->getLuaState())) {
-			auto err = Err("Script `{}` plugin loading: Plugin `{}` returned error: {}", this->metadata->id, plugin->metadata->id, lua_tostring(plugin->getLuaState(), -1));
-			this->terminate();
-			return err;
-		}
+		plugin->getOnScriptLoaded()(this->getLuaState());
 
 		pendingPlugins.push_back(plugin);
 	}
@@ -169,7 +145,7 @@ geode::Result<> Script::loadPlugins() {
 geode::Result<> Script::execute() {
 	if (luaL_dofile(this->state, this->metadata->path.c_str()) != LUA_OK) {
 		auto err = Err("Script `{}` execution: \n\n{}\n\nScript has failed initial execution, will terminate for the rest of this session.", metadata->id, std::string(lua_tostring(this->state, -1)));
-		this->terminate();
+		RuntimeManager::get()->removeLoadedScript(this);
 		return err;
 	}
 	metadata->loaded = true;
