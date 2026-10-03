@@ -8,8 +8,6 @@
 #include <filesystem>
 #include <lua.hpp>
 
-#define GEODE_BUNDLE_PDB
-
 #ifdef GEODE_IS_WINDOWS
 	#ifdef YELLOWCAT98_SERPENTLUA_EXPORTING
 		#define SERPENTLUA_DLL __declspec(dllexport)
