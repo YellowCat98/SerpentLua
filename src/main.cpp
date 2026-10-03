@@ -2,7 +2,6 @@
 #include <SerpentLua.hpp>
 #include <internal/StartupOperations.hpp>
 #include <internal/SettingsIdk.hpp>
-#include <internal/ServerManager.hpp>
 #include <internal/ui/ScriptsLayer.hpp>
 #include <internal/std/PluginEntry.hpp>
 #include <Geode/utils/async.hpp>
@@ -41,11 +40,9 @@ $on_mod(Loaded) {
 
 	(void)Mod::get()->registerCustomSettingType("open-scripts-btn", &OpenScriptsSettingV3::parse);
 
-	ServerManager::get()->setServerUrl(Mod::get()->getSettingValue<std::string>("server-url"));
-
 	auto configDir = Mod::get()->getConfigDir();
 	
-	auto res = createDirs(configDir, {"scripts", "playground", "pending_install/plugins", "pending_install/scripts", "temp", "unzipped"});
+	auto res = createDirs(configDir, {"scripts"});
 	if (res.isErr()) {
 		auto errs = *(res.err());
 		for (auto& err : errs) {
@@ -56,10 +53,6 @@ $on_mod(Loaded) {
 
 	StartupOperations::installPending(false);
 	StartupOperations::installPending(true);
-
-	geode::listenForSettingChanges<std::string>("server-url", +[](const std::string& url) {
-		ServerManager::get()->setServerUrl(url);
-	});
 
 	auto initpluginres = ScriptBuiltin::initPlugin();
 	if (initpluginres.isErr()) {

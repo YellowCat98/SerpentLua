@@ -1,7 +1,5 @@
 #include <internal/ui/ScriptsLayer.hpp>
-#include <internal/ui/OwnPluginManager.hpp>
 #include <internal/ui/SelectLayer.hpp>
-#include <internal/ServerManager.hpp>
 
 using namespace geode::prelude;
 using namespace SerpentLua::internal::ui;
@@ -87,24 +85,6 @@ void SelectLayer::createButtons() {
 	pluginsBtn->setID("plugins-btn");
 
 	buttonMenu->addChild(pluginsBtn);
-
-	auto manageSpr = CategoryButtonSprite::createWithSpriteFrameName("manage_select.png"_spr);
-	auto manageBtn = CCMenuItemExt::createSpriteExtra(manageSpr, [](CCMenuItemSpriteExtra*) {
-		if (!ServerManager::get()->isAuthenticated()) {
-			FLAlertLayer::create("Forbidden", "You must be <cb>authenticated</c> to access the <ca>plugin uploader</c>.", "OK")->show();
-			return;
-		} else if (ServerManager::get()->getStatusCached() == ServerManager::Status::Banned) {
-			FLAlertLayer::create("Banned", fmt::format("You are <cr>banned</c> from uploading plugins.\n\n<cf>Reason:</c> {}", ServerManager::get()->getBanReason()).c_str(), "OK")->show();
-			return;
-		} else if (ServerManager::get()->getStatusCached() == ServerManager::Status::Unknown) {
-			FLAlertLayer::create("Forbidden", "The <cb>SerpentLua</c> client could not determine your rank.\nPlease authenticate in the settings.\nIf this error keeps occurring, report this issue to the maintainers of the server you are using.", "OK")->show(); // this will be our lovely secret message because under normal circumstances you should never see this
-			return;
-		}
-
-		OwnPluginManager::create()->show();
-	});
-	manageBtn->setID("manage-btn");
-	buttonMenu->addChild(manageBtn);
 
 	auto infoSpr = CCSprite::createWithSpriteFrameName("GJ_infoIcon_001.png");
 	auto infoBtn = CCMenuItemExt::createSpriteExtra(infoSpr, [](CCMenuItemSpriteExtra*) {

@@ -56,13 +56,6 @@ CPMAddPackage(
 )
 target_include_directories(${PROJECT_NAME} PRIVATE ${sol2_SOURCE_DIR}/include)
 
-CPMAddPackage(
-	NAME argon
-	GITHUB_REPOSITORY GlobedGD/argon
-	VERSION 1.4.9
-)
-target_link_libraries(${PROJECT_NAME} argon)
-
 add_dependencies(${PROJECT_NAME} libluajit)
 target_include_directories(${PROJECT_NAME} PRIVATE ${luajit-cmake_BINARY_DIR})
 

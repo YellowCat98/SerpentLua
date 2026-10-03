@@ -1,8 +1,6 @@
 #include <Geode/ui/GeodeUI.hpp>
 #include <internal/ui/ScriptsLayer.hpp>
 #include <internal/ui/ScriptItem.hpp>
-#include <internal/ui/PluginFetcherPopup.hpp>
-#include <internal/ServerManager.hpp>
 #include <internal/RuntimeManager.hpp>
 
 using namespace SerpentLua::internal::ui;
@@ -16,7 +14,7 @@ void ScriptsLayer::refreshWith(CCArray* array) {
 	m_scriptsListLayer->addChild(m_scriptsListLayer->m_listView);
 }
 
-void ScriptsLayer::loadPageLocal(int page) {
+void ScriptsLayer::loadPage(int page) {
 	std::vector<DisplayInfo> scriptsInPage;
 
 	int start = (page - 1) * itemsPerPage; // reason we do page - 1 is because indexes start at 0
@@ -70,73 +68,6 @@ void ScriptsLayer::loadPageLocal(int page) {
 	infoLabel->setString(fmt::format("Page {}/{} ({} Items)", currentPage, totalPages, totalItems).c_str());
 	infoMenu->updateLayout();
 }
-
-void ScriptsLayer::loadPageServer(int page) {
-	backBtn->setVisible(false);
-	nextBtn->setVisible(false);
-	this->spinner->setVisible(true);
-	infoMenu->setVisible(false);
-
-	this->refreshWith(CCArray::create());
-
-	auto req = ServerManager::get()->createReq();
-
-	req.param("sort", "most_recent");
-	req.param("page", page);
-
-	async::spawn(ServerManager::get()->sendReq("GET", "/api/v1/plugin/fetch/bulk", req), [this, page](web::WebResponse res) {
-		spinner->setVisible(false);
-		MDPopup* popup = nullptr;
-		if (!res.ok()) {
-			popup = MDPopup::create("Server Error", res.string().unwrapOr("No Response"), "ok");
-		}
-		auto jsonRes = res.json();
-		if (jsonRes.isErr()) {
-			popup = MDPopup::create("Server Error", jsonRes.unwrapErr(), "ok");
-		}
-
-		if (popup) {
-			// because `popup` only gets created in the case of an error, we can just check if its nullptr or not to check if there was an error!
-			popup->m_scene = this;
-			popup->show();
-			return;
-		}
-
-		auto json = jsonRes.unwrap();
-
-		// safe to unwrap these without checking because the server will always return these in case of success
-		bool hasNext = json["has_next"].asBool().unwrap();
-		bool hasPrev = json["has_prev"].asBool().unwrap();
-		int totalItems = json["total"].asInt().unwrap();
-		int totalPages = json["total_pages"].asInt().unwrap();
-
-		CCArray* array = CCArray::create();
-		for (auto& item : json["items"].asArray().unwrap()) {
-			array->addObject(ScriptItem::create(DisplayInfo::create(item), [](CCMenuItemToggler*){}, CCSize(358.0f, 30), source));
-		}
-
-		this->refreshWith(array);
-		this->currentPage = page;
-		this->totalPages = totalPages;
-		this->totalItems = totalItems;
-
-		backBtn->setVisible(hasPrev);
-		nextBtn->setVisible(hasNext);
-
-		infoMenu->setVisible(true);
-		infoLabel->setString(fmt::format("Page {}/{} ({} Items)", page, totalPages, totalItems).c_str());
-		infoMenu->updateLayout();
-	});
-}
-
-void ScriptsLayer::loadPage(int page) {
-	if (source == Source::Index) {
-		return loadPageServer(page);
-	} else {
-		return loadPageLocal(page);
-	}
-}
-
 
 void ScriptsLayer::setupScriptsList() {
 	if (this->source == Source::Scripts) {
@@ -268,18 +199,6 @@ bool ScriptsLayer::init(Source source) {
 
 	geode::addSideArt(this);
 
-	if (source == Source::Index) {
-		auto alert = FLAlertLayer::create(
-			"Modified SerpentLua",
-			"It appears you are using a modified version of SerpentLua.\n"
-			"The plugin explorer is scrapped and will not be finished due to Geode Index rules.\n"
-			"The plugin explorer should (hopefully) work without crashes, though it is very lacking of features.",
-			"OK"
-		);
-		alert->m_scene = this;
-		alert->show();
-	}
-
 	auto backMenu = CCMenu::create();
 	backMenu->setID("back-menu");
 	
@@ -312,50 +231,21 @@ bool ScriptsLayer::init(Source source) {
 	actionsMenu->setContentSize({38.0f, 200.0f});
 	actionsMenu->setID("actions-menu");
 
-	if (source != Source::Index) {
-		CCMenuItemSpriteExtra* JeomETRYdASH;
+	auto JeomETRYdASH = CCMenuItemExt::createSpriteExtra(CircleButtonSprite::create(CCSprite::create("script_import.png"_spr), CircleBaseColor::Green, CircleBaseSize::Small), [this](CCObject* sender) {
+		geode::createQuickPopup(
+			"Confirm",
+			"Would you like to import a script?",
+			"Cancel", "Confirm",
+			[this, sender](FLAlertLayer*, bool btn2) {
+				if (!btn2) return;
 
-		JeomETRYdASH = CCMenuItemExt::createSpriteExtra(CircleButtonSprite::create(CCSprite::create(this->source == Source::Plugins ? "plugin_import.png"_spr : "script_import.png"_spr), CircleBaseColor::Green, CircleBaseSize::Small), [this](CCObject* sender) {
-			geode::createQuickPopup(
-				"Confirm",
-				fmt::format("Would you like to import a {}?", this->source == Source::Plugins ? "plugin" : "script"),
-				"Cancel", "Confirm",
-				[this, sender](FLAlertLayer*, bool btn2) {
-					if (!btn2) return;
-
-					if (this->source == Source::Scripts) {
-						this->importPlugin(sender);
-						return;
-					}
-
-					geode::createQuickPopup(
-						"Choose Method",
-						"What method would you like to use to import?",
-						"From disk", "From server",
-						[this, sender](FLAlertLayer*, bool btn2) {
-							if (btn2) {
-								PluginFetcherPopup::create()->show();
-							} else {
-								this->importPlugin(sender);
-							}
-						}
-					);
-				}
-			);
-		});
-
-		JeomETRYdASH->setID("import-btn");
-
-		actionsMenu->addChild(JeomETRYdASH);
-	} else {
-		auto FUCKINGBUASLDJAOSIDJOAFJOASJOASDOIASJD = CCMenuItemExt::createSpriteExtra(CircleButtonSprite::create(CCSprite::createWithSpriteFrameName("geode.loader/reload.png"), CircleBaseColor::Green, CircleBaseSize::Small), [this](CCMenuItemSpriteExtra*) {
-			this->loadPageServer(currentPage);
-		});
-		// FUCKINGBUASLDJAOSIDJOAFJOASJOASDOIASJD->setID("FUCKING BULLSHIT");
-		FUCKINGBUASLDJAOSIDJOAFJOASJOASDOIASJD->setID("refresh-btn");
-
-		actionsMenu->addChild(FUCKINGBUASLDJAOSIDJOAFJOASJOASDOIASJD);
-	}
+				this->importPlugin(sender);
+			}
+		);
+	});
+	JeomETRYdASH->setID("import-btn");
+	JeomETRYdASH->setVisible(this->source == Source::Scripts);
+	actionsMenu->addChild(JeomETRYdASH);
 
 	auto rightActionsMenu = CCMenu::create();
 	rightActionsMenu->setLayout(SimpleColumnLayout::create()

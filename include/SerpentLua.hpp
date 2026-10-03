@@ -6,7 +6,6 @@
 #include <string>
 #include <vector>
 #include <filesystem>
-#include <argon/argon.hpp>
 #include <lua.hpp>
 
 #ifdef GEODE_IS_WINDOWS

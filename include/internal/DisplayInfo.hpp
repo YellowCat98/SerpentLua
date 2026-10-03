@@ -37,6 +37,6 @@ namespace SerpentLua::internal {
 		bool loaded;
 		bool script;
 
-		std::variant<ScriptMetadata*, PluginMetadata*> internal; // represents the ScriptMetadata or PluginMetadata, nullptr if index.
+		std::variant<ScriptMetadata*, PluginMetadata*> internal; // represents the ScriptMetadata or PluginMetadata
 	};
 }

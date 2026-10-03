@@ -43,37 +43,6 @@
 			"type": "bool",
 			"default": false,
 			"requires-restart": false
-		},
-		"dev-mode": {
-			"name": "Dev Mode",
-			"description": "Allows loading plugins that aren't imported through the plugin importer.",
-			"type": "bool",
-			"default": false,
-			"requires-restart": true
-		},
-		"servers": {
-			"type": "title",
-			"name": "Server-Related"
-		},
-		"custom-servers": {
-			"name": "Allow custom servers",
-			"description": "Allows you to use a different version plugin index server.\nWarning: SerpentLua is built against the main plugin index server, using other servers that modified/forked the server may cause issues.",
-			"type": "bool",
-			"default": false
-		},
-		"server-url": {
-			"name": "Index URL",
-			"description": "The base server URL to use for plugins.",
-			"type": "string",
-			"filter": "!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~",
-			"default": "https://serpentluaserver.yellowcat98.workers.dev/",
-			"enable-if": "custom-servers"
-		},
-		"should-authenticate": {
-			"name": "Authenticate on Startup",
-			"description": "Determines whether to authenticate with Argon on startup or not.\nThis is usually only needed if you're looking to upload your own plugins to the plugin index.",
-			"type": "bool",
-			"default": false
 		}
 	}
 }

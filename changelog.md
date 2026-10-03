@@ -7,6 +7,7 @@
 - SL Plugin v2.0.0: Removed `SL.playground.init` and made it run inside the entry function directly, no need to call it anymore.
 - Plugins: Removed native plugins. All plugins are Geode mods.
 - Platform: Added support for all platforms that Geode supports. (except Apple Silicon Macs, for some reason. This might be fixed later.)
+- Plugin Index: Removed plugin index due to native plugins being removed.
 - Internal: Reorganized code. (boy do i have to reorganize code a lot!)
 
 ## 1.7.0

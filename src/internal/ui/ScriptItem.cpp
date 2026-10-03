@@ -1,6 +1,5 @@
 #include <Geode/binding/CCMenuItemSpriteExtra.hpp>
 #include <internal/ui/ScriptItem.hpp>
-#include <internal/ui/PluginInfoPopup.hpp>
 
 using namespace geode::prelude;
 using namespace SerpentLua::internal::ui;
@@ -108,7 +107,7 @@ bool ScriptItem::init(const DisplayInfo& theMetadata, std::function<void(CCMenuI
 	viewBtn->setID("toggle");
 	viewMenu->addChild(viewBtn);
 
-	if (this->source == Source::Plugins || this->source == Source::Index) viewBtn->setVisible(false);
+	if (this->source == Source::Plugins) viewBtn->setVisible(false);
 
 	// @geode-ignore(unknown-resource)
 	auto errorBtn = CCMenuItemExt::createSpriteExtraWithFrameName("geode.loader/info-alert.png", 1.5f, [this](CCMenuItemSpriteExtra*) {
@@ -122,13 +121,6 @@ bool ScriptItem::init(const DisplayInfo& theMetadata, std::function<void(CCMenuI
 
 	viewMenu->addChild(errorBtn);
 
-	auto infoBtn = CCMenuItemExt::createSpriteExtraWithFrameName("GJ_infoIcon_001.png", 1.5f, [&](CCMenuItemSpriteExtra*) {
-		PluginInfoPopup::create(metadata)->show();
-	});
-	infoBtn->setID("info-btn");
-	if (this->source != Source::Index) infoBtn->setVisible(false);
-	viewMenu->addChild(infoBtn);
-
 	viewMenu->setLayout(
 		RowLayout::create()
 			->setAxisReverse(true)
@@ -136,7 +128,6 @@ bool ScriptItem::init(const DisplayInfo& theMetadata, std::function<void(CCMenuI
 			->setGap(10)
 	);
 
-	
 	CCSize indicatorSize = {30, 30};
 
 	auto indicatorContainer = CCMenu::create();

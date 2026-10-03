@@ -1,5 +1,4 @@
 #include <internal/SettingsIdk.hpp>
-#include <internal/ServerManager.hpp>
 
 using namespace geode::prelude;
 using namespace SerpentLua::internal;
@@ -59,14 +58,6 @@ bool OpenScriptsSettingNodeV3::init(std::shared_ptr<OpenScriptsSettingV3> settin
 		utils::file::openFolder(Mod::get()->getConfigDir() / "plugins");
 	});
 	this->getButtonMenu()->addChild(openPluginsBtn);
-
-	auto authSpr = ButtonSprite::create("Authenticate", "goldFont.fnt", "GJ_button_01.png");
-	authSpr->setScale(0.5f);
-
-	auto authBtn = CCMenuItemExt::createSpriteExtra(authSpr, [&](CCMenuItemSpriteExtra* sender) {
-		ServerManager::get()->authenticate(argon::getGameAccountData());
-	});
-	this->getButtonMenu()->addChild(authBtn);
 
 	this->getButtonMenu()->setPosition(this->getContentSize() / 2);
 	this->getButtonMenu()->setAnchorPoint({0.5f, 0.5f});

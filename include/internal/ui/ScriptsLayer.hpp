@@ -1,24 +1,17 @@
 #pragma once
 #include <Geode/Geode.hpp>
 #include <internal/DisplayInfo.hpp>
-
-
 namespace SerpentLua::internal::ui {
-	// this takes into account always on top members of std::map<std::string, T>
-
 	enum class Source {
 		Scripts,
-		Plugins,
-		Index
+		Plugins
 	};
 
 	template <typename T> T sourceValue(Source source, T script, T plugin, T index) {
 		if (source == Source::Scripts) {
 			return script;
-		} else if (source == Source::Plugins) {
-			return plugin;
 		} else {
-			return index;
+			return plugin;
 		}
 	}
 
@@ -28,7 +21,6 @@ namespace SerpentLua::internal::ui {
 		static cocos2d::CCScene* scene(Source source);
 		inline static bool pendingRestart = false; // making it static allows for when you enter the plugins ui the indicator is still there
 		static void changesMade();
-		geode::async::TaskHolder<geode::utils::web::WebResponse> serverListener;
 	private:
 
 		void keyBackClicked() override;
@@ -37,9 +29,7 @@ namespace SerpentLua::internal::ui {
 
 		void setupScriptsList();
 
-		void loadPageServer(int page);
-		void loadPageLocal(int page);
-		void loadPage(int page); // just forwards the call to loadPageServer or loadPageLocal lol
+		void loadPage(int page);
 		void refreshWith(cocos2d::CCArray* array);
 
 		GJListLayer* m_scriptsListLayer;
