@@ -28,43 +28,38 @@ sol::table ScriptBuiltin::Metadata::entry(sol::state_view state) {
 	};
 
 	_ScriptMetadata["name"] = sol::property(
-		[](ScriptMetadata& self) -> std::string& {
-			return self.name;
+		[](ScriptMetadata& self) -> std::string {
+			return self.getName();
 		}
 	);
 	_ScriptMetadata["id"] = sol::property(
-		[](ScriptMetadata& self) -> std::string& {
-			return self.id;
+		[](ScriptMetadata& self) -> std::string {
+			return self.getID();
 		}
 	);
 	_ScriptMetadata["version"] = sol::property(
-		[](ScriptMetadata& self) -> std::string& {
-			return self.version;
+		[](ScriptMetadata& self) -> std::string {
+			return self.getVersion();
 		}
 	);
 	_ScriptMetadata["serpentVersion"] = sol::property(
-		[](ScriptMetadata& self) -> std::string& {
-			return self.serpentVersion;
-		}
-	);
-	_ScriptMetadata["nostd"] = sol::property(
-		[](ScriptMetadata& self) -> bool& {
-			return self.nostd;
+		[](ScriptMetadata& self) -> std::string {
+			return self.getSerpentVersion();
 		}
 	);
 	_ScriptMetadata["developer"] = sol::property(
-		[](ScriptMetadata& self) -> std::string& {
-			return self.developer;
+		[](ScriptMetadata& self) -> std::string {
+			return self.getDeveloper();
 		}
 	);
 	_ScriptMetadata["path"] = sol::property(
-		[](ScriptMetadata& self) -> std::string& {
-			return self.path;
+		[](ScriptMetadata& self) -> std::string {
+			return self.getPath();
 		}
 	);
 	_ScriptMetadata["plugins"] = sol::property(
 		[](ScriptMetadata& self) {
-			return sol::as_table(self.plugins);
+			return sol::as_table(self.getPlugins());
 		}
 	);
 
@@ -81,29 +76,29 @@ sol::table ScriptBuiltin::Metadata::entry(sol::state_view state) {
 	};
 
 	_PluginMetadata["name"] = sol::property(
-		[](PluginMetadata& self) -> std::string& {
-			return self.name;
+		[](PluginMetadata& self) -> std::string {
+			return self.getName();
 		}
 	);
 	_PluginMetadata["id"] = sol::property(
-		[](PluginMetadata& self) -> std::string& {
-			return self.id;
+		[](PluginMetadata& self) -> std::string {
+			return self.getID();
 		}
 	);
 	_PluginMetadata["version"] = sol::property(
-		[](PluginMetadata& self) -> std::string& {
-			return self.version;
+		[](PluginMetadata& self) -> std::string {
+			return self.getVersion();
 		}
 	);
 	_PluginMetadata["serpentVersion"] = sol::property(
-		[](PluginMetadata& self) -> std::string& {
-			return self.serpentVersion;
+		[](PluginMetadata& self) -> std::string {
+			return self.getSerpentVersion();
 		}
 	);
 
 	_PluginMetadata["developer"] = sol::property(
-		[](PluginMetadata& self) -> std::string& {
-			return self.developer;
+		[](PluginMetadata& self) -> std::string {
+			return self.getDeveloper();
 		}
 	);
 

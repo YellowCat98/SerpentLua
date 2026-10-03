@@ -5,31 +5,6 @@
 using namespace SerpentLua::internal;
 using namespace geode::prelude;
 
-void StartupOperations::installPending(bool scripts) {
-	auto configDir = Mod::get()->getConfigDir();
-	std::string where = scripts ? "scripts" : "plugins";
-
-	std::vector<std::filesystem::path> files;
-	for (const auto& fileEntry : std::filesystem::directory_iterator(configDir/"pending_install"/where))
-		files.push_back(fileEntry.path());
-
-	for (const auto& file : files) {
-		auto final = configDir/where/file.filename();
-		std::filesystem::remove(final); // no biggie if it fails
-
-		std::error_code ec;
-		std::filesystem::rename(file, final, ec);
-		if (ec) {
-			log::error("Unable to move file: {}", ec.message());
-			return;
-		}
-
-		if (!scripts) {
-			Mod::get()->setSavedValue<bool>(fmt::format("safe-{}", file.stem()), true);
-		}
-	}
-}
-
 void StartupOperations::loadScripts() {
 	auto configDir = Mod::get()->getConfigDir();
 	// setup metadata first
@@ -49,22 +24,22 @@ void StartupOperations::loadScripts() {
 
 	for (auto& pair : RuntimeManager::get()->getAllScripts()) {
 		if (Mod::get()->getSavedValue<bool>(fmt::format("enabled-{}", pair.first))) {
-			auto version = VersionInfo::parse(pair.second->serpentVersion);
+			auto version = VersionInfo::parse(pair.second->getSerpentVersion());
 			if (version.isErr()) {
 				auto err = fmt::format("Script {} could not parse serpent-version: {}", pair.first, *(version.err()));
-				pair.second->errors.push_back(err);
+				RuntimeManager::get()->addScriptError(pair.second->getID(), err);
 				log::error("{}", err);
 				continue;
 			}
 			if (!Utility::versionInfoCompare(version.unwrap(), Mod::get()->getVersion())) {
-				auto err = fmt::format("Script {} was made for serpent version {} but you are on {}", pair.first, pair.second->serpentVersion, Mod::get()->getVersion().toNonVString());
-				pair.second->errors.push_back(err);
+				auto err = fmt::format("Script {} was made for SerpentLua version {} but you are on {}", pair.first, pair.second->getSerpentVersion(), Mod::get()->getVersion().toNonVString());
+				RuntimeManager::get()->addScriptError(pair.second->getID(), err);
 				log::error("{}", err);
 				continue; // why didnt i do this before
 			}
 			auto res = Script::create(pair.second);
 			if (res.isErr()) {
-				pair.second->errors.push_back(res.err().value());
+				RuntimeManager::get()->addScriptError(pair.second->getID(), res.err().value());
 				log::error("{}", res.err().value());
 				continue;
 			}
@@ -75,14 +50,14 @@ void StartupOperations::loadScripts() {
 			auto loadres = script->loadPlugins();
 
 			if (loadres.isErr()) {
-				pair.second->errors.push_back(loadres.err().value());
+				RuntimeManager::get()->addScriptError(pair.second->getID(), loadres.err().value());
 				log::error("{}", loadres.err().value());
 				continue;
 			}
 
 			auto execres = script->execute();
 			if (execres.isErr()) {
-				pair.second->errors.push_back(execres.err().value());
+				RuntimeManager::get()->addScriptError(pair.second->getID(), execres.err().value());
 				log::error("{}", execres.err().value());
 				continue;
 			}
@@ -104,7 +79,6 @@ void StartupOperations::unfortunatelyDeleteTheUnfortunates() {
 	for (auto& theUnfortunate : theUnfortunates) {
 		auto mdplugin = RuntimeManager::get()->getPluginByID(theUnfortunate).unwrap();
 		auto plugin = RuntimeManager::get()->getLoadedPluginByID(theUnfortunate).unwrap();
-		mdplugin->loaded = false;
 		RuntimeManager::get()->removeLoadedPlugin(plugin);
 		// imagine this plugin wantign to be used and then getting TERMINATED
 	}

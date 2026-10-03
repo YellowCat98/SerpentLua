@@ -73,12 +73,12 @@ void ScriptsLayer::setupScriptsList() {
 	if (this->source == Source::Scripts) {
 		for (const auto [k, v] : RuntimeManager::get()->getAllScripts()) {
 			scripts.push_back({k, DisplayInfo::createFromScript(v, true)});
-			nameCache.insert({k, v->name});
+			nameCache.insert({k, v->getName()});
 		}
-	} else if (this->source == Source::Plugins) {
+	} else {
 		for (const auto [k, v] : RuntimeManager::get()->getAllPlugins()) {
 			scripts.push_back({k, DisplayInfo::createFromScript(v, false)});
-			nameCache.insert({k, v->name});
+			nameCache.insert({k, v->getName()});
 		}
 	} // because this takes all the scripts it would be illogical to just get the entire index and split it!
 

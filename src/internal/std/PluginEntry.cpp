@@ -1,3 +1,4 @@
+#include "Geode/utils/file.hpp"
 #include <internal/std/PluginEntry.hpp>
 #include <internal/std/Playground.hpp>
 #include <internal/std/UI.hpp>
@@ -38,16 +39,48 @@ void ScriptBuiltin::entry(lua_State* L) {
 	ctx.mainModule["fmt"] = ScriptBuiltin::Format::entry(state);
 	ctx.mainModule["enums"] = ScriptBuiltin::Enums::entry(state);
 
-	log::info("oyoyo");
-
 	state["serpentlua_modules"]["serpentlua.std"] = ctx.mainModule;
 }
 
 Result<> ScriptBuiltin::initPlugin() {
 	if (ScriptBuiltin::plugin) return Err("Builtin plugin was already initialized.");
-	auto metadata = SerpentLua::PluginMetadata::createFromMod(Mod::get());
-	metadata->id = "serpentlua.std"; // i do not want to use create(std::map<std::string, std::string>) when this is very much simpler
-	metadata->version = "v2.0.0";
+
+	auto mdPath = Mod::get()->getResourcesDir() / "stdpluginmd.json"; // horrible name i know
+
+	auto mdRes = utils::file::readJson(mdPath);
+	if (mdRes.isErr()) return Err("Unable to read Builtin plugin metadata: {}", mdRes.unwrapErr());
+
+	auto md = mdRes.unwrap();
+
+	// since stdpluginmd.json can be written to, we have to check each item separately!
+
+	GEODE_UNWRAP_INTO(auto name, md["name"].asString().mapErr([](auto const& err) {
+		return fmt::format("Unable to get builtin plugin metadata `name` property: {}", err);
+	}));
+
+	GEODE_UNWRAP_INTO(auto developer, md["developer"].asString().mapErr([](auto const& err) {
+		return fmt::format("Unable to get builtin plugin metadata `developer` property: {}", err);
+	}));
+
+	GEODE_UNWRAP_INTO(auto id, md["id"].asString().mapErr([](auto const& err) {
+		return fmt::format("Unable to get builtin plugin metadata `id` property: {}", err);
+	}));
+
+	GEODE_UNWRAP_INTO(auto version, md["version"].asString().mapErr([](auto const& err) {
+		return fmt::format("Unable to get builtin plugin metadata `version` property: {}", err);
+	}));
+
+	GEODE_UNWRAP_INTO(auto serpentVersion, md["serpent-version"].asString().mapErr([](auto const& err) {
+		return fmt::format("Unable to get builtin plugin metadata `serpent-version` property: {}", err);
+	}));
+
+	auto metadata = SerpentLua::PluginMetadata::create({
+		{"name", name},
+		{"developer", developer},
+		{"id", id},
+		{"version", version},
+		{"serpent-version", serpentVersion}
+	});
 	auto res = SerpentLua::Plugin::create(metadata, &ScriptBuiltin::entry);
 	if (res.isErr()) return Err("{}", res.err().value());
 

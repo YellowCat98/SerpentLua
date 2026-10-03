@@ -262,19 +262,19 @@ sol::table ScriptBuiltin::Playground::entry(sol::state_view state) {
 	auto table = state.create_table();
 	lua_State* L = state;
 
-	auto scriptDir = Mod::get()->getConfigDir() / "playground" / ScriptBuiltin::getMetadata(L)->id;
+	auto scriptDir = Mod::get()->getConfigDir() / "playground" / ScriptBuiltin::getMetadata(L)->getID();
 	if (!std::filesystem::exists(scriptDir)) {
 		auto result = utils::file::createDirectoryAll(scriptDir);
 		if (result.isErr()) {
-			log::error("[PLAYGROUND]: Couldn't create script directory for {}.\nErr: {}", ScriptBuiltin::getMetadata(L)->name, *(result.err()));
+			log::error("[PLAYGROUND]: Couldn't create script directory for {}.\nErr: {}", ScriptBuiltin::getMetadata(L)->getName(), *(result.err()));
 		}
 	}
 
-	auto saveDir = Mod::get()->getSaveDir() / "playground" / ScriptBuiltin::getMetadata(L)->id;
+	auto saveDir = Mod::get()->getSaveDir() / "playground" / ScriptBuiltin::getMetadata(L)->getID();
 	if (!std::filesystem::exists(saveDir)) {
 		auto result = utils::file::createDirectoryAll(saveDir);
 		if (result.isErr()) {
-			log::error("[PLAYGROUND]: Couldn't create script directory for {}.\nErr: {}", ScriptBuiltin::getMetadata(L)->name, *(result.err()));
+			log::error("[PLAYGROUND]: Couldn't create script directory for {}.\nErr: {}", ScriptBuiltin::getMetadata(L)->getName(), *(result.err()));
 		}
 	}
 

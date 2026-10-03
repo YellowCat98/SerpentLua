@@ -7,6 +7,38 @@ using namespace SerpentLua;
 using namespace SerpentLua::internal;
 using namespace geode::prelude;
 
+std::string ScriptMetadata::getName() {
+	return name;
+}
+
+std::string ScriptMetadata::getDeveloper() {
+	return developer;
+}
+
+std::string ScriptMetadata::getID() {
+	return id;
+}
+
+std::string ScriptMetadata::getVersion() {
+	return version;
+}
+
+std::string ScriptMetadata::getSerpentVersion() {
+	return serpentVersion;
+}
+
+std::string ScriptMetadata::getPath() {
+	return path;
+}
+
+std::vector<std::pair<std::string, std::string>> ScriptMetadata::getPlugins() {
+	return plugins;
+}
+
+std::vector<std::string> ScriptMetadata::getErrors() {
+	return RuntimeManager::get()->getScriptErrors(this->getID());
+}
+
 void SerpentLua::ScriptMetadata::setPlugins() {
 	if (this->pluginIDstring.empty()) return;
 	std::vector<std::pair<std::string, std::string>> pluginIDs;
@@ -80,7 +112,6 @@ geode::Result<SerpentLua::ScriptMetadata*, std::string> SerpentLua::ScriptMetada
 		if (!metadata.contains(req)) return Err("Script `{}` metadata: Metadata is missing `{}` key.", scriptPath.filename(), req);
 	}
 
-	requiredKeys.push_back("nostd"); // nostd is not required, im only adding nostd to it because requiredKeys is now repurposed to check for unknown keys!
 	requiredKeys.push_back("plugins"); // same for this one
 	for (const auto& [key, value] : metadata) { // this also disallows things like `--@  developer hello`
 		auto it = std::find(requiredKeys.begin(), requiredKeys.end(), key);
@@ -115,7 +146,6 @@ SerpentLua::ScriptMetadata* SerpentLua::ScriptMetadata::create(std::map<std::str
 	ret->id = metadata["id"];
 	ret->version = metadata["version"];
 	ret->serpentVersion = metadata["serpent-version"];
-	ret->nostd = metadata.contains("nostd");
 	ret->path = metadata["path"];
 	if (metadata.contains("plugins")) ret->pluginIDstring = metadata["plugins"];
 	else ret->pluginIDstring = "";

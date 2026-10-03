@@ -26,6 +26,10 @@ namespace SerpentLua::internal {
 		std::map<std::string, SerpentLua::Plugin*> getAllLoadedPlugins();
 		std::map<std::string, SerpentLua::PluginMetadata*> getAllPlugins();
 
+		std::map<std::string, std::vector<std::string>> getAllScriptErrors();
+		std::vector<std::string> getScriptErrors(const std::string& id);
+		void addScriptError(const std::string& id, std::string error);
+
 		// these two cowboys both terminate the plugin and script
 		// there might also be cases where i'd have to call this function without the plugin/script being registered at all
 		void removeLoadedScript(Script* script);
@@ -37,5 +41,7 @@ namespace SerpentLua::internal {
 
 		std::map<std::string, SerpentLua::PluginMetadata*> plugins;
 		std::map<std::string, SerpentLua::Plugin*> loadedPlugins;
+
+		std::map<std::string, std::vector<std::string>> scriptErrors;
 	};
 }

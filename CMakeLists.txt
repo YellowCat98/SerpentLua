@@ -23,6 +23,7 @@ else()
 	message(STATUS "Found Geode: $ENV{GEODE_SDK}")
 endif()
 
+set(GEODE_BUNDLE_PDB ON)
 add_subdirectory($ENV{GEODE_SDK} ${CMAKE_CURRENT_BINARY_DIR}/geode)
 
 if("${CMAKE_SYSTEM_NAME}" STREQUAL "iOS" OR IOS)

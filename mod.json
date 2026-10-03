@@ -24,13 +24,16 @@
 	},
 	"resources": {
 		"sprites": [
-			"resources/*.png"
+			"resources/sprites/*.png"
 		],
 		"spritesheets": {
 			"SelectSheet": [
-				"resources/SelectSheet/*.png"
+				"resources/sprites/sheets/SelectSheet/*.png"
 			]
-		}
+		},
+		"files": [
+			"resources/files/*.json"
+		]
 	},
 	"settings": {
 		"open-scripts-btn": {

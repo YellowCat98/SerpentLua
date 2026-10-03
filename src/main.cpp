@@ -51,18 +51,13 @@ $on_mod(Loaded) {
 		return;
 	}
 
-	StartupOperations::installPending(false);
-	StartupOperations::installPending(true);
-
 	auto initpluginres = ScriptBuiltin::initPlugin();
 	if (initpluginres.isErr()) {
 		log::error("{}", initpluginres.err().value());
 		return;
 	}
 
-	log::info("Populating list of plugins that are yet to load...");
 	for (const auto mod : getDependants()) {
-		log::trace("Adding {} to SerpentLua::globals::pluginsYetToLoad", mod->getID());
 		SerpentLua::globals::pluginsYetToLoad.push_back(mod->getID());
 	}
 
@@ -74,9 +69,8 @@ $on_mod(Loaded) {
 		}
 
 		geode::queueInMainThread([]() {
-			log::info("All plugins loaded!");
+			log::info("All plugins loaded! Now loading scripts...");
 			
-			log::info("Loading scripts...");
 			SerpentLua::internal::StartupOperations::loadScripts();
 
 			log::info("Unloading unused plugins...");

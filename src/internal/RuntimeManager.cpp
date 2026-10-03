@@ -22,16 +22,17 @@ Result<SerpentLua::PluginMetadata*, std::string> RuntimeManager::getPluginByID(c
 }
 
 void RuntimeManager::setLoadedScript(Script* script) {
-	loadedScripts.insert({script->getMetadata()->id, script});
+	loadedScripts.insert({script->getMetadata()->getID(), script});
 }
 
 void RuntimeManager::setScript(ScriptMetadata* script) {
-	scripts.insert({script->id, script});
+	scripts.insert({script->getID(), script});
 }
 
 void RuntimeManager::setPlugin(Plugin* plugin) {
-	plugins.insert({plugin->metadata->id, plugin->metadata});
-	loadedPlugins.insert({plugin->metadata->id, plugin});
+	auto id = plugin->metadata->getID();
+	plugins.insert({id, plugin->metadata});
+	loadedPlugins.insert({id, plugin});
 }
 
 Result<Script*, std::string> RuntimeManager::getLoadedScriptByID(const std::string& id) {
@@ -83,15 +84,27 @@ std::map<std::string, SerpentLua::PluginMetadata*> RuntimeManager::getAllPlugins
 	return plugins;
 }
 
+std::map<std::string, std::vector<std::string>> RuntimeManager::getAllScriptErrors() {
+	return scriptErrors;
+}
+
+std::vector<std::string> RuntimeManager::getScriptErrors(const std::string& id) {
+	return scriptErrors[id];
+}
+
+void RuntimeManager::addScriptError(const std::string& id, std::string error) {
+	scriptErrors[id].push_back(error);
+}
+
 void RuntimeManager::removeLoadedScript(Script* script) {
-	auto id = script->getMetadata()->id;
-	if (loadedPlugins.contains(script->getMetadata()->id)) loadedPlugins.erase(id);
+	auto id = script->getMetadata()->getID();
+	if (loadedPlugins.contains(script->getMetadata()->getID())) loadedPlugins.erase(id);
 	if (script->getLuaState()) lua_close(script->getLuaState());
 	delete script;
 }
 
 void RuntimeManager::removeLoadedPlugin(Plugin* plugin) {
-	auto id = plugin->metadata->id;
-	if (loadedPlugins.contains(plugin->metadata->id)) loadedPlugins.erase(id);
+	auto id = plugin->metadata->getID();
+	if (loadedPlugins.contains(id)) loadedPlugins.erase(id);
 	delete plugin;
 }

@@ -111,13 +111,13 @@ bool ScriptItem::init(const DisplayInfo& theMetadata, std::function<void(CCMenuI
 
 	// @geode-ignore(unknown-resource)
 	auto errorBtn = CCMenuItemExt::createSpriteExtraWithFrameName("geode.loader/info-alert.png", 1.5f, [this](CCMenuItemSpriteExtra*) {
-		std::string errorString = fmt::format("{}", fmt::join(std::get<ScriptMetadata*>(metadata.internal)->errors, "\n"));
+		std::string errorString = fmt::format("{}", fmt::join(std::get<ScriptMetadata*>(metadata.internal)->getErrors(), "\n"));
 		MDPopup::create("Errors", errorString, "OK")->show();
 	});
 	errorBtn->setID("error-button");
 
 	if (this->source != Source::Scripts) errorBtn->setVisible(false);
-	else if (std::get<ScriptMetadata*>(metadata.internal)->errors.empty()) errorBtn->setVisible(false);
+	else if (std::get<ScriptMetadata*>(metadata.internal)->getErrors().empty()) errorBtn->setVisible(false);
 
 	viewMenu->addChild(errorBtn);
 

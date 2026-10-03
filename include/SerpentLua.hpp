@@ -8,6 +8,8 @@
 #include <filesystem>
 #include <lua.hpp>
 
+#define GEODE_BUNDLE_PDB
+
 #ifdef GEODE_IS_WINDOWS
 	#ifdef YELLOWCAT98_SERPENTLUA_EXPORTING
 		#define SERPENTLUA_DLL __declspec(dllexport)
@@ -19,23 +21,28 @@
 #endif
 
 namespace SerpentLua {
-
 	struct globals {
 		inline static std::vector<std::string> SERPENTLUA_DLL pluginsYetToLoad;
 	};
 
 	struct SERPENTLUA_DLL PluginMetadata final {
-		static PluginMetadata* create(std::map<std::string, std::string>& metadata);
+	public:
+		static PluginMetadata* create(std::map<std::string, std::string> metadata);
 		static PluginMetadata* createFromMod(geode::Mod* mod);
-		#ifdef YELLOWCAT98_SERPENTLUA_EXPORTING
-		static geode::Result<PluginMetadata*, std::string> createFromScript(const std::filesystem::path& path, bool enforceSameID = true);
-		#endif
+
+		std::string getName();
+		std::string getDeveloper();
+		std::string getID();
+		std::string getVersion();
+		std::string getSerpentVersion();
+		bool isLoaded();
+
+	private:
 		std::string name;
 		std::string developer;
 		std::string id;
 		std::string version;
 		std::string serpentVersion;
-		std::string path;
 		bool loaded;
 	};
 	class SERPENTLUA_DLL Plugin final {
@@ -52,6 +59,7 @@ namespace SerpentLua {
 
 	// only exporting this for plugins since its accessible through the serpentlua internal plugin
 	struct SERPENTLUA_DLL ScriptMetadata final {
+	public:
 		#ifdef YELLOWCAT98_SERPENTLUA_EXPORTING
 			static ScriptMetadata* create(std::map<std::string, std::string>& metadata);
 			static geode::Result<ScriptMetadata*, std::string> createFromScript(const std::filesystem::path& scriptPath);
@@ -60,17 +68,24 @@ namespace SerpentLua {
 		#endif
 		static geode::Result<ScriptMetadata*, std::string> getScriptByID(const std::string& id);
 		static ScriptMetadata* getScriptByState(lua_State* L); // doesnt need to return a result because if the scriptmetadata doesnt exist then neither should the state (unless it was created manually)
+
+		std::string getName();
+		std::string getDeveloper();
+		std::string getID();
+		std::string getVersion();
+		std::string getSerpentVersion();
+		std::string getPath();
+		std::vector<std::pair<std::string, std::string>> getPlugins();
+		std::vector<std::string> getErrors();
+
+	private:
 		std::string name;
 		std::string id;
 		std::string version;
 		std::string serpentVersion;
 		std::string developer; // HOW the fuck did i forget this for this long
-		bool nostd;
 		std::string path;
-		bool loaded;
 		std::vector<std::pair<std::string, std::string>> plugins;
 		std::string pluginIDstring;
-
-		std::vector<std::string> errors;
 	};
 }

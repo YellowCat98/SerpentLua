@@ -11,7 +11,7 @@ local SL = require("serpentlua.std")
 local metadata = SL.ScriptMetadata.get()
 --[[
 	SL.ScriptMetadata: Represents the metadata of a script.
-	members: name, id, developer, serpentVersion, version, nostd, plugins
+	members: name, id, developer, serpentVersion, version, plugins
 ]]
 SL.log.info("Hello, World!")
 

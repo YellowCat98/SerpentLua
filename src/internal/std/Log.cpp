@@ -16,7 +16,7 @@ sol::table ScriptBuiltin::Log::entry(sol::state_view state) {
 			log::error("Metadata is null.");
 			return;
 		}
-		auto name = metadata->name;
+		auto name = metadata->getName();
 
 		if (type == "info") log::info("[SCRIPT] [{}]: {}", name, msg);
 		else if (type == "debug") log::debug("[SCRIPT] [{}]: {}", name, msg);
