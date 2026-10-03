@@ -110,40 +110,6 @@ bool ScriptItem::init(const DisplayInfo& theMetadata, std::function<void(CCMenuI
 
 	if (this->source == Source::Plugins || this->source == Source::Index) viewBtn->setVisible(false);
 
-	auto deleteBtn = CCMenuItemExt::createSpriteExtra(
-		ButtonSprite::create(
-			CCSprite::createWithSpriteFrameName("edit_delBtn_001.png"),
-			42, true, 40, "GJ_button_04.png", 1),
-		[=, this](CCMenuItemSpriteExtra*) {
-			if (this->source == Source::Plugins) if (!metadata.native) return;
-
-			geode::createQuickPopup("Confirm",
-				fmt::format("Are you sure you would like to <cr>delete</c> \"{}\"?\nThis action is <cr>irreversible</c>!", metadata.name),
-				"Cancel", "Delete",
-				[=, this](FLAlertLayer*, bool btn2) {
-					if (btn2) {
-						std::error_code ec;
-						bool removed = std::filesystem::remove(metadata.path, ec);
-						if (ec) {
-							std::string message;
-							if (ec.value() == 5) message = "<cr>This usually means a script is using this plugin.</c>";
-							FLAlertLayer::create("Error", fmt::format("Error: \"{}\" (Code: {})\n{}", ec.message(), ec.value(), message).c_str(), "OK")->show();
-						} else if (removed) {
-							FLAlertLayer::create("Success", fmt::format("\"{}\" was removed <cg>successfully</c>!", metadata.name).c_str(), "OK")->show();
-							ScriptsLayer::changesMade();
-						}
-					}
-				}
-			);
-		});
-	deleteBtn->setID("delete-button");
-
-	if (this->source == Source::Plugins) deleteBtn->setVisible(metadata.native);
-	else if (this->source == Source::Scripts) deleteBtn->setVisible(true);
-	else deleteBtn->setVisible(false);
-
-	viewMenu->addChild(deleteBtn);
-
 	// @geode-ignore(unknown-resource)
 	auto errorBtn = CCMenuItemExt::createSpriteExtraWithFrameName("geode.loader/info-alert.png", 1.5f, [this](CCMenuItemSpriteExtra*) {
 		std::string errorString = fmt::format("{}", fmt::join(std::get<ScriptMetadata*>(metadata.internal)->errors, "\n"));
@@ -187,22 +153,6 @@ bool ScriptItem::init(const DisplayInfo& theMetadata, std::function<void(CCMenuI
 		->setAxisReverse(true)
 		->setGap(5)
 	);
-
-	//bool native = std::get<PluginMetadata*>(this->metadata)->native;
-
-	// @geode-ignore(unknown-resource)
-	auto indicatorSpr = CCSprite::createWithSpriteFrameName("geode.loader/updates-available.png");
-	indicatorSpr->setScale(0.7f);
-	indicatorSpr->setOpacity(100);
-	auto indicator = CCMenuItemExt::createSpriteExtra(indicatorSpr, [](CCMenuItemSpriteExtra*) {
-		FLAlertLayer::create("Plugin Indicator", "This is a <cf>non-native plugin</c>.", "OK")->show();
-	});
-
-	indicator->setID("native-indicator");
-	indicator->setAnchorPoint({1.0f, 0.5f});
-	indicatorContainer->addChild(indicator);
-	if (this->source == Source::Plugins) indicator->setVisible(!metadata.native);
-	else indicator->setVisible(false);
 
 	this->addChild(bg);
 	this->addChild(mainContainer);

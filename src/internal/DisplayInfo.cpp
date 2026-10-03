@@ -31,7 +31,6 @@ DisplayInfo DisplayInfo::create(matjson::Value map) {
 
     info.featured = static_cast<bool>(map["featured"].asInt().unwrapOr(0));
 
-    info.native = false; // you arent really meant to use this to construct local plugins/scripts
     info.loaded = false;
 	info.script = false;
 

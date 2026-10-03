@@ -151,6 +151,7 @@ void ScriptsLayer::setupScriptsList() {
 		}
 	} // because this takes all the scripts it would be illogical to just get the entire index and split it!
 
+	// todo: remove the favoritism its bad
 	std::sort(scripts.begin(), scripts.end(), [&](const auto& a, const auto& b) {
 		if (source == Source::Plugins) {
 			if (a.first == "serpentlua.std") return true;

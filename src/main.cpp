@@ -67,16 +67,13 @@ $on_mod(Loaded) {
 		return;
 	}
 
-	// initialize all the native plugins! (non-native plugins are initialized by the mods themselves)
-
-	// Assume every dependant of SerpentLua is a native plugin.
 	log::info("Populating list of plugins that are yet to load...");
 	for (const auto mod : getDependants()) {
 		log::trace("Adding {} to SerpentLua::globals::pluginsYetToLoad", mod->getID());
 		SerpentLua::globals::pluginsYetToLoad.push_back(mod->getID());
 	}
 
-	log::info("Waiting for non-native plugins to load...");
+	log::info("Waiting for plugins to load...");
 
 	async::spawn([]() -> arc::Future<> {
 		while (!SerpentLua::globals::pluginsYetToLoad.empty()) {

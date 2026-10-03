@@ -34,7 +34,6 @@ namespace SerpentLua::internal {
 		bool featured;
 
 		std::string path;
-		bool native;
 		bool loaded;
 		bool script;
 

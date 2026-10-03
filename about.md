@@ -15,41 +15,13 @@ See the next sections for more information.
 ## Plugins
 - A plugin extends what a script can do on its own.
 - Scripts cannot do anything meaningful without plugins. This includes even stuff as simple as printing to the console.
+- A plugin is essentially a Geode mod, it uses interfaces/API that SerpentLua exposes to mod developers to be able to extend what SerpentLua scripts can do.
 
-## Types of plugins
-### Native plugins
-- Plugins that are in the form of .slp files, developed specifically for this mod.
-- They are not sandboxed.
-- They run with the same privileges that GD is given.
+## Disclaimer
+- Although scripts are sandboxed, you should still not run any scripts unless you know exactly what they do.
+- Do not install plugins that are not on the Geode Index. Geode itself already warns you of this.
 
-### Non-native Plugins
-- Plugins that are created directly using the SerpentLua API.
-- These plugins are just Geode mods, nothing else.
-- If they're in the Geode Index (meaning downloaded from the Geode Loader directly), they are safe to install.
-- Non-native plugins can be used by Geode developers who wish to integrate their mods within SerpentLua.
-- Creating plugins as non-native plugins is generally recommended more than creating them as native plugins.
-
-## Disclaimer!!
-
-### Plugins
-- Using non-approved native plugins is risky.
-- Native plugins are in the form of DLLs (just with the .slp extension instead), they are not sandboxed.
-- If you're using a non-approved native plugin, **MAKE SURE** you know what you're doing.
-- If you aren't sure if a plugin is safe or not, it is better to just delete it.
-- You can view the next section (after the disclaimer) if you want to verify if a plugin is safe, though most of the time it's better to just delete it.
-### Scripts
-- The only risk with running scripts is the risk of it abusing a plugin that allows it to break out of the sandbox.
-
-## Plugin Verification
-### If you have the source code:
-- Review it.
-- Recompile it.
-- If on GitHub, verify the .slp matches the source code.
-
-### If you don't have the source code:
-Do not install unless you trust the source.
-
-## Setup
+## Documentation
 - Check out the README at the [GitHub Repository](https://github.com/yellowcat98/SerpentLua) for setting up SerpentLua and documentation.
 
 ## Possible questions:
@@ -62,8 +34,6 @@ Do not install unless you trust the source.
 - **Q: What is the platform console?**  
   A: The platform console is an additional window that opens alongside GD that shows logs. It is recommended to have it on as SerpentLua logs errors.
 
-- **Q: What is Error 126?**  
-  A: Error 126 corresponds to the "module not found" error in Windows. Please make sure you have `lua.dll` in `plugin_global_deps`. (If so, try reinstalling it from whatever release of SerpentLua you have.)
 
 ## Notes:
 - Enabling the platform console in the Geode settings is encouraged for better error handling.
@@ -73,9 +43,8 @@ Do not install unless you trust the source.
 - [SerpentLua Plugin Index](https://github.com/yellowcat98/serpentlua-server): The source code of the SerpentLua server.
 
 ## Community
-- The [SerpentLua Discord server](https://discord.gg/qnPgmUVZsV) is where you can find more plugins, share your own scripts, or ask any questions you might have.
+- The [SerpentLua Discord server](https://discord.gg/qnPgmUVZsV) is where you can share your own scripts or ask any questions you might have.
 
 ## By installing this mod, you acknowledge:
-- The disclaimer above.
 - That YellowCat98 **IS NOT** responsible to any harm that may be caused to your device.
 - You are responsible for any plugins or scripts you run.
