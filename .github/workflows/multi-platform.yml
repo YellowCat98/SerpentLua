@@ -15,8 +15,11 @@ jobs:
         - name: Windows
           os: windows-latest
 
-        - name: macOS
+        - name: macOS arm64
           os: macos-latest
+
+        - name: macOS x86_64
+          os: macos-26-intel
 
         - name: iOS
           os: macos-latest
