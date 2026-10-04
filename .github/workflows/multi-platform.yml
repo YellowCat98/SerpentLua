@@ -17,9 +17,11 @@ jobs:
 
         - name: macOS arm64
           os: macos-latest
+          output: geode-build-mac-arm64
 
         - name: macOS x86_64
           os: macos-26-intel
+          output: geode-build-mac-x86_64
 
         - name: iOS
           os: macos-latest
