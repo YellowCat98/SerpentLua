@@ -93,6 +93,17 @@ jobs:
         working-directory: artifacts/serpentlua-arm64
         run: zip -r ../yellowcat98.serpentlua.geode *
 
+      - uses: actions/upload-artifact@v4
+        with:
+          name: geode-build-mac
+          path: artifacts/yellowcat98.serpentlua.geode
+
+      - uses: geekyeggo/delete-artifact@v6
+        with:
+          name: |
+            geode-build-mac-arm64
+            geode-build-mac-x86_64
+
   package:
     name: Package builds
     runs-on: ubuntu-latest
