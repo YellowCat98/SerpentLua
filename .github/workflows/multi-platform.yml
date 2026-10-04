@@ -48,6 +48,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y gcc-multilib g++-multilib libc6-dev-i386
 
       - name: Build the mod
+        id: build
         uses: geode-sdk/build-geode-mod@main
         with:
           combine: ${{ matrix.config.combine != 'false' }}
