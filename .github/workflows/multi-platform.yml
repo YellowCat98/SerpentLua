@@ -86,7 +86,7 @@ jobs:
       - name: Merge macOS dylibs
         working-directory: artifacts
         run: |
-          llvm-lipo -create -output ./fat-serpentlua.dylib ./serpentlua-arm64/yellowcat98.serpentlua.dylib ./serpentlua-x86_64/yellowcat98.serpentlua.dylib
+          lipo -create -output ./fat-serpentlua.dylib ./serpentlua-arm64/yellowcat98.serpentlua.dylib ./serpentlua-x86_64/yellowcat98.serpentlua.dylib
           mv fat-serpentlua.dylib ./serpentlua-arm64/yellowcat98.serpentlua.dylib
 
       - name: Repackage macOS Geode mod
