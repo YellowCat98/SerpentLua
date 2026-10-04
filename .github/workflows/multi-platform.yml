@@ -17,11 +17,13 @@ jobs:
 
         - name: macOS arm64
           os: macos-latest
-          combine: false
+          combine: 'false'
+          artifact: mac-arm64
 
         - name: macOS x86_64
           os: macos-26-intel
-          combine: false
+          combine: 'false'
+          artifact: mac-x86_64
 
         - name: iOS
           os: macos-latest
@@ -48,11 +50,18 @@ jobs:
       - name: Build the mod
         uses: geode-sdk/build-geode-mod@main
         with:
-          combine: true
+          combine: ${{ matrix.config.combine != 'false' }}
           target: ${{ matrix.config.target }}
         env:
           CC: clang
           CXX: clang++
+
+      - name: Upload macOS artifacts separately
+        if: matrix.config.combine == 'false'
+        uses: actions/upload-artifact@v4
+        with:
+          name: geode-build-${{ matrix.config.artifact }}
+          path: ${{ steps.build.outputs.build-output }}
 
   package:
     name: Package builds
