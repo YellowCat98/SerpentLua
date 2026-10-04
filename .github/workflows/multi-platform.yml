@@ -70,6 +70,29 @@ jobs:
     needs: ['build']
 
     steps:
+
+      - name: Get macOS artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: geode-build-mac-*
+          path: artifacts
+
+      - name: Unzip .geode packages
+        working-directory: artifacts
+        run: |
+          unzip geode-build-mac-arm64/yellowcat98.serpentlua.geode -d ./serpentlua-arm64
+          unzip geode-build-mac-x86_64/yellowcat98.serpentlua.geode -d ./serpentlua-x86_64
+
+      - name: Merge macOS dylibs
+        working-directory: artifacts
+        run: |
+          llvm-lipo -create -output ./fat-serpentlua.dylib ./serpentlua-arm64/yellowcat98.serpentlua.dylib ./serpentlua-x86_64/yellowcat98.serpentlua.dylib
+          mv fat-serpentlua.dylib ./serpentlua-arm64/yellowcat98.serpentlua.dylib
+
+      - name: Repackage macOS Geode mod
+        working-directory: artifacts/serpentlua-arm64
+        run: zip -r ../yellowcat98.serpentlua.geode *
+
       - uses: geode-sdk/build-geode-mod/combine@main
         id: build
 
