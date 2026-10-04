@@ -64,17 +64,12 @@ jobs:
           name: geode-build-${{ matrix.config.artifact }}
           path: ${{ steps.build.outputs.build-output }}
 
-  package:
-    name: Package builds
-    runs-on: ubuntu-latest
+  mashmac:
+    name: Repackage macOS
+    runs-on: macos-latest
     needs: ['build']
 
     steps:
-
-      - name: Ensure llvm-lipo exists
-        run: |
-          sudo apt update && sudo apt-get install -y llvm
-          sudo ln -sf /usr/bin/llvm-lipo-* /usr/bin/llvm-lipo # yeah yeah whatever
 
       - name: Get macOS artifacts
         uses: actions/download-artifact@v4
@@ -97,6 +92,13 @@ jobs:
       - name: Repackage macOS Geode mod
         working-directory: artifacts/serpentlua-arm64
         run: zip -r ../yellowcat98.serpentlua.geode *
+
+  package:
+    name: Package builds
+    runs-on: ubuntu-latest
+    needs: ['build', 'mashmac']
+
+    steps:
 
       - uses: geode-sdk/build-geode-mod/combine@main
         id: build
