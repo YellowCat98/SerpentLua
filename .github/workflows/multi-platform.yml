@@ -72,7 +72,9 @@ jobs:
     steps:
 
       - name: Ensure llvm-lipo exists
-        run: sudo apt update && sudo apt-get install -y llvm
+        run: |
+          sudo apt update && sudo apt-get install -y llvm
+          sudo ln -sf /usr/bin/llvm-lipo-* /usr/bin/llvm-lipo # yeah yeah whatever
 
       - name: Get macOS artifacts
         uses: actions/download-artifact@v4
