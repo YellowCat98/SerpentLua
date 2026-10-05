@@ -129,7 +129,7 @@ geode::Result<> Script::loadPlugins() {
 			}
 		}
 
-		plugin->getOnScriptLoaded()(this->getLuaState());
+		plugin->getEntry()(this->getLuaState());
 
 		pendingPlugins.push_back(plugin);
 	}

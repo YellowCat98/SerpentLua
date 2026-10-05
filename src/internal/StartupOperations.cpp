@@ -64,22 +64,3 @@ void StartupOperations::loadScripts() {
 		}
 	}
 }
-
-void StartupOperations::unfortunatelyDeleteTheUnfortunates() {
-	std::vector<std::string> theUnfortunates;
-
-	for (const auto& [key, value] : RuntimeManager::get()->getAllLoadedPlugins()) {
-		if (value->loadCount == 0) {
-			log::trace("{}", key);
-			theUnfortunates.push_back(key);
-		}
-	}
-	// the fate has been determined
-
-	for (auto& theUnfortunate : theUnfortunates) {
-		auto mdplugin = RuntimeManager::get()->getPluginByID(theUnfortunate).unwrap();
-		auto plugin = RuntimeManager::get()->getLoadedPluginByID(theUnfortunate).unwrap();
-		RuntimeManager::get()->removeLoadedPlugin(plugin);
-		// imagine this plugin wantign to be used and then getting TERMINATED
-	}
-}

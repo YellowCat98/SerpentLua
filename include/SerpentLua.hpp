@@ -46,13 +46,13 @@ namespace SerpentLua {
 	class SERPENTLUA_DLL Plugin final {
 	public:
 		static geode::Result<Plugin*, std::string> create(PluginMetadata* metadata, std::function<void(lua_State*)> onScriptLoaded);
-		std::function<void(lua_State*)> getOnScriptLoaded();
+		std::function<void(lua_State*)> getEntry();
 
 		void setPlugin();
 		int loadCount;
 		PluginMetadata* metadata;
 	private:
-		std::function<void(lua_State*)> onScriptLoaded;
+		std::function<void(lua_State*)> entry;
 	};
 
 	// only exporting this for plugins since its accessible through the serpentlua internal plugin

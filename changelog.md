@@ -7,11 +7,12 @@
 - SL Plugin v2.0.0: Removed `SL.playground.init` and made it run inside the entry function directly, no need to call it anymore.
 - SL Plugin v2.0.0: Removed `SL.ScriptMetadata.errors`
 - Plugins: Removed native plugins. All plugins are Geode mods.
-- Platform: Added support for all platforms that Geode supports. (except Apple Silicon Macs, for some reason. This might be fixed later.)
+- Platform: Added support for all platforms that Geode supports.
 - Plugin Index: Removed plugin index due to native plugins being removed.
 - API changes: added `PluginMetadata` and `ScriptMetadata` getter functions and made the variables private. (`getName`, `getID`, etc.)
 - API changes: Removed `PluginMetadata::loaded`, `ScriptMetadata::loaded`, `ScriptMetadata::nostd`.
 - Scripts: removed `--@nostd` metadata flag.
+- Plugins: Do not unload unused plugins so Mod Developers can assume their plugin is alive
 - Internal: Reorganized code. (boy do i have to reorganize code a lot!)
 
 ## 1.7.0

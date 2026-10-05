@@ -72,9 +72,6 @@ $on_mod(Loaded) {
 			log::info("All plugins loaded! Now loading scripts...");
 			
 			SerpentLua::internal::StartupOperations::loadScripts();
-
-			log::info("Unloading unused plugins...");
-			SerpentLua::internal::StartupOperations::unfortunatelyDeleteTheUnfortunates();
 		});
 	});
 }
